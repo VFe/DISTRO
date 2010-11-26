@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>DISTRO &ndash; Preview</title>
+	<link rel="stylesheet" href="style.css" charset="utf-8">
+</head>
+
+<body>
+<div id="top"><div id="topContent">
+	<div class="right">
+		<input id="networkSearch" class="fancy" placeholder="Search for a Network" size="25" tabindex=1>
+		<ul id="networkSearchResults" style="display: none"><li><a href="#/networks/kylemarler" class="buttom"><img src="images/kylemarler_icon.png"><span>^kylemarler^</span></a></li></ul>
+		<span class="button" id="user"><img id="userIcon" width="21" height="21" src="images/generic_avatar.png"><span id="userName">^techstars^</span></span>
+	</div>
+	<ul id="transport">
+		<li class="button" id="skipBackButton" style="letter-spacing: -0.3em">&#x2758;<span style="letter-spacing: -0.35em;">&#x25C0;&#x25C0;</span></li>
+		<!-- <li class="button" id="rewindButton" style="letter-spacing: -0.4em">&#x25C0;&#x25C0;</li> -->
+		<li class="button" id="pauseButton" style="letter-spacing: 0.15em">&#x2759;&#x2759;</li>
+		<li class="button" id="playButton">&#x25BA;</li>
+		<!-- <li class="button" id="fastForwardButton"style="letter-spacing: -0.25em">&#x25BA;&#x25BA;</li> -->
+		<li class="button" id="skipForwardButton"style="letter-spacing: -0.25em">&#x25BA;&#x25BA;&#x2758;</li>
+	</ul>
+	<img width="162" height="35" id="mastheadLogo" src="images/mastheadLogo.png">
+	<ul id="navigation">
+		<li><a href="#library">MY LIBRARY</a></li>
+		<li><a href="#distro">MY DISTRO</a></li>
+		<li><a href="#networks">MY NETWORKS</a></li>
+	</ul>
+</div></div>
+<div id="content">
+	<div id="libraryWrapper">
+		<div id="library">
+			<table id="musicTableHead" border=0>
+				<colgroup>
+					<col width="18px">
+					<col width="18px">
+					<col>
+					<col width="30%">
+					<col width="60">
+					<col width="30%">
+				</colgroup>
+				<thead>
+					<tr>
+						<th><div class="dot blue"></div></th>
+						<th><div class="dot red"></div></th>
+						<th>NAME</th>
+						<th>RECEIVED FROM</th>
+						<th>TIME</th>
+						<th>ARTIST</th>
+					</tr>
+				</thead>
+			</table>
+			<div id="musicTableBodyContainer" tabindex="3">
+				<table id="musicTableBody">
+					<colgroup>
+						<col width="18px">
+						<col width="18px">
+						<col>
+						<col width="30%">
+						<col width="60">
+						<col width="30%">
+					</colgroup>
+					<tbody>
+						<tr class="filler">
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div id="sidebar">
+		<div id="sidebarContent">
+			<ul id="sidebarButtons">
+				<li><a class="button" id="joinButton" href="#join">JOIN DISTRO<img src="images/joinIcon.png" alt=""></a></li>
+				<li><a class="button" id="uploadButton" href="#upload">UPLOAD MUSIC<img src="images/uploadIcon.png" alt=""></a></li>
+				<li><a class="button" id="newNetworkButton" href="#create">NEW NETWORK<img src="images/createIcon.png" alt=""></a></li>
+			</ul>
+			<div id="infoBox"></div>
+			<div id="mapControls">
+				<div class="right">
+					<ul id="mapButtons">
+						<li class="button" id="weekButton">WEEK</li>
+						<li class="button" id="fourtyEightHourButton">48 HRS</li>
+						<li class="button" id="twentyFourHourButton">24 HRS</li>
+						<li class="button" id="newShowButton">NEW SHOW</li>
+					</ul>
+				</div>
+				<input class="fancy" id="mapSearch" placeholder="Address, Zip Code, City" size=20>
+			</div>
+			<div id="map">
+				<div id="newEventForm">
+					<h2 align="center" id="addEventHead"></h2>
+					<table border="0" cellspacing="5" cellpadding="5" style="width: 100%; font-size: 1.5em">
+						<tr><th align="right" width=100>Event</th><td><input size=25></td></tr>
+						<tr><th align="right" width=100>Venue</th><td><input id="venueEventField" size=25></td></tr>
+						<tr><th align="right" width=100>Cost</th><td><input id="costEventField" size=15></td></tr>
+						<tr><th align="right"  width=100>Date</th><td><input id="dateEventField" size=15></td></tr>
+						<tr><th align="right"  width=100>Time</th><td><input id="timeEventField" size=15></td></tr>
+					</table>
+					<span id="addEvent"style="margin: 1.5em; padding: 0.7em 1em; display: inline-block; background: green; -webkit-border-radius: 0.2em; -moz-border-radius: 0.2em; border-radius: 0.2em; cursor: pointer; position: absolute; right: 1.5em; bottom: 2em" >ADD EVENT</span>
+				</div>
+				<div id="mapView"></div>
+				<img class="leftCap" src="images/bottomLeftCap.png">
+				<img class="rightCap" src="images/bottomRightCap.png">
+			</div>
+			<div id="footer">
+				&copy; 2010 Distro &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy Policy</a> &bull; <a href="#">Contact</a> &bull; <a href="">Facebook</a> &bull; <a href="">Twitter</a> &bull; <a href="">Help</a> &bull; <a href="">Copyright Policy</a>
+			</div>
+		</div>
+	</div>
+	<div id="lightbox">
+		<div id="kmNetworkBox" class="lightboxContent">
+			<div class="networkName" style="font-size: 2.5em;margin: 0.8em">
+				^kylemarler^<br>
+				<p style="margin: 0.4em 0 0 1.3em; font-size: 0.4em">NEW YORK, NY</p>
+			</div>
+			<ul class="tiers">
+				<li>
+					<div class="tierPrice">FREE<a class="button" id="kmNetworkSubscribe" style="cursor: pointer">Subscribe</a></div>
+					<table border="0" cellspacing="5" cellpadding="0">
+						<tr>
+							<th width="80px">DURATION</th>
+							<td>ONE YEAR</td>
+						</tr>
+						<tr>
+							<th width="80px">FEATURES</th>
+							<td>TWO SONGS (AUTOMATIC)<br>CONCERT UPDATES</td>
+						</tr>
+					</table>
+				</li>
+				<li>
+					<div class="tierPrice">$10<a>Subscribe</a></div>
+					<table border="0" cellspacing="5" cellpadding="0">
+						<tr>
+							<th align="left" width="80px">DURATION</th>
+							<td align="left">ONE YEAR</td>
+						</tr>
+						<tr>
+							<th align="left" width="80px">FEATURES</th>
+							<td align="left">FOURTEEN SONGS (AUTOMATIC)<br>CONCERT UPDATES<br>LIVE RECORDINGS<br>ONE CONCERT ADMISSION</td>
+						</tr>
+					</table>
+				</li>
+			</ul>
+		</div>
+		<div id="newNetworkBox" class="lightboxContent" style="max-height: 40em; overflow-y: auto">
+			<dl>
+				<dt>What's your network called?</dt>
+				<dd><input id="newNetworkName" size="35"></dd>
+				<dt>Where is it located?</dt>
+				<dd><input id="newNetworkLocation" size="35"></dd>
+			</dl>
+			<div id="tierSelection">
+				How many subcription levels would you like to offer?<br>
+				<ul><li>1</li><li class="selected">2</li><li>3</li><li>4</li><li>5</li></ul>
+			</div>
+			<div class="subscriptionTier" style="font-size: 1.2em; line-height: 1.5em; margin: 1em 1em 0 1em; padding: 1em; background-color: #222">
+				Describe this subscription level.<br>
+				<div class="right" style="text-align: center">
+					<span style="font-size: 2em">$</span><input class="price" size=5 style="font-size: 2em;"><span class="inform" style="color: #555">(per year)</span><br>
+					<span class="inform" style="color: #888; font-weight: bold">-or-</span><br>
+					Subscribers pay what they want <input type="checkbox" class="payWhatYouLike">
+				</div>
+				<textarea style="width: 25em; height: 9em"></textarea>
+			</div>
+			<div style="text-align: right"><span id="createNetwork"style="margin: 1.5em; padding: 0.7em 1em; display: inline-block; background: green; -webkit-border-radius: 0.2em; -moz-border-radius: 0.2em; border-radius: 0.2em; cursor: pointer" >CREATE NETWORK</span></div>
+		</div>
+	</div>
+	<div id="tour" style="display:none">
+		<div id="tourContent"></div>
+		<p id="advanceTour"><button>Next</button></p>
+	</div>
+</div>
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script src="js/underscore.js"></script>
+<script src="js/backbone.js"></script>
+<script src="js/jquery.haml-1.3.js"></script>
+<script src="js/stencil.js"></script>
+<script src="js/distro.js"></script>
