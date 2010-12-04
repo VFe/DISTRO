@@ -6,8 +6,8 @@ html, body {
 }
 body {
   background-color: #b3aca4;
-  background-image: url(images/backgroundTile.png), -webkit-gradient(linear, left 48, left bottom, from(#aeb0af), to(#b3aca4), color-stop(0.25, #9ca1b5), color-stop(0.85, #bf998e));
-  background-image: url(images/backgroundTile.png), -moz-linear-gradient(top, #aeb0af, #9ca1b5 25%, #af998e 85%, #9ca1b5);
+  background-image: -webkit-gradient(linear, left 48, left bottom, from(#aeb0af), to(#b3aca4), color-stop(0.25, #9ca1b5), color-stop(0.85, #bf998e));
+  background-image: -moz-linear-gradient(top, #aeb0af, #9ca1b5 25%, #af998e 85%, #9ca1b5);
   background-attachment: fixed;
 }
 img {
@@ -25,12 +25,9 @@ input.fancy {
   -moz-border-radius: 0.3em;
   border-radius: 0.3em;
   padding: 0.3em 2.6em 0.3em 0.8em;
-  -webkit-box-shadow: inset 0 1px 1px #000000;
-  -moz-box-shadow: inset 0 1px 1px #000000;
-  box-shadow: inset 0 1px 1px #000000;
-  -webkit-box-shadow: inset 0 1px 1px #000000, 0 1px 1px rgba(255, 255, 255, 0.3);
-  -moz-box-shadow: inset 0 1px 1px #000000, 0 1px 1px rgba(255, 255, 255, 0.3);
-  box-shadow: inset 0 1px 1px #000000, 0 1px 1px rgba(255, 255, 255, 0.3);
+  -webkit-box-shadow: inset 0 1px 1px #000000 0 1px 1px rgba(255, 255, 255, 0.3);
+  -moz-box-shadow: inset 0 1px 1px #000000 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 1px #000000 0 1px 1px rgba(255, 255, 255, 0.3);
   line-height: 1.5em;
   height: 1.5em;
   position: relative;
@@ -38,12 +35,9 @@ input.fancy {
 }
 input.fancy:focus {
   outline: none;
-  -webkit-box-shadow: inset 0 1px 1px #000000;
-  -moz-box-shadow: inset 0 1px 1px #000000;
-  box-shadow: inset 0 1px 1px #000000;
-  -webkit-box-shadow: inset 0 1px 1px #000000, 0 0px 5px rgba(255, 255, 255, 0.7);
-  -moz-box-shadow: inset 0 1px 1px #000000, 0 0px 5px rgba(255, 255, 255, 0.7);
-  box-shadow: inset 0 1px 1px #000000, 0 0px 5px rgba(255, 255, 255, 0.7);
+  -webkit-box-shadow: inset 0 1px 1px #000000 0 0px 5px rgba(255, 255, 255, 0.7);
+  -moz-box-shadow: inset 0 1px 1px #000000 0 0px 5px rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 1px 1px #000000 0 0px 5px rgba(255, 255, 255, 0.7);
 }
 .button {
   -webkit-user-select: none;
@@ -69,8 +63,13 @@ tr.filler > td {
   z-index: 100;
 }
 #topContent {
-  min-width: 93em;
-  margin: 0 5em;
+  min-width: 64em;
+  max-width: 85em;
+  padding: 0 2em;
+  margin: 0 auto;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
 }
 #transport {
   list-style: none;
@@ -194,30 +193,30 @@ tr.filler > td {
 .bright {
   color: #28aeed;
 }
-#content {
-  height: 100%;
+#backing {
+  max-width: 115em;
+  min-width: 60em;
   margin: 0 auto;
+  padding: 0 2em;
+  height: 100%;
+}
+#content {
+  min-width: 60em;
+  max-width: 100em;
+  margin: 0 0 0 auto;
+  height: 100%;
   padding-top: 4em;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
-  margin: 0 4em;
-  min-width: 95em;
-  position: relative;
-}
-#libraryWrapper {
-  float: left;
-  clear-after: both;
-  width: 100%;
-  height: 100%;
   position: relative;
 }
 #library {
+  margin-right: 15em;
   height: auto;
-  margin-right: 40em;
-  min-width: 55em;
+  min-width: 45em;
   height: 100%;
-  min-height: 50em;
+  min-height: 30em;
   position: relative;
 }
 #libraryTop {
@@ -310,35 +309,15 @@ tr.filler > td {
   -webkit-background-size: 1px 3em;
   -moz-background-size: 1px 3em;
   background-size: 1px 3em;
-  min-height: 66em;
 }
 #sidebar {
   color: white;
-  float: left;
-  position: relative;
-  clear-after: both;
-  margin-left: -40em;
-  background-color: rgba(255, 255, 255, 0.7);
-  min-height: 100%;
-  -webkit-border-top-right-radius: 0.5em 1.5em;
-  -moz-border-radius-topright: 0.5em 1.5em;
-  padding: 1.6em 1.6em 1.6em 0;
-  float: right;
-  bottom: 0;
-  width: 40em;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-}
-#sidebarContent {
-  background: black;
-  padding: 0 0.2em 2em 0.2em;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
-  -webkit-border-radius: 0 0 1em 0;
-  -moz-border-radius: 0 0 1em 0;
-  border-radius: 0 0 1em 0;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: -15em;
+  width: 15em;
+  padding-top: 4em;
 }
 #sidebarButtons {
   margin: 0;
@@ -346,129 +325,20 @@ tr.filler > td {
   list-style: none;
 }
 #sidebarButtons > li > a {
-  font-size: 0.8em;
-  line-height: 2.4em;
-  padding: 0.2em 0 0 3em;
-  background-repeat: no-repeat;
-  -webkit-background-size: 2.6em 2.6em;
-  -moz-background-size: 2.6em 2.6em;
-  background-size: 2.6em 2.6em;
-  border-bottom-style: solid;
-  border-bottom: width: 0.3em;
-  position: relative;
+  background: #897672;
+  border: 0.4em solid #514f4e;
+  -webkit-border-radius: 0.8em;
+  -moz-border-radius: 0.8em;
+  border-radius: 0.8em;
+  -webkit-box-shadow: 0 0.2em 1em rgba(0, 0, 0, 0.8);
+  -moz-box-shadow: 0 0.2em 1em rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0.2em 1em rgba(0, 0, 0, 0.8);
+  line-height: 6em;
+  margin: 2em 0 2em 2em;
+  text-align: center;
+  color: inherit;
+  text-decoration: inherit;
   display: block;
-  text-decoration: none;
-}
-#sidebarButtons > li > a > img {
-  position: absolute;
-  left: 12em;
-  top: 0.8em;
-}
-#joinButton {
-  background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #77c6ed), color-stop(0.5, rgba(0, 0, 0, 0)));
-  background-image: -moz-linear-gradient(45deg, #77c6ed 50%, rgba(0, 0, 0, 0) 50%);
-  border-bottom-color: #77c6ed;
-  color: #77c6ed;
-}
-#uploadButton {
-  background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #0160a0), color-stop(0.5, rgba(0, 0, 0, 0)));
-  background-image: -moz-linear-gradient(45deg, #0160a0 50%, rgba(0, 0, 0, 0) 50%);
-  border-bottom-color: #0160a0;
-  color: #0160a0;
-}
-#newNetworkButton {
-  background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #8b5da5), color-stop(0.5, rgba(0, 0, 0, 0)));
-  background-image: -moz-linear-gradient(45deg, #8b5da5 50%, rgba(0, 0, 0, 0) 50%);
-  border-bottom-color: #8b5da5;
-  color: #8b5da5;
-}
-#mapControls {
-  line-height: 4em;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#323232), to(#141318));
-  background-image: -moz-linear-gradient(top, #323232, #141318);
-  border-top: 0.1em solid #555555;
-  font-size: 0.8em;
-  padding: 0 1em;
-}
-#mapButtons {
-  display: inline-block;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-#mapButtons > li {
-  border-bottom-left-radius: 0.5em 0.8em;
-  border-bottom-right-radius: 0.5em 0.8em;
-  border-top-left-radius: 0.5em 0.8em;
-  border-top-right-radius: 0.5em 0.8em;
-  -webkit-border-bottom-left-radius: 0.5em 0.8em;
-  -webkit-border-bottom-right-radius: 0.5em 0.8em;
-  -webkit-border-top-left-radius: 0.5em 0.8em;
-  -webkit-border-top-right-radius: 0.5em 0.8em;
-  -moz-border-radius-bottomleft: 0.5em 0.8em;
-  -moz-border-radius-bottomright: 0.5em 0.8em;
-  -moz-border-radius-topleft: 0.5em 0.8em;
-  -moz-border-radius-topright: 0.5em 0.8em;
-  line-height: 100%;
-  padding: 0.6em 0.8em;
-  display: inline-block;
-  margin: 0 0.2em;
-  cursor: pointer;
-}
-#mapButtons #weekButton {
-  background-color: #fac320;
-}
-#mapButtons #fourtyEightHourButton {
-  background-color: #fe3420;
-}
-#mapButtons #twentyFourHourButton {
-  background-color: #b91e26;
-}
-#mapButtons #newShowButton {
-  background-color: #79c942;
-  background-image: url(images/newShowIcon.png);
-  background-repeat: no-repeat;
-  background-position: 0.6em center;
-  padding-left: 2.2em;
-}
-#mapSearch {
-  background-image: url(images/magnifyingGlass_small.png);
-}
-#map {
-  position: relative;
-  width: 100%;
-  height: 25em;
-}
-#mapView {
-  height: 100%;
-  width: 100%;
-}
-#map .leftCap, #map .rightCap {
-  position: absolute;
-  bottom: 0;
-  pointer-events: none;
-}
-#map .leftCap {
-  left: 0;
-}
-#map .rightCap {
-  right: 0;
-}
-#newEventForm {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.8);
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1000;
-  display: none;
-}
-#newEventForm input {
-  background: #333;
-  color: white;
-  border: 0.1em solid black;
-  font: inherit;
 }
 #footer {
   color: #CCC;

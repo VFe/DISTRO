@@ -1,7 +1,8 @@
-@sidebar-width: 40em;
-@library-min-width: 55em;
-@contentMargin: 4em;
+@sidebar-width: 15em;
+@library-min-width: 45em;
+@library-max-width: 85em;
 @topBarHeight: 4em;
+@content-padding: 2em;
 
 @brightBlue: #28aeed;
 
@@ -40,11 +41,6 @@
 	-moz-box-shadow: @args;
 	box-shadow: @args;
 }
-.box-shadow (@args, @args2){
-	-webkit-box-shadow: @args, @args2;
-	-moz-box-shadow: @args, @args2;
-	box-shadow: @args, @args2;
-}
 
 html, body{
 	margin: 0;
@@ -54,8 +50,8 @@ html, body{
 }
 body{
 	background-color: #b3aca4;
-	background-image: url(images/backgroundTile.png), -webkit-gradient(linear, left 48, left bottom, from(#aeb0af), to(#b3aca4), color-stop(0.25, #9ca1b5), color-stop(0.85, #bf998e));
-	background-image: url(images/backgroundTile.png), -moz-linear-gradient(top, #aeb0af, #9ca1b5 25%, #af998e 85%, #9ca1b5);
+	background-image: -webkit-gradient(linear, left 48, left bottom, from(#aeb0af), to(#b3aca4), color-stop(0.25, #9ca1b5), color-stop(0.85, #bf998e));
+	background-image: -moz-linear-gradient(top, #aeb0af, #9ca1b5 25%, #af998e 85%, #9ca1b5);
 	background-attachment: fixed;
 }
 img{
@@ -71,7 +67,7 @@ input.fancy{
 	border: 1px solid black;
 	.border-radius(0.3em);
 	padding: 0.3em 2.6em 0.3em 0.8em;
-	.box-shadow(inset 0 1px 1px #000000, 0 1px 1px rgba(255, 255, 255, 0.3));
+	.box-shadow(inset 0 1px 1px #000000 0 1px 1px rgba(255, 255, 255, 0.3));
 	line-height: 1.5em;
 	height: 1.5em;
 	position: relative;
@@ -79,7 +75,7 @@ input.fancy{
 }
 input.fancy:focus{
 	outline: none;
-	.box-shadow(inset 0 1px 1px #000000, 0 0px 5px rgba(255, 255, 255, 0.7));
+	.box-shadow(inset 0 1px 1px #000000 0 0px 5px rgba(255, 255, 255, 0.7));
 }
 .button{
 	-webkit-user-select: none;
@@ -105,8 +101,11 @@ tr.filler>td{
 	z-index: 100;
 }
 #topContent{
-	min-width: @sidebar-width + @library-min-width - 2em;
-	margin: 0 @contentMargin + 1em;
+	min-width: @library-min-width + @sidebar-width + @content-padding * 2;
+	max-width: @library-max-width;
+	padding: 0 @content-padding;
+	margin: 0 auto;
+	.border-box
 }
 #transport{
 	list-style: none;
@@ -224,28 +223,28 @@ tr.filler>td{
 .bright{
 	color: @brightBlue;
 }
-#content{
-	height: 100%;
+#backing{
+	max-width: @sidebar-width * 2 + @library-max-width;
+	min-width: @sidebar-width + @library-min-width;
 	margin: 0 auto;
+	padding: 0 @content-padding;
+	height: 100%;
+}
+#content{
+	min-width: @library-min-width + @sidebar-width;
+	max-width: @library-max-width + @sidebar-width;
+	margin: 0 0 0 auto;
+	height: 100%;
 	padding-top: @topBarHeight;
 	.border-box;
-	margin: 0 @contentMargin;
-	min-width: @sidebar-width + @library-min-width;
-	position: relative;
-}
-#libraryWrapper{
-	float: left;
-	clear-after: both;
-	width: 100%;
-	height: 100%;
 	position: relative;
 }
 #library{
-	height: auto;
 	margin-right: @sidebar-width;
+	height: auto;
 	min-width: @library-min-width;
 	height: 100%;
-	min-height: 50em;
+	min-height: 30em;
 	position: relative;
 }
 #libraryTop{
@@ -328,153 +327,32 @@ tr.filler>td{
 	left: 0;
 	top: 1.6em;
 	.zebra(rgba(255, 255, 255, 0.8), rgba(230, 230, 230, 0.8), 1.5em);
-	min-height: 66em; // Hackity hack
 }
 #sidebar{
 	color: white;
-	float: left;
-	position: relative;
-	clear-after: both;
-	margin-left: @sidebar-width * -1;
-	background-color: rgba(255, 255, 255, 0.7);
-	min-height: 100%;
-	-webkit-border-top-right-radius: 0.5em 1.5em;
-	-moz-border-radius-topright: 0.5em 1.5em;
-	padding: 1.6em 1.6em 1.6em 0;
-	float: right;
-	bottom: 0;
+	position: absolute;
+	top: 0;
+	left: 100%;
+	margin-left: 0-@sidebar-width;
 	width: @sidebar-width;
-	.border-box;
-}
-#sidebarContent{
-	background: black;
-	padding: 0 0.2em 2em 0.2em;
-	.border-radius(0, 0, 1em, 0);
+	padding-top: @topBarHeight;
 }
 #sidebarButtons{
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
-
 #sidebarButtons>li>a{
-	font-size: 0.8em;
-	line-height: 2.4em;
-	padding: 0.2em 0 0 3em;
-	background-repeat: no-repeat;
-	.background-size(2.6em, 2.6em);
-	border-bottom-style: solid;
-	border-bottom: width: 0.3em;
-	position: relative;
+	background: #897672;
+	border: 0.4em solid #514f4e;
+	.border-radius(0.8em);
+	.box-shadow(0 0.2em 1em rgba(0, 0, 0, 0.8));
+	line-height: 6em;
+	margin: 2em 0 2em @content-padding;
+	text-align: center;
+	color: inherit;
+	text-decoration: inherit;
 	display: block;
-	text-decoration: none;
-}
-#sidebarButtons>li>a>img{
-	position: absolute;
-	left: 12em;
-	top: 0.8em;
-}
-.sidebarButton(@color){
-	background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, @color), color-stop(0.5, rgba(0, 0, 0, 0)));
-	background-image: -moz-linear-gradient(45deg, @color 50%, rgba(0, 0, 0, 0) 50%);
-	border-bottom-color: @color;
-	color: @color;
-}
-#joinButton{
-	.sidebarButton(#77c6ed);
-}
-#uploadButton{
-	.sidebarButton(#0160a0);
-}
-#newNetworkButton{
-	.sidebarButton(#8b5da5);
-}
-#mapControls{
-	line-height: 4em;
-	.simpleGradient(#323232, #141318);
-	border-top: 0.1em solid #555555;
-	font-size: 0.8em;
-	padding: 0 1em;
-}
-#mapButtons{
-	display: inline-block;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-#mapButtons>li{
-	border-bottom-left-radius: 0.5em 0.8em;
-	border-bottom-right-radius: 0.5em 0.8em;
-	border-top-left-radius: 0.5em 0.8em;
-	border-top-right-radius: 0.5em 0.8em;
-	-webkit-border-bottom-left-radius: 0.5em 0.8em;
-	-webkit-border-bottom-right-radius: 0.5em 0.8em;
-	-webkit-border-top-left-radius: 0.5em 0.8em;
-	-webkit-border-top-right-radius: 0.5em 0.8em;
-	-moz-border-radius-bottomleft: 0.5em 0.8em;
-	-moz-border-radius-bottomright: 0.5em 0.8em;
-	-moz-border-radius-topleft: 0.5em 0.8em;
-	-moz-border-radius-topright: 0.5em 0.8em;
-	line-height: 100%;
-	padding: 0.6em 0.8em;
-	display: inline-block;
-	margin: 0 0.2em;
-	cursor: pointer;
-}
-#mapButtons #weekButton{
-	background-color: #fac320;
-}
-#mapButtons #fourtyEightHourButton{
-	background-color: #fe3420;
-}
-#mapButtons #twentyFourHourButton{
-	background-color: #b91e26;
-}
-#mapButtons #newShowButton{
-	background-color: #79c942;
-	background-image: url(images/newShowIcon.png);
-	background-repeat: no-repeat;
-	background-position: 0.6em center;
-	padding-left: 2.2em;
-}
-#mapSearch{
-	background-image: url(images/magnifyingGlass_small.png);
-}
-#map{
-	position: relative;
-	width: 100%;
-	height: 25em;
-}
-#mapView{
-	height: 100%;
-	width: 100%;
-}
-#map .leftCap, #map .rightCap{
-	position: absolute;
-	bottom: 0;
-	pointer-events: none;
-}
-#map .leftCap{
-	left: 0;
-}
-#map .rightCap{
-	right: 0;
-}
-#newEventForm{
-	position: absolute;
-	background: rgba(0, 0, 0, 0.8);
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	z-index: 1000;
-	display: none;
-}
-#newEventForm input{
-	background: #333;
-	color: white;
-	border: 0.1em solid black;
-	font: inherit;
 }
 #footer{
 	color: #CCC;
