@@ -13,91 +13,86 @@ var util = require('util'),
 	auth = require('connect-auth');
 
 global.db = new Db('Distro', new Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || Connection.DEFAULT_PORT, {}), {native_parser:true});
-//global.users = new UserController();
+global.users = new DISTROUsers();
+global.sessions = new DISTROSessions();
 
-function UserStore(callback){
-	
+function DISTROUsers(){}
+DISTROUsers.prototype.init = function(callback){
+	global.db.collection('users', function(err, collection){
+		if (err) {
+			throw err;
+		} else if (!collection) {
+			throw "Collection is not defined";
+		} else {
+			this.collection = collection;
+			callback();
+		}
+	});
 }
 
-function callMany(){
-	var callees = arguments.slice(0, arguments.length - 1),
+
+function DISTROSessions(){}
+DISTROSessions.prototype.init = function(callback){
+	global.db.collection('sessions', function(err, collection){
+		if (err) {
+			throw err;
+		} else if (!collection) {
+			throw "Collection is not defined";
+		} else {
+			this.collection = collection;
+			callback();
+		}
+	});
+}
+
+
+function initMany(){
+	var callees = Array.prototype.slice.call(arguments, 0, arguments.length - 1),
+	    remaining = callees.length;
 		callback = arguments[arguments.length - 1];
 	if (callees.length === 0) {
 		setTimeout(callback, 0);
 	}
 	function ownCallback(){
-		callees.pop();
-		if (callees.length === 0) {
+		if (--remaining === 0) {
 			callback();
 		}
 	}
 	callees.forEach(function(callee){
-		callee(ownCallback);
+		callee.init(ownCallback);
 	});
 }
 
-// db.open(function(err, db){
-// 	callMany(_.bind(global.users.init, global.users), function (){
-// 		var server = http.createServer(function(req, res){
-// 			if(url.parse(req.url) !== '/' || req.method !== 'POST'){
-// 				var body = 'Not Found';
-// 				response.writeHead(404, {
-// 				  'Content-Length': body.length,
-// 				  'Content-Type': 'text/plain'
-// 				});
-// 				response.end(body);
-// 			}
-// 			else{
-// 				
-// 			}
-// 		})
-// 	})
-// })
-
-
-var server = connect.createServer(
-	connect.cookieDecoder(),
-	connect.session(),
-	connect.bodyDecoder(),
-	auth(function(options) {
-	  options= options || {};
-	  var that= {};
-	  var my= {}; 
-	  that.name     = options.name || "someName";
-	  that.authenticate= function(request, response, callback) {
-	   if( !(request.body && request.body.user && request.body.password && request.body.user == "Waffler") ) { 
-	     response.writeHead(303, { 'Location': "/auth/form_callback?redirect_url=" + escape(request.url) });
-	     response.end('');
-	   }
-	  };
-	that.setupRoutes = function(server){
-		server.use('/', connect.router(function routes(app){
-			app.post('/', function(request, response){
-			        request.authenticate( [that.name], function(error, authenticated) {
-			          var redirectUrl= "/",
-			          	  parsedUrl= url.parse(request.url, true);
-			          if( parsedUrl.query && parsedUrl.query.redirect_url ) {
-			            redirectUrl= parsedUrl.query.redirect_url;
-			          }
-			          response.writeHead(303, { 'Location':  redirectUrl });
-			          response.end('');
-			        })
-			      });
-		}))
+function handleDISTRORequest(callback){
+	return function(req, res, params){
+		var sessionID = req.cookies.session,
+		    session,
+		    responseContent = {status: "OK"};
+		if (sessionID && (session = distroSessions.sessionIsValid(sessionID))) { // session = {userID: 12345, userName: "Steve"}
+			connect.utils.merge(responseContent, callback(session, req, res, params));
+			res.writeHead(200);
+		} else {
+			responseContent.status = "error";
+			responseContent.error = "You are not logged in";
+			res.writeHead(401);
+		}
+		res.end(JSON.stringify(responseContent));
 	}
-	  return that;
-	}()),
-	connect.router(function(app) {
-	    app.get('/',
-	    function(req, res, params) {
-	        req.authenticate(['someName'],
-	        function(error, authenticated) {
-	            res.writeHead(200, {
-	                'Content-Type': 'text/plain'
-	            });
-	            res.end('Hello World');
-	        });
-	    });
-	})
-);
-server.listen(3000);
+};
+
+global.db.open(function(err, db){
+	if (err){
+		throw err;
+	}
+	initMany(global.users, global.sessions, function(){
+		connect.createServer(
+		connect.cookieDecoder(),
+		connect.bodyDecoder(),
+		connect.router(function(app) {
+			app.get('/', handleDISTRORequest(function(){
+				return {message: "Hello, World!"};
+			}));
+		})).listen(3000);
+		util.log('Alive on port 3000');
+	});
+});
