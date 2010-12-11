@@ -205,71 +205,72 @@ global.db.open(function(err, db){
 	}
 	initMany(global.users, global.sessions, function(){
 		connect.createServer(
-		connect.cookieDecoder(),
-		connect.bodyDecoder(),
-		connect.router(function(app) {
-			function methodNotAllowed(req, res, params){
-				res.writeHead(405);
-				res.end("Method Not Allowed");
-			}
+			connect.cookieDecoder(),
+			connect.bodyDecoder(),
+			connect.router(function(app) {
+				function methodNotAllowed(req, res, params){
+					res.writeHead(405);
+					res.end("Method Not Allowed");
+				}
 
-			app.get('/', handleDISTRORequest(function(session, req, res, params){
-				return {response: "You win!"};
-			}));
-			app.get('/login', methodNotAllowed);
-			app.post('/login', function(req, res, params){
-				var login = req.body;
-				if(login && login.email && login.password){
-					global.users.validateUser(login.email, login.password, function(err, userID){
-						if(userID){
-							global.sessions.startSessionForUserID(userID, body.extendedSession, req, res, function(err){
-								if(err){
-									DISTROInternalServerError(err, res);
-								} else {
-									res.writeHead(200);
-									res.end("OK!");
-								}
-							});	
-						} else {
-							res.writeHead(403);
-							res.end("Can't do that: Login invalid");
-						}
-					});
-				} else {
-					res.writeHead(403);
-					res.end("Login invalid");
-				}
-			});
-			app.get('/logout', methodNotAllowed);
-			app.post('/logout', handleDISTRORequest(function(session, req, res, params){
-				global.sessions.endSession(session.sessionID, res, function(err){
-					// Need to handle error; there is a better way to do this than copypasting 500s all over the place
-					// unfinished!
+				app.get('/', handleDISTRORequest(function(session, req, res, params){
+					return {response: "You win!"};
+				}));
+				app.get('/login', methodNotAllowed);
+				app.post('/login', function(req, res, params){
+					var login = req.body;
+					if(login && login.email && login.password){
+						global.users.validateUser(login.email, login.password, function(err, userID){
+							if(userID){
+								global.sessions.startSessionForUserID(userID, body.extendedSession, req, res, function(err){
+									if(err){
+										DISTROInternalServerError(err, res);
+									} else {
+										res.writeHead(200);
+										res.end("OK!");
+									}
+								});	
+							} else {
+								res.writeHead(403);
+								res.end("Can't do that: Login invalid");
+							}
+						});
+					} else {
+						res.writeHead(403);
+						res.end("Login invalid");
+					}
+				});
+				app.get('/logout', methodNotAllowed);
+				app.post('/logout', handleDISTRORequest(function(session, req, res, params){
+					global.sessions.endSession(session.sessionID, res, function(err){
+						// Need to handle error; there is a better way to do this than copypasting 500s all over the place
+						// unfinished!
 					
-				})
-			}));
-			app.get('/register', methodNotAllowed);
-			app.post('/register', function(req, res, params){
-				var body = req.body;
-				if(body && body.email && body.password){
-					global.users.registerUser(body.email, body.password, function(err, userID){
-						if(userID){
-							res.writeHead(200);
-							res.end("created: " + userID.toHexString());
-						} else {
-							res.writeHead(403);
-							res.end("Can't do that: " + err);
-						}
-					});
-				} else {
-					res.writeHead(403);
-					res.end("You didn't send me the codes");
-				}
-			});
-			app.get('/badthings', function(){
-				setTimeout(function(){ throw new Error("Foo") }, 0);
-			});
-		})).listen(3000);
+					})
+				}));
+				app.get('/register', methodNotAllowed);
+				app.post('/register', function(req, res, params){
+					var body = req.body;
+					if(body && body.email && body.password){
+						global.users.registerUser(body.email, body.password, function(err, userID){
+							if(userID){
+								res.writeHead(200);
+								res.end("created: " + userID.toHexString());
+							} else {
+								res.writeHead(403);
+								res.end("Can't do that: " + err);
+							}
+						});
+					} else {
+						res.writeHead(403);
+						res.end("You didn't send me the codes");
+					}
+				});
+				app.get('/badthings', function(){
+					setTimeout(function(){ throw new Error("Foo") }, 0);
+				});
+			})
+		).listen(3000);
 		util.log('Alive on port 3000');
 	});
 });
