@@ -8,7 +8,8 @@ var util = require('util'),
 	url = require('url'),
 	_ = require('underscore.js'),
 	connect = require('connect'),
-	crypto = require('crypto');
+	crypto = require('crypto'),
+	distro = require('./lib');
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 global.users = new DISTROUsers();
@@ -163,42 +164,6 @@ function initMany(){
 	});
 }
 
-function handleDISTRORequest(callback){
-	return function(req, res, params){
-		responseContent = {status: "OK"};
-		global.sessions.getRequestSession(req, res, function(err, userID, sessionID){
-			if (err || !userID){
-				res.writeHead(403);
-				responseContent.status = "error";
-				responseContent.errorMessage = "Can't let you do that dave!";
-				if (err) {
-					responseContent.errorDetails = err;
-				}
-			} else {
-				connect.utils.merge(responseContent, callback({user: userID, session: sessionID}, req, res, params));
-				res.writeHead(200);
-			}
-			res.end(JSON.stringify(responseContent));
-		});
-	};
-};
-
-function DISTROInternalServerError(error, res){
-	if (DISTROInternalServerError.logToConsole){
-		sys.error(err.stack);
-	}
-	
-	if (DISTROInternalServerError.logToResponse){
-		res.writeHead(500, { 'Content-Type': 'text/plain' });
-		res.end(err.stack);
-	} else {
-		res.writeHead(500);
-		res.end("BROKEN...");
-	}
-}
-DISTROInternalServerError.logToConsole = true;
-DISTROInternalServerError.logToResponse = true;
-
 global.db.open(function(err, db){
 	if (err){
 		throw err;
@@ -213,21 +178,20 @@ global.db.open(function(err, db){
 					res.end("Method Not Allowed");
 				}
 
-				app.get('/', handleDISTRORequest(function(session, req, res, params){
-					return {response: "You win!"};
+				app.get('/', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+					successback({response: "You win!"});
 				}));
 				app.get('/login', methodNotAllowed);
-				app.post('/login', function(req, res, params){
+				app.post('/login', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 					var login = req.body;
 					if(login && login.email && login.password){
 						global.users.validateUser(login.email, login.password, function(err, userID){
 							if(userID){
-								global.sessions.startSessionForUserID(userID, body.extendedSession, req, res, function(err){
+								global.sessions.startSessionForUserID(userID, login.extendedSession, req, res, function(err){
 									if(err){
-										DISTROInternalServerError(err, res);
+										errback(err);
 									} else {
-										res.writeHead(200);
-										res.end("OK!");
+										successback({});
 									}
 								});	
 							} else {
@@ -237,25 +201,28 @@ global.db.open(function(err, db){
 						});
 					} else {
 						res.writeHead(403);
-						res.end("Login invalid");
+						res.end("Can't do that: Login invalid");
 					}
-				});
+				}));
 				app.get('/logout', methodNotAllowed);
-				app.post('/logout', handleDISTRORequest(function(session, req, res, params){
+				app.post('/logout', distro.request.handleRequest(true, function(session, req, res, successback, errback){
 					global.sessions.endSession(session.sessionID, res, function(err){
-						// Need to handle error; there is a better way to do this than copypasting 500s all over the place
-						// unfinished!
-					
+						if (err) {
+							errback(err);
+						} else {
+							successback({});
+						}
 					})
 				}));
 				app.get('/register', methodNotAllowed);
-				app.post('/register', function(req, res, params){
+				app.post('/register', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 					var body = req.body;
 					if(body && body.email && body.password){
 						global.users.registerUser(body.email, body.password, function(err, userID){
-							if(userID){
-								res.writeHead(200);
-								res.end("created: " + userID.toHexString());
+							if (err) {
+								errback(err);
+							} else if(userID){
+								successback();
 							} else {
 								res.writeHead(403);
 								res.end("Can't do that: " + err);
@@ -265,7 +232,7 @@ global.db.open(function(err, db){
 						res.writeHead(403);
 						res.end("You didn't send me the codes");
 					}
-				});
+				}));
 				app.get('/badthings', function(){
 					setTimeout(function(){ throw new Error("Foo") }, 0);
 				});
