@@ -109,7 +109,7 @@ DISTROSessions.attachCookieToResponse = function (value, options, res){
 };
 DISTROSessions.prototype.getRequestSession = function(req, res, callback){
 	var sessionID = req.cookies && req.cookies.distro_session;
-	if ((sessionID = mongoDB.ObjectID(sessionID))){
+	if ((sessionID = new mongoDB.ObjectID(sessionID))){
 		this.collection.findOne({"_id":sessionID}, function(err, doc){
 			if (err) { callback(err, null); return; }
 			if (!doc || +doc.lastRenewal + (doc.extended ? DISTROSessions.EXTENDED_SESSION_LENGTH : DISTROSessions.SESSION_LENGTH) < new Date) {
