@@ -218,9 +218,9 @@ global.db.open(function(err, db){
 			}));
 			app.get('/login', methodNotAllowed);
 			app.post('/login', function(req, res, params){
-				var body = req.body;
-				if(body && body.email && body.password){
-					global.users.validateUser(body.email, body.password, function(err, userID){
+				var login = req.body;
+				if(login && login.email && login.password){
+					global.users.validateUser(login.email, login.password, function(err, userID){
 						if(userID){
 							global.sessions.startSessionForUserID(userID, body.extendedSession, req, res, function(err){
 								if(err){
