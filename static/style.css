@@ -392,7 +392,6 @@ tr.filler > td {
   position: fixed;
   top: 0px;
   width: 100%;
-  display: none;
 }
 #lightbox .lightboxContent {
   background: black;
@@ -435,9 +434,6 @@ tr.filler > td {
 #kmNetworkBox th, #kmNetworkBox td {
   vertical-align: top;
   text-align: left;
-}
-#newNetworkBox {
-  display: none;
 }
 #newNetworkBox {
   width: 50em;

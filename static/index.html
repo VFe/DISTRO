@@ -80,11 +80,30 @@
 			</div>
 		</div>
 	</div>
-	<div id="lightbox"><div id="someStuff" class="lightboxContent">
-		<div id="someContent">
-			Moof
+	<div id="lightbox">
+		<div id="newNetworkBox" class="lightboxContent" style="max-height: 40em; overflow-y: auto; display:none;">
+			<dl>
+				<dt>Username</dt>
+				<dd><input id="newNetworkName" size="35" placeholder="s@distro.fm"></dd>
+				<dt>Password</dt>
+				<dd><input size="35" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></dd>
+			</dl>
+			<div style="text-align: right">
+				<span id="createNetwork" style="margin: 1.5em; padding: 0.7em 1em; display: inline-block; background: green; -webkit-border-radius: 0.2em; -moz-border-radius: 0.2em; border-radius: 0.2em; cursor: pointer">LOGIN</span>
+			</div>
 		</div>
-	</div>></div>
+		<div id="newNetworkBox" class="lightboxContent" style="max-height: 40em; overflow-y: auto">
+			<dl>
+				<dt>Please Choose a Username</dt>
+				<dd><input id="newNetworkName" size="35" placeholder="s@distro.fm"></dd>
+				<dt>Enter a Password</dt>
+				<dd><input size="35" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></dd>
+			</dl>
+			<div style="text-align: right">
+				<span id="createNetwork" style="margin: 1.5em; padding: 0.7em 1em; display: inline-block; background: green; -webkit-border-radius: 0.2em; -moz-border-radius: 0.2em; border-radius: 0.2em; cursor: pointer">REGISTER</span>
+			</div>
+		</div>
+	</div>
 </div>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script src="js/underscore.js"></script>
