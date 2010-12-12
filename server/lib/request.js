@@ -37,6 +37,7 @@ exports.handleRequest = function(requireAuthentication, callback){
 					res.writeHead(403);
 					responseContent.status = "unauthorized";
 					responseContent.errorMessage = "Can't let you do that dave!";
+					res.end(JSON.stringify(responseContent));
 				} else {
 					callback({user: userID, session: sessionID}, req, res, successback, errback);
 				}

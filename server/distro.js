@@ -7,7 +7,8 @@ var util = require('util'),
 	_ = require('underscore.js'),
 	connect = require('connect'),
 	crypto = require('crypto'),
-	distro = require('./lib');
+	distro = require('./lib'),
+	uuid = require('uuid');
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 global.users = new DISTROUsers();
@@ -108,12 +109,13 @@ DISTROSessions.attachCookieToResponse = function (value, options, res){
 };
 DISTROSessions.prototype.getRequestSession = function(req, res, callback){
 	var sessionID = req.cookies && req.cookies.distro_session;
-	if ((sessionID = new mongoDB.ObjectID(sessionID))){
-		this.collection.findOne({"_id":sessionID}, function(err, doc){
+	if (sessionID){
+		this.collection.findOne({"session":sessionID}, function(err, doc){
 			if (err) { callback(err, null); return; }
 			if (!doc || +doc.lastRenewal + (doc.extended ? DISTROSessions.EXTENDED_SESSION_LENGTH : DISTROSessions.SESSION_LENGTH) < new Date) {
+				// TODO: Extend sessions when they get close to expiration
 				DISTROSessions.attachCookieToResponse("", {expires:new Date(0)}, res); //Destroy Cookie
-				callback("No, no. Session expire.", null);
+				callback(null, null, null);
 			} else {
 				// Success!
 				callback(null, doc.userID, sessionID);
@@ -130,13 +132,13 @@ DISTROSessions.prototype.endSession = function(sessionID, res, callback){
 	DISTROSessions.attachCookieToResponse("", {expires:new Date(0)}, res); //Destroy Cookie
 };
 DISTROSessions.prototype.startSessionForUserID = function (userID, extendedSession, req, res, callback){
-	this.collection.insert({"userID":userID, "lastRenewal":new Date, "extended":extendedSession}, function(err, doc){
+	var sessionID = uuid.generate('ascii');
+	this.collection.insert({"userID":userID, "session":sessionID, "lastRenewal":new Date, "extended":extendedSession}, function(err, doc){
 		if (err){
 			callback(err);
 			return;
 		}
-		var sessionID = doc[0]._id.toHexString(),
-		    cookieOpts = {};
+		var cookieOpts = {};
 		if (extendedSession) {
 			cookieOpts.expires = new Date(+new Date + DISTROSessions.EXTENDED_SESSION_LENGTH);
 		}
