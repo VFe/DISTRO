@@ -169,6 +169,7 @@ global.db.open(function(err, db){
 	}
 	initMany(global.users, global.sessions, function(){
 		connect.createServer(
+			connect.logger(),
 			connect.cookieDecoder(),
 			connect.bodyDecoder(),
 			connect.router(function(app) {

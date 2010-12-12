@@ -3,8 +3,8 @@
 * Build Login and Registration Front End
 
 ## Backend ##
-* Choose RDBMS Driver
-* Convert existing mongodb code to Relational DB
+* Choose RDBMS Driver _Maybe Not..._
+* Convert existing mongodb code to Relational DB _Maybe Not..._
 * Implement Session Renewing
 
 ### Eventually ###
