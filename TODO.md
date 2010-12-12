@@ -6,3 +6,6 @@
 * Choose RDBMS Driver
 * Convert existing mongodb code to Relational DB
 * Implement Session Renewing
+
+### Eventually ###
+* Change error messages to something useful

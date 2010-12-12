@@ -69,7 +69,6 @@ DISTROUsers.prototype.registerUser = function(email, password, callback){
 	});
 }
 
-
 function DISTROSessions(){}
 DISTROSessions.prototype.init = function(callback){
 	var self = this;
@@ -222,7 +221,14 @@ global.db.open(function(err, db){
 							if (err) {
 								errback(err);
 							} else if(userID){
-								successback();
+								global.sessions.startSessionForUserID(userID, null, req, res, function(err){
+									if(err){
+										errback(err);
+									} else {
+										successback();
+									}
+								});
+								//successback();
 							} else {
 								res.writeHead(403);
 								res.end("Can't do that: " + err);
@@ -234,7 +240,7 @@ global.db.open(function(err, db){
 					}
 				}));
 				app.get('/badthings', function(){
-					setTimeout(function(){ throw new Error("Foo") }, 0);
+					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM") }, 0); //TODO: FIND A SOLUTION FOR THIS
 				});
 			})
 		).listen(3000);
