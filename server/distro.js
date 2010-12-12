@@ -3,8 +3,6 @@ require.paths.unshift(__dirname + "/vendor");
 var util = require('util'),
 	fs = require('fs'),
 	mongoDB = require('mongodb'),
-	querystring = require('querystring'),
-	staticServer = require('node-static'),
 	url = require('url'),
 	_ = require('underscore.js'),
 	connect = require('connect'),
