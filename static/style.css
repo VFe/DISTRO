@@ -407,9 +407,11 @@ tr.filler > td {
 #lightbox.newNetwork #newNetworkBox {
   display: block;
 }
-#kmNetworkBox {
-  display: none;
+#someStuff {
   width: 40em;
+}
+#contentStuff {
+  margin: 0, auto;
 }
 #kmNetworkBox .tiers {
   padding: 0;
