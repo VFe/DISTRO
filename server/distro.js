@@ -39,7 +39,7 @@ DISTROUsers.prototype.userExists = function(email, callback){
 		callback(err, !!result);
 	});
 }
-DISTROUsers.prototype.validateUser = function(email, password, callback){
+DISTROUsers.prototype.userWithCredentials = function(email, password, callback){
 	if (!email || !password){
 		callback(new Error("Missing credentials"), false);
 		return;
@@ -49,12 +49,19 @@ DISTROUsers.prototype.validateUser = function(email, password, callback){
 			callback(err, null);
 		}
 		if (result && result.salt && result.hash && DISTROUsers.hash(password, result.salt) === result.hash){
-			callback(null, result._id);
+			callback(null, result);
 		} else {
 			callback(null, null);
 		}
 	});
 }
+DISTROUsers.prototype.userWithUserID = function(userID, callback){
+	if (!(userID instanceof mongoDB.ObjectID)){
+		userID = new mongoDB.ObjectID(userID);
+	}
+	this.collection.findOne({"_id":userID}, callback);
+}
+
 DISTROUsers.prototype.registerUser = function(email, password, callback){
 	var self = this;
 	var salt = Math.floor(Math.random() * 0x100000000).toString(16);
@@ -86,6 +93,7 @@ DISTROSessions.prototype.init = function(callback){
 DISTROSessions.SESSION_NAME = 'distro_session'; // Session cookie name
 DISTROSessions.SESSION_LENGTH = 86400000; // Twenty four hours
 DISTROSessions.EXTENDED_SESSION_LENGTH = 15778463000; // Six months
+DISTROSessions.TIME_TO_REFRESH = 600000; //Ten minutes
 DISTROSessions.attachCookieToResponse = function (value, options, res){
 	
 	// Based on Connect's session middleware
@@ -117,7 +125,15 @@ DISTROSessions.prototype.getRequestSession = function(req, res, callback){
 				callback(null, null, null);
 			} else {
 				// Success!
-				callback(null, doc.userID, sessionID);
+				global.users.userWithUserID(doc.userID, function(err, user){
+					if(err) { callback(err, null, null); return; }
+					if(user && user.email){
+						callback(null, user, sessionID);
+					} else {
+						DISTROSessions.attachCookieToResponse("", {expires:new Date(0)}, res); //Destroy Cookie
+						callback(null, null, null);
+					}
+				});
 			}
 		});
 	} else {
@@ -179,19 +195,19 @@ global.db.open(function(err, db){
 				}
 
 				app.get('/', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-					successback({response: "You win!"});
+					successback({response: "Welcome, "+session.user.email+"!"});
 				}));
 				app.get('/login', methodNotAllowed);
 				app.post('/login', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 					var login = req.body;
 					if(login && login.email && login.password){
-						global.users.validateUser(login.email, login.password, function(err, userID){
-							if(userID){
-								global.sessions.startSessionForUserID(userID, login.extendedSession, req, res, function(err){
+						global.users.userWithCredentials(login.email, login.password, function(err, user){
+							if(user){
+								global.sessions.startSessionForUserID(user._id, login.extendedSession, req, res, function(err){
 									if(err){
 										errback(err);
 									} else {
-										successback({});
+										successback({userName:user.email});
 									}
 								});	
 							} else {
@@ -210,7 +226,7 @@ global.db.open(function(err, db){
 						if (err) {
 							errback(err);
 						} else {
-							successback({});
+							successback({userName:null});
 						}
 					})
 				}));

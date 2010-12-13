@@ -29,17 +29,18 @@ exports.handleRequest = function(requireAuthentication, callback){
 			res.end(JSON.stringify(responseContent));
 		};
 		if (requireAuthentication){
-			global.sessions.getRequestSession(req, res, function(err, userID, sessionID) {
+			global.sessions.getRequestSession(req, res, function(err, user, sessionID) {
 				if (err){
 					errback(err);
 					return;
-				} else if (!userID) {
+				} else if (!user) {
 					res.writeHead(403);
 					responseContent.status = "unauthorized";
-					responseContent.errorMessage = "Can't let you do that dave!";
+					responseContent.errorMessage = "Can't let you do that, Dave!";
 					res.end(JSON.stringify(responseContent));
 				} else {
-					callback({user: userID, session: sessionID}, req, res, successback, errback);
+					responseContent.userName = user.email;
+					callback({user: user, session: sessionID}, req, res, successback, errback);
 				}
 			});
 		} else {
