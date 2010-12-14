@@ -87,7 +87,7 @@ distro.lightbox = new Lightbox;
 								error: function(xhr, status, error){
 									var errorMessage = $.parseJSON(xhr.responseText).errorMessage;
 									distro.global.set({user:null});
-									alert("BAD THINGS! : " + errorMes.message);
+									alert("BAD THINGS! : " + errorMessage);
 									console.log("response: "+ xhr.responseText);
 									// debugger;
 								}
