@@ -19,7 +19,7 @@ exports.handleRequest = function(requireAuthentication, callback){
 		var responseContent = {status: "OK"};
 		function successback(response){
 			connect.utils.merge(responseContent, response);
-			res.writeHead(200);
+			res.writeHead(200, {'Content-Type': 'application/json'});
 			res.end(JSON.stringify(responseContent));
 		}
 		function errback(err){
