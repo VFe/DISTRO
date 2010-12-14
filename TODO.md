@@ -9,3 +9,12 @@
 
 ### Eventually ###
 * Change error messages to something useful
+* Show errors to users
+
+###TONIGHT?!?###
+* Only submit once
+* email validity (This mostly works now...)
+* library
+* create networks
+* subscriptions(hackety hack hack)
+

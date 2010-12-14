@@ -35,9 +35,12 @@ DISTROUsers.passwordIsAcceptable = function(password){
 	return (password.length > 2);
 }
 DISTROUsers.prototype.userExists = function(email, callback){
-	this.collection.findOne({"email":email}, function(err, result){
-		callback(err, !!result);
-	});
+	var re = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
+	if (re.test(email)){
+		this.collection.findOne({"email":email}, function(err, result){
+			callback(err, !!result);
+		});
+	} else{callback({message:"email invalid"}, null)}
 }
 DISTROUsers.prototype.userWithCredentials = function(email, password, callback){
 	if (!email || !password){
@@ -66,7 +69,9 @@ DISTROUsers.prototype.registerUser = function(email, password, callback){
 	var self = this;
 	var salt = Math.floor(Math.random() * 0x100000000).toString(16);
 	self.userExists(email, function(err, exists){
-		if (exists){
+		if(err){
+			callback(err, null)
+		} else if (exists){
 			callback("user already exists!", null);
 		} else {
 			self.collection.insert({"email":email, "password":password, "hash":DISTROUsers.hash(password, salt), "salt":salt}, function(err, doc){
