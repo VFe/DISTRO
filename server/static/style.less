@@ -410,16 +410,14 @@ tr.filler>td{
 	margin: 10em auto 0px;
 	vertical-align: middle;
 }
-#lightbox.kmNetwork, #lightbox.newNetwork, #lightbox.kmNetwork #kmNetworkBox, #lightbox.newNetwork #newNetworkBox{
-	display: block;
+#lightbox .button{
+	margin: 0 1.5em 1.5em 1.5em;
+	padding: 0.7em 1em;
+	display: inline-block;
+	background: green;
+	-webkit-border-radius: 0.2em;
+	-moz-border-radius: 0.2em; border-radius: 0.2em; cursor: pointer;
 }
-#someStuff{
-	width: 40em;
-}
-#contentStuff{
-	margin:0, auto;
-}
-
 #kmNetworkBox .tiers{
 	padding: 0;
 	list-style: none;
@@ -438,28 +436,25 @@ tr.filler>td{
 	vertical-align: top;
 	text-align: left;
 }
-#newNetworkBox{
-	//display: none;
-}
-#newNetworkBox{
+#loginRegisterBox{
 	width: 50em;
 }
-#newNetworkBox dt, #newNetworkBox dd{
+#loginRegisterBox dt, #loginRegisterBox dd{
 	font-size: 1.3em;
 	margin-left: 1em;
 }
-#newNetworkBox dd{
+#loginRegisterBox dd{
 	padding-bottom: 0.5em;
 	border-bottom: 0.3em solid @brightBlue;
 	margin-bottom: 1em;
 }
-#newNetworkBox input{
+#loginRegisterBox input{
 	font: inherit;
 }
-#newNetworkBox #tierSelection{
+#loginRegisterBox #tierSelection{
 	text-align: center;
 }
-#newNetworkBox #tierSelection ul{
+#loginRegisterBox #tierSelection ul{
 	list-style: none;
 	background: #222;
 	line-height:1.8em;
@@ -468,7 +463,7 @@ tr.filler>td{
 	margin: 0.5em auto;
 	.border-radius(0.5em);
 }
-#newNetworkBox #tierSelection li{
+#loginRegisterBox #tierSelection li{
 	.border-radius(1.5em);
 	line-height: 1.5em;
 	width: 1.5em;
@@ -479,7 +474,7 @@ tr.filler>td{
 	.button;
 	cursor: pointer;
 }
-#newNetworkBox #tierSelection li.selected{
+#loginRegisterBox #tierSelection li.selected{
 	background: #999;
 	color: black;
 }
@@ -543,4 +538,7 @@ tr.filler>td{
 }
 #advanceTour button:active{
 	.simpleGradient(#70b4e9, #00ddfd);
+}
+.hidden{
+	display: none !important;
 }

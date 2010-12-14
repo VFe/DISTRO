@@ -1,3 +1,105 @@
+var distro = {
+	SERVER: "http://localhost:3000",
+	global: new Backbone.Model({})
+};
+
+// Bind user menu
+(function(){
+	var $userMenu = $('#user'),
+	    $userName = $('#userName');
+	distro.global.bind('change:user', function(model, user){
+		if (user) {
+			$userName.text(user);
+			$userMenu.fadeIn();
+		} else {
+			$userMenu.fadeOut();
+		}
+	});
+})();
+
+function Lightbox(){
+	this.$lightbox = $('#lightbox');
+}
+Lightbox.prototype.show = function(content){
+	this.hideContent();
+	this.content = content;
+	content.show(this);
+	this.$lightbox.fadeIn();
+}
+Lightbox.prototype.hide = function(){
+	var self = this;
+	this.$lightbox.fadeOut(function(){
+		self.hideContent();
+	});
+}
+Lightbox.prototype.hideContent = function(){
+	if (this.content) {
+		this.content.hide && this.content.hide(this);
+		this.content = null;
+	}
+	this.$lightbox.empty();
+}
+distro.lightbox = new Lightbox;
+
+// Login/registration lightbox
+(function(){
+	var loginForm = null;
+	distro.global.bind('change:user', function(model, user){
+		if (user) {
+			if (distro.lightbox.content === loginForm) {
+				distro.lightbox.hide();
+			}
+			loginForm = null;
+		} else if (!loginForm) {
+			distro.lightbox.show((loginForm = {
+				show: function(lightbox){
+					var $emailField, $passwordField, $registerCheckbox, $submitButton;
+					lightbox.$lightbox.haml(['#loginRegisterBox.lightboxContent', {style: "max-height: 40em; overflow-y: auto;"},
+						['%dl',
+							['%dt', ['%label', {'for':'emailAddress'}, "What's your email address?"]],
+							['%dd', ['%input#emailAddress', {$:{$:function(){ $emailField = this }}, size:'35', placeholder:'s@distro.fm'}]],
+							['%dt', ['%label', {'for':'password'}, "What's your DISTRO password?"]],
+							['%dd', ['%input#password', {$:{$:function(){ $passwordField = this }}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
+							['%dt', ['%label', {'for':'registrationType'}, "Are you new here?"]],
+							['%dd', ['%input#registrationType', {$:{$:function(){ $registerCheckbox = this }}, type:'checkbox'}]]
+						],
+						['%div', {style:"text-align: right"},
+							['%span#submitButton', {$:{$:function(){ $submitButton = this}}, 'class': "button lightboxButton"}, 'LOG IN'],
+						]
+					]);
+					$registerCheckbox.change(function(){
+						$submitButton.text($registerCheckbox[0].checked ? 'REGISTER' : 'LOG IN');
+					});
+					$submitButton.click(function(){
+						var email = $emailField.val(), password = $passwordField.val(), register = $registerCheckbox[0].checked;
+						if (!email || !password) {
+							alert('Please enter a username and a password.');
+						} else {
+							console.log('yay');
+							$.ajax({
+								url: distro.SERVER + (register ? '/register' : '/login'),
+								data: JSON.stringify({email: email, password: password}),
+								type: "POST",
+								contentType: 'application/json',
+								success: function(data){
+									distro.global.set({user:data.userName});
+								},
+								error: function(xhr, status, error){
+									var errorMes = JSON.parse(xhr.responseText).errorMessage;
+									distro.global.set({user:null});
+									alert("BAD THINGS! : " + errorMes.message);
+									console.log("response: "+ xhr.responseText);
+									// debugger;
+								}
+							})
+						}
+					});
+				}
+			}));
+		}
+	});
+})();
+
 // Music list view
 var TrackDetailView = Backbone.View.extend({
 	el: $('<div/>', {'class':'infoBoxContent'})[0],

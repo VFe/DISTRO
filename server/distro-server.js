@@ -259,7 +259,8 @@ global.db.open(function(err, db){
 				app.get('/badthings', function(){
 					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM") }, 0); //TODO: FIND A SOLUTION FOR THIS
 				});
-			})
+			}),
+			connect.staticProvider(__dirname + '/static')
 		).listen(3000);
 		util.log('Alive on port 3000');
 	});
