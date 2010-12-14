@@ -40,7 +40,7 @@ DISTROUsers.prototype.userExists = function(email, callback){
 		this.collection.findOne({"email":email}, function(err, result){
 			callback(err, !!result);
 		});
-	} else{callback({message:"email invalid"}, null)}
+	} else{callback(new distro.error.ClientError("email invalid"), null)}
 }
 DISTROUsers.prototype.userWithCredentials = function(email, password, callback){
 	if (!email || !password){

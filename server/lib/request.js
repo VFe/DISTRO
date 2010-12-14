@@ -1,19 +1,6 @@
 var util = require('util'),
     connect = require('connect'),
-
-function internalServerError(error, res){
-	if (exports.logToConsole){
-		util.error(err.stack);
-	}
-	
-	if (exports.logToResponse){
-		res.writeHead(500, { 'Content-Type': 'text/plain' });
-		res.end(err.stack);
-	} else {
-		res.writeHead(500);
-		res.end("Internal Server Error");
-	}
-}
+    error = require('./error');
 
 exports.handleRequest = function(requireAuthentication, callback){
 	return function(req, res) {
@@ -24,9 +11,22 @@ exports.handleRequest = function(requireAuthentication, callback){
 			res.end(JSON.stringify(responseContent));
 		}
 		function errback(err){
-			res.writeHead(500);
-			responseContent.status = "error";
-			responseContent.errorMessage = err || "BAD THINGS GO HAPPEN";
+			if (err instanceof error.ClientError) {
+				responseContent.errorMessage = err.message;
+				responseContent.status = "error";
+				res.writeHead(403, {'Content-Type': 'application/json'});
+				res.end(JSON.stringify(responseContent));
+			} else {
+				if (exports.logToConsole){
+					util.error(err.stack);
+				}
+				if (exports.logToResponse){
+					responseContent.rawError = error;
+				}
+				responseContent.status = "error";
+				res.writeHead(500, {'Content-Type': 'application/json'});
+				res.end(JSON.stringify(responseContent));
+			}
 			res.end(JSON.stringify(responseContent));
 		};
 		if (requireAuthentication){
