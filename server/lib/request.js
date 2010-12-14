@@ -1,16 +1,17 @@
-var connect = require('connect');
+var util = require('util'),
+    connect = require('connect'),
 
 function internalServerError(error, res){
-	if (DISTROInternalServerError.logToConsole){
-		sys.error(err.stack);
+	if (exports.logToConsole){
+		util.error(err.stack);
 	}
 	
-	if (DISTROInternalServerError.logToResponse){
+	if (exports.logToResponse){
 		res.writeHead(500, { 'Content-Type': 'text/plain' });
 		res.end(err.stack);
 	} else {
 		res.writeHead(500);
-		res.end("BROKEN...");
+		res.end("Internal Server Error");
 	}
 }
 
