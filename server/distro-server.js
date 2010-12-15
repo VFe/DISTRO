@@ -74,7 +74,7 @@ DISTROUsers.prototype.registerUser = function(email, password, callback){
 		} else if (exists){
 			callback("user already exists!", null);
 		} else {
-			self.collection.insert({"email":email, "password":password, "hash":DISTROUsers.hash(password, salt), "salt":salt}, function(err, doc){
+			self.collection.insert({"email":email, "hash":DISTROUsers.hash(password, salt), "salt":salt}, function(err, doc){
 				callback(err, doc[0]._id);
 			});
 		}
