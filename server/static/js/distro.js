@@ -1,6 +1,55 @@
 var distro = {
-	SERVER: "http://localhost:3000",
-	global: new Backbone.Model({})
+	SERVER: "http://localhost:3000/",
+	global: new Backbone.Model({}),
+	pyramidHead: function(message, callback){
+		var composedMessage = 'Pyramid head says\u2026\n' + message;
+		if (callback) {
+			if (confirm(composedMessage + '\n\nDo you want me to try that request again now?')) {
+				callback();
+			}
+		} else {
+			alert(composedMessage);
+		}
+	},
+	request: function(path, data, hollerback){
+		$.ajax({
+			url: (distro.SERVER + path),
+			data: JSON.stringify(data),
+			type: (data ? 'POST' : 'GET'),
+			contentType: (data ? 'application/json' : undefined),
+			success: function(responseData, status, xhr){
+				if (responseData && 'userName' in responseData) {
+					distro.global.set({user: responseData.userName});
+				}
+				hollerback.succeed(responseData, status, xhr);
+			},
+			error: function(xhr, status, error){
+				var responseData = null;
+				try{
+					responseData = $.parseJSON(xhr.responseText);
+				} catch(e) {
+					distro.pyramidHead("The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken.", function(){
+						distro.request(path, data, hollerback);
+					});
+				}
+				hollerback.fail(responseData, status, xhr);
+			}
+		})
+	}
+};
+
+// Simple success/failure callback abstraction layer
+function Hollerback(callbacks, context){
+	this.callbacks = callbacks;
+	this.context = context;
+}
+Hollerback.prototype.succeed = function(){
+	this.callbacks.success && this.callbacks.success.apply(this.context, arguments);
+	this.callbacks.complete && this.callbacks.complete.apply(this.context, arguments);
+};
+Hollerback.prototype.fail = function(){
+	this.callbacks.failure && this.callbacks.failure.apply(this.context, arguments);
+	this.callbacks.complete && this.callbacks.complete.apply(this.context, arguments);
 };
 
 // Bind user menu
@@ -53,46 +102,56 @@ distro.lightbox = new Lightbox;
 		} else if (!loginForm) {
 			distro.lightbox.show((loginForm = {
 				show: function(lightbox){
-					var $emailField, $passwordField, $registerCheckbox, $submitButton;
+					var $form, $emailField, $passwordField, $registerCheckbox, $submitButton, submitStatus = new Backbone.Model({submitting:false});
 					lightbox.$lightbox.haml(['#loginRegisterBox.lightboxContent', {style: "max-height: 40em; overflow-y: auto;"},
-						['%dl',
-							['%dt', ['%label', {'for':'emailAddress'}, "What's your email address?"]],
-							['%dd', ['%input#emailAddress', {$:{$:function(){ $emailField = this }}, size:'35', placeholder:'s@distro.fm'}]],
-							['%dt', ['%label', {'for':'password'}, "What's your DISTRO password?"]],
-							['%dd', ['%input#password', {$:{$:function(){ $passwordField = this }}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
-							['%dt', ['%label', {'for':'registrationType'}, "Are you new here?"]],
-							['%dd', ['%input#registrationType', {$:{$:function(){ $registerCheckbox = this }}, type:'checkbox'}]]
-						],
-						['%div', {style:"text-align: right"},
-							['%span#submitButton', {$:{$:function(){ $submitButton = this}}, 'class': "button lightboxButton"}, 'LOG IN'],
+						['%form', {$:{$:function(){ $form = this; }}},
+							['%dl',
+								['%dt', ['%label', {'for':'emailAddress'}, "What's your email address?"]],
+								['%dd', ['%input#emailAddress', {$:{$:function(){
+									$emailField = this;
+									submitStatus.bind('change:submitting', function(m, submitting){ $emailField.attr('disabled', submitting ? true : null) });
+								}}, size:'35', placeholder:'s@distro.fm'}]],
+								['%dt', ['%label', {'for':'password'}, "What's your DISTRO password?"]],
+								['%dd', ['%input#password', {$:{$:function(){
+									$passwordField = this;
+									submitStatus.bind('change:submitting', function(m, submitting){ $passwordField.attr('disabled', submitting ? true : null) });
+								}}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
+								['%dt', ['%label', {'for':'registrationType'}, "Are you new here?"]],
+								['%dd', ['%input#registrationType', {$:{$:function(){
+									$registerCheckbox = this;
+									submitStatus.bind('change:submitting', function(m, submitting){ $registerCheckbox.attr('disabled', submitting ? true : null) });
+								}}, type:'checkbox'}]]
+							],
+							['%div', {style:"text-align: right"},
+								['%button#submitButton', {$:{$:function(){
+									$submitButton = this;
+									submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
+								}}, 'class': "button lightboxButton"}, 'LOG IN'],
+							]
 						]
 					]);
 					$registerCheckbox.change(function(){
 						$submitButton.text($registerCheckbox[0].checked ? 'REGISTER' : 'LOG IN');
 					});
-					$submitButton.click(function(){
+					$form.submit(function(e){
+						e.preventDefault();
 						var email = $emailField.val(), password = $passwordField.val(), register = $registerCheckbox[0].checked;
 						if (!email || !password) {
 							alert('Please enter a username and a password.');
 						} else {
-							console.log('yay');
-							$.ajax({
-								url: distro.SERVER + (register ? '/register' : '/login'),
-								data: JSON.stringify({email: email, password: password}),
-								type: "POST",
-								contentType: 'application/json',
-								success: function(data){
-									distro.global.set({user:data.userName});
+							submitStatus.set({submitting: true});
+							distro.request(register ? 'register' : 'login', {email: email, password: password}, new Hollerback({
+								failure: function(data){
+									if (data && data.errorMessage) {
+										alert(data.errorMessage);
+									}
 								},
-								error: function(xhr, status, error){
-									var errorMessage = $.parseJSON(xhr.responseText).errorMessage;
-									distro.global.set({user:null});
-									alert("BAD THINGS! : " + errorMessage);
-									console.log("response: "+ xhr.responseText);
-									// debugger;
+								complete: function(){
+									submitStatus.set({submitting: false});
 								}
-							})
+							}));
 						}
+						return false;
 					});
 				}
 			}));
@@ -316,6 +375,7 @@ Player.prototype.stop = function(){
 var tracks = new Backbone.Collection(),
 	player = new Player(),
 	musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
+
 
 // Miscellaneous UI
 $('.button').live('mousedown', function(e){
