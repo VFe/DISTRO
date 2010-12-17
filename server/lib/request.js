@@ -34,14 +34,15 @@ exports.handleRequest = function(requireAuthentication, callback){
 				if (err){
 					errback(err);
 					return;
-				} else if (!user) {
+				} else if (user && user.email) {
+					responseContent.userName = user.email;
+					callback({user: user, session: sessionID}, req, res, successback, errback);
+				} else {
 					res.writeHead(403);
+					responseContent.userName = null;
 					responseContent.status = "unauthorized";
 					responseContent.errorMessage = "Can't let you do that, Dave!";
 					res.end(JSON.stringify(responseContent));
-				} else {
-					responseContent.userName = user.email;
-					callback({user: user, session: sessionID}, req, res, successback, errback);
 				}
 			});
 		} else {
