@@ -216,8 +216,7 @@ global.db.open(function(err, db){
 									}
 								});	
 							} else {
-								res.writeHead(403);
-								res.end("Can't do that: Login invalid");
+								errback(new distro.error.ClientError("Invalid credentials"));
 							}
 						});
 					} else {
