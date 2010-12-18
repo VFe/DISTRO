@@ -1,6 +1,7 @@
 # TODO #
 ## Frontend ##
 * Build Login and Registration Front End
+* Landing page handling
 
 ## Backend ##
 * Choose RDBMS Driver _Maybe Not..._

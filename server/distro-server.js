@@ -40,7 +40,7 @@ DISTROUsers.prototype.userExists = function(email, callback){
 		this.collection.findOne({"email":email}, function(err, result){
 			callback(err, !!result);
 		});
-	} else{callback(new distro.error.ClientError("email invalid"), null)}
+	} else {callback(new distro.error.ClientError("email invalid"), null)};
 }
 DISTROUsers.prototype.userWithCredentials = function(email, password, callback){
 	if (!email || !password){
@@ -263,6 +263,10 @@ global.db.open(function(err, db){
 				app.get('/badthings', function(){
 					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM") }, 0); //TODO: FIND A SOLUTION FOR THIS
 				});
+				app.get('/:pageid', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+					//Tell the front end to load lightbox with pageid
+					errback(new distro.error.ClientError("not implemented"));
+				}));
 			}),
 			connect.staticProvider(__dirname + '/static')
 		).listen(3000);
