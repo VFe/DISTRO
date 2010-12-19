@@ -28,21 +28,23 @@ DISTROUsers.prototype.init = function(callback){
 			callback();
 		}
 	});
-}
+};
 DISTROUsers.hash = function(password, salt){
 	return new crypto.Hash("sha1").update(password + salt).digest("hex");
-}
+};
 DISTROUsers.passwordIsAcceptable = function(password){
 	return (password.length > 2);
-}
+};
 DISTROUsers.prototype.userExists = function(email, callback){
+	//This regex isn't _nearly_ complete, but it mostly works (The alternative is a page long PCRE that is completely compliant with RFC 822)
+	//If we decide we want the _insanely_ long one, an example is here http://www.ex-parrot.com/pdw/Mail-RFC822-Address.html
 	var re = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
 	if (re.test(email)){
 		this.collection.findOne({"email":email}, function(err, result){
 			callback(err, !!result);
 		});
-	} else {callback(new distro.error.ClientError("email invalid"), null)};
-}
+	} else {callback(new distro.error.ClientError("email invalid"), null);}
+};
 DISTROUsers.prototype.userWithCredentials = function(email, password, callback){
 	if (!email || !password){
 		callback(new Error("Missing credentials"), false);
@@ -58,20 +60,19 @@ DISTROUsers.prototype.userWithCredentials = function(email, password, callback){
 			callback(null, null);
 		}
 	});
-}
+};
 DISTROUsers.prototype.userWithUserID = function(userID, callback){
 	if (!(userID instanceof mongoDB.ObjectID)){
 		userID = new mongoDB.ObjectID(userID);
 	}
 	this.collection.findOne({"_id":userID}, callback);
-}
-
+};
 DISTROUsers.prototype.registerUser = function(email, password, callback){
 	var self = this;
 	var salt = Math.floor(Math.random() * 0x100000000).toString(16);
 	self.userExists(email, function(err, exists){
 		if(err){
-			callback(err, null)
+			callback(err, null);
 		} else if (exists){
 			callback("user already exists!", null);
 		} else {
@@ -80,7 +81,7 @@ DISTROUsers.prototype.registerUser = function(email, password, callback){
 			});
 		}
 	});
-}
+};
 
 function DISTROSessions(){}
 DISTROSessions.prototype.init = function(callback){
@@ -248,7 +249,7 @@ global.db.open(function(err, db){
 						} else {
 							successback({userName:null});
 						}
-					})
+					});
 				}));
 				app.get('/register', methodNotAllowed);
 				app.post('/register', distro.request.handleRequest(false, function(session, req, res, successback, errback){
