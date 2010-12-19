@@ -288,7 +288,6 @@ global.db.open(function(err, db){
 						res.end("You didn't send me the codes");//This should be a little more descriptive
 					}
 				}));
-<<<<<<< HEAD
 				app.get('/badthings', function(){
 					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM"); }, 0); //TODO: FIND A SOLUTION FOR THIS (Maybe just set a global exception handler in node?)
 				});
@@ -302,10 +301,8 @@ global.db.open(function(err, db){
 							errback(new distro.error.ClientError("something bad happened"));
 						}
 					});
-=======
 				app.get('/ping', distro.request.handleRequest(true, function(session, req, res, successback, errback){
 					successback();
->>>>>>> 163d7af9d433f7e97d6dfdf7972f11c3173cf48c
 				}));
 			}),
 			connect.staticProvider(__dirname + '/static')
