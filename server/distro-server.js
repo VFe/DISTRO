@@ -301,10 +301,7 @@ global.db.open(function(err, db){
 							errback(new distro.error.ClientError("something bad happened"));
 						}
 					});
-<<<<<<< HEAD
 				}));
-=======
->>>>>>> aaf1f6a51b85cd3db809c7939da8b55989a8ec30
 				app.get('/ping', distro.request.handleRequest(true, function(session, req, res, successback, errback){
 					successback();
 				}));
