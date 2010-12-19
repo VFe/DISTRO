@@ -183,6 +183,17 @@ DISTROBands.prototype.init = function(callback){
 		}
 	});
 };
+DISTROBands.prototype.findBandByID = function(bandID, callback){
+	this.collection.findOne({"bandID":bandID}, function(err, bandDoc){ //this.collection seems to be undefined...
+		if(err) {
+			callback(err, null);
+		} else if(!doc){
+			callback("band not found", null);
+		} else {
+			callback(err, bandDoc);
+		}
+	});
+};
 
 function initMany(){
 	var callees = Array.prototype.slice.call(arguments, 0, arguments.length - 1),
@@ -281,8 +292,15 @@ global.db.open(function(err, db){
 					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM"); }, 0); //TODO: FIND A SOLUTION FOR THIS (Maybe just set a global exception handler in node?)
 				});
 				app.get('/b/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-					//Tell the front end to load lightbox with bandID
-					errback(new distro.error.ClientError("not implemented"));
+					global.bands.findBandByID(req.bandID, function(err, bandDoc){
+						if(err){
+							errback(err);
+						} else if(JSON.stringify(bandDoc)){
+							successback(bandDoc);
+						} else {
+							errback(new distro.error.ClientError("something bad happened"));
+						}
+					});
 				}));
 			}),
 			connect.staticProvider(__dirname + '/static')
