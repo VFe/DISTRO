@@ -1,38 +1,54 @@
 var distro = {
 	SERVER: "http://localhost:3000/",
 	global: new Backbone.Model({}),
-	pyramidHead: function(message, callback){
+	pyramidHead: function(message, retryback, giveupback){
 		var composedMessage = 'Pyramid head says\u2026\n' + message;
-		if (callback) {
+		if (retryback) {
 			if (confirm(composedMessage + '\n\nDo you want me to try that request again now?')) {
-				callback();
+				retryback();
+			} else if (giveupback) {
+				giveupback();
 			}
 		} else {
 			alert(composedMessage);
 		}
 	},
 	request: function(path, data, hollerback){
+		var responseData = null
 		$.ajax({
 			url: (distro.SERVER + path),
-			data: JSON.stringify(data),
+			data: (data ? JSON.stringify(data) : null),
 			type: (data ? 'POST' : 'GET'),
 			contentType: (data ? 'application/json' : undefined),
-			success: function(responseData, status, xhr){
-				if (responseData && 'userName' in responseData) {
-					distro.global.set({user: responseData.userName});
-				}
+			success: function(responseDataInternal, status, xhr){
+				responseData = responseDataInternal;
 				hollerback.succeed(responseData, status, xhr);
 			},
 			error: function(xhr, status, error){
-				var responseData = null;
 				try{
 					responseData = $.parseJSON(xhr.responseText);
 				} catch(e) {
 					distro.pyramidHead("The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken.", function(){
 						distro.request(path, data, hollerback);
+					}, function(){
+						hollerback.fail(responseData, status, xhr);
 					});
+					return;
 				}
-				hollerback.fail(responseData, status, xhr);
+				if (xhr.status === 500) {
+					distro.pyramidHead("The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken.", function(){
+						distro.request(path, data, hollerback);
+					}, function(){
+						hollerback.fail(responseData, status, xhr);
+					});
+				} else {
+					hollerback.fail(responseData, status, xhr);
+				}
+			},
+			complete: function(){
+				if (responseData && 'userName' in responseData) {
+					distro.global.set({user: responseData.userName});
+				}
 			}
 		})
 	}
@@ -376,6 +392,7 @@ var tracks = new Backbone.Collection(),
 	player = new Player(),
 	musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
 
+distro.request('ping', null, new Hollerback({}));
 
 // Miscellaneous UI
 $('.button').live('mousedown', function(e){

@@ -72,7 +72,7 @@ DISTROUsers.prototype.registerUser = function(email, password, callback){
 		if(err){
 			callback(err, null)
 		} else if (exists){
-			callback("user already exists!", null);
+			callback(new distro.error.ClientError("user already exists!"), null);
 		} else {
 			self.collection.insert({"email":email, "hash":DISTROUsers.hash(password, salt), "salt":salt}, function(err, doc){
 				callback(err, doc[0]._id);
@@ -246,7 +246,7 @@ global.db.open(function(err, db){
 									if(err){
 										errback(err);
 									} else {
-										successback();
+										successback({userName: body.email});
 									}
 								});
 								//successback();
@@ -260,9 +260,9 @@ global.db.open(function(err, db){
 						res.end("You didn't send me the codes");
 					}
 				}));
-				app.get('/badthings', function(){
-					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM") }, 0); //TODO: FIND A SOLUTION FOR THIS
-				});
+				app.get('/ping', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+					successback();
+				}));
 			}),
 			connect.staticProvider(__dirname + '/static')
 		).listen(3000);
