@@ -13,6 +13,7 @@ var util = require('util'),
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 global.users = new DISTROUsers();
 global.sessions = new DISTROSessions();
+global.bands = new DISTROBands();
 
 function DISTROUsers(){}
 DISTROUsers.prototype.init = function(callback){
@@ -21,7 +22,7 @@ DISTROUsers.prototype.init = function(callback){
 		if (err) {
 			throw err;
 		} else if (!collection) {
-			throw "Collection is not defined";
+			throw "users collection is not defined";
 		} else {
 			self.collection = collection;
 			callback();
@@ -88,7 +89,7 @@ DISTROSessions.prototype.init = function(callback){
 		if (err) {
 			throw err;
 		} else if (!collection) {
-			throw "Collection is not defined";
+			throw "sessions collection is not defined";
 		} else {
 			self.collection = collection;
 			callback();
@@ -167,6 +168,21 @@ DISTROSessions.prototype.startSessionForUserID = function (userID, extendedSessi
 	});
 };
 
+function DISTROBands(){}
+DISTROBands.prototype.init = function(callback){
+	var self = this;
+	global.db.collection('bands', function(err, collection){
+		if(err) {
+			throw err;
+		} else if(!collection) {
+			throw "bands collection is not defined";
+		} else {
+			self.collection = collection;
+			callback();
+		}
+	});
+};
+
 function initMany(){
 	var callees = Array.prototype.slice.call(arguments, 0, arguments.length - 1),
 	    remaining = callees.length;
@@ -240,7 +256,7 @@ global.db.open(function(err, db){
 					if(body && body.email && body.password){
 						global.users.registerUser(body.email, body.password, function(err, userID){
 							if (err) {
-								errback(err);
+								errback(new distro.error.ClientError(err));
 							} else if(userID){
 								global.sessions.startSessionForUserID(userID, null, req, res, function(err){
 									if(err){
@@ -257,14 +273,14 @@ global.db.open(function(err, db){
 						});
 					} else {
 						res.writeHead(403);
-						res.end("You didn't send me the codes");
+						res.end("You didn't send me the codes");//This should be a little more descriptive
 					}
 				}));
 				app.get('/badthings', function(){
-					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM") }, 0); //TODO: FIND A SOLUTION FOR THIS
+					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM"); }, 0); //TODO: FIND A SOLUTION FOR THIS (Maybe just set a global exception handler in node?)
 				});
-				app.get('/:pageid', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-					//Tell the front end to load lightbox with pageid
+				app.get('/b/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+					//Tell the front end to load lightbox with bandID
 					errback(new distro.error.ClientError("not implemented"));
 				}));
 			}),
