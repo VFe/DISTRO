@@ -103,9 +103,6 @@ global.db.open(function(err, db){
 						res.end("You didn't send me the codes");//This should be a little more descriptive
 					}
 				}));
-				app.get('/badthings', function(){
-					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM"); }, 0); //TODO: FIND A SOLUTION FOR THIS (Maybe just set a global exception handler in node?)
-				});
 				app.get('/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 					global.bands.findBandByID(req.bandID, function(err, bandDoc){
 						if(err){
