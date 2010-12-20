@@ -83,7 +83,7 @@ global.db.open(function(err, db){
 					if(body && body.email && body.password){
 						global.users.registerUser(body.email, body.password, function(err, userID){
 							if (err) {
-								errback(new distro.error.ClientError(err));
+								errback(err);
 							} else if(userID){
 								global.sessions.startSessionForUserID(userID, null, req, res, function(err){
 									if(err){
@@ -106,7 +106,7 @@ global.db.open(function(err, db){
 				app.get('/badthings', function(){
 					setTimeout(function(){ throw new Error("BAD THINGS GO BOOM"); }, 0); //TODO: FIND A SOLUTION FOR THIS (Maybe just set a global exception handler in node?)
 				});
-				app.get('/b/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				app.get('/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 					global.bands.findBandByID(req.bandID, function(err, bandDoc){
 						if(err){
 							errback(err);
