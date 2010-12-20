@@ -103,6 +103,9 @@ global.db.open(function(err, db){
 						res.end("You didn't send me the codes");//This should be a little more descriptive
 					}
 				}));
+				app.get('/ping', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+					successback();
+				}));
 				app.get('/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 					global.bands.findBandByID(req.bandID, function(err, bandDoc){
 						if(err){
@@ -113,9 +116,6 @@ global.db.open(function(err, db){
 							errback(new distro.error.ClientError("something bad happened"));
 						}
 					});
-				}));
-				app.get('/ping', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-					successback();
 				}));
 			}),
 			connect.staticProvider(__dirname + '/static')
