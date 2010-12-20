@@ -394,6 +394,10 @@ var tracks = new Backbone.Collection(),
 
 distro.request('ping', null, new Hollerback({}));
 
+$('#logOut').click(function(){
+	distro.request('logout', {}, new Hollerback({}));
+});
+
 // Miscellaneous UI
 $('.button').live('mousedown', function(e){
 	e.preventDefault();

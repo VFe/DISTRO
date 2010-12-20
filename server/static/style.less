@@ -187,14 +187,13 @@ tr.filler>td{
 	vertical-align: middle;
 }
 #user{
-	cursor: pointer;
 	margin: 0 0.5em;
 	display: inline-block;
 	padding: 0.3em 1.7em 0.3em 0.6em;
 	line-height: 100%;
 	.border-radius(0.4em);
 	margin: -0.1em 0.4em;
-	cursor: pointer;
+	cursor: default;
 	background-image: url(images/menuDisclosure.png);
 	background-repeat: no-repeat;
 	background-position: right center;
@@ -209,6 +208,12 @@ tr.filler>td{
 	margin: -0.07em 0.33em;
 	border: 0.1em solid rgba(255, 255, 255, 0.1);
 }
+#user>.dropdown{
+	display: none;
+}
+#user:hover>.dropdown{
+	display: block;
+}
 #userIcon{
 	vertical-align: middle;
 	margin-right: 0.5em;
@@ -216,6 +221,21 @@ tr.filler>td{
 }
 #userName{
 	vertical-align: middle;
+}
+ul.dropdown{
+	background: #222;
+	list-style: none;
+	padding: 0px;
+	position: absolute;
+	min-width: 100%;
+	top: 1.4em;
+	right: 0;
+	.border-radius(0 0 0.5em 0.5em);
+}
+ul.dropdown>li>a{
+	color: inherit;
+	line-height: 2em;
+	padding: 1em;
 }
 .right{
 	float: right;
