@@ -45,9 +45,6 @@ global.db.open(function(err, db){
 					res.end("Method Not Allowed");
 				}
 
-				app.get('/', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-					successback({response: "Welcome, "+session.user.email+"!"});
-				}));
 				app.get('/login', methodNotAllowed);
 				app.post('/login', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 					var login = req.body;
