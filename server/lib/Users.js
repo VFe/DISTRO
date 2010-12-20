@@ -1,5 +1,6 @@
 var mongoDB = require('mongodb'),
-    crypto = require('crypto');
+    crypto = require('crypto'),
+    error = require('./error');
 
 function Users(){}
 module.exports = Users;
@@ -32,7 +33,7 @@ Users.prototype.userExists = function(email, callback){
 		this.collection.findOne({"email":email}, function(err, result){
 			callback(err, !!result);
 		});
-	} else {callback(new distro.error.ClientError("email invalid"), null);}
+	} else {callback(new error.ClientError("email invalid"), null);}
 };
 Users.prototype.userWithCredentials = function(email, password, callback){
 	if (!email || !password){
@@ -63,7 +64,7 @@ Users.prototype.registerUser = function(email, password, callback){
 		if(err){
 			callback(err, null);
 		} else if (exists){
-			callback(new distro.error.ClientError("user already exists!"), null);
+			callback(new error.ClientError("user already exists!"), null);
 		} else {
 			self.collection.insert({"email":email, "hash":hash(password, salt), "salt":salt}, function(err, doc){
 				callback(err, doc[0]._id);
