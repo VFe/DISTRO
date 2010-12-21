@@ -1,0 +1,36 @@
+{
+	"global": {
+		"pyramidHead": {
+			"pre": "Pyramid head says\u2026",
+			"tryAgain": "Do you want me to try that request again now?"
+		},
+		"serverError": "The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken."
+	},
+	"chrome": {
+		"logOut": "Log out"
+	},
+	"library": {
+		"name": "Name",
+		"receivedFrom": "Received from",
+		"time": "Time",
+		"artist": "Artist"
+	},
+	"registration": {
+		"emailAddressQuery": "What's your email address?",
+		"passwordQuery": "What's your DISTRO password?",
+		"registerQuery": "Are you new here?",
+		"registerLabel": "Register",
+		"logInLabel": "Log in",
+		"errors": {
+			"badEmail": "The email address you entered doesn't look right.",
+			"invalidCredentials": "This username and password aren't working.",
+			"noCredentials": "Please enter a username and password.",
+			"existingUser": "This email address already has an account with DISTRO."
+		}
+	},
+	"bands": {
+		"errors": {
+			"noBand": "This band doesn't exist"
+		}
+	}
+}

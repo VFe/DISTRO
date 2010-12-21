@@ -59,12 +59,11 @@ global.db.open(function(err, db){
 									}
 								});	
 							} else {
-								errback(new distro.error.ClientError("Invalid credentials"));
+								errback(new distro.error.ClientError("registration.errors.invalidCredentials"));
 							}
 						});
 					} else {
-						res.writeHead(403);
-						res.end("Can't do that: Login invalid");
+						errback(new distro.error.ClientError("registration.errors.noCredentials"));
 					}
 				}));
 				app.get('/logout', methodNotAllowed);
@@ -84,7 +83,7 @@ global.db.open(function(err, db){
 						global.users.registerUser(body.email, body.password, function(err, userID){
 							if (err) {
 								errback(err);
-							} else if(userID){
+							} else {
 								global.sessions.startSessionForUserID(userID, null, req, res, function(err){
 									if(err){
 										errback(err);
@@ -92,15 +91,10 @@ global.db.open(function(err, db){
 										successback({userName: body.email});
 									}
 								});
-								//successback();
-							} else {
-								res.writeHead(403);
-								res.end("Can't do that: " + err);
 							}
 						});
 					} else {
-						res.writeHead(403);
-						res.end("You didn't send me the codes");//This should be a little more descriptive
+						errback(new distro.error.ClientError("registration.errors.noCredentials"));
 					}
 				}));
 				app.get('/ping', distro.request.handleRequest(true, function(session, req, res, successback, errback){
@@ -113,7 +107,7 @@ global.db.open(function(err, db){
 						} else if(JSON.stringify(bandDoc)){
 							successback(bandDoc);
 						} else {
-							errback(new distro.error.ClientError("something bad happened"));
+							errback(new distro.error.ClientError("bands.errors.noBand"));
 						}
 					});
 				}));

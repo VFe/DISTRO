@@ -1,10 +1,43 @@
 var distro = {
 	SERVER: "http://localhost:3000/",
 	global: new Backbone.Model({}),
+	loc: {
+		init: function(callback){
+			var self = this;
+			// $.getJSON handles JSON parse errors silently! This should be replaced with a $.ajax call with appropriate error handling.
+			$.getJSON('/localized/en-US.json', function(data){
+				self.locale = data;
+				callback();
+			});
+		},
+		str: function(pathString){
+			var path = pathString.split('.'), pathComponent, current = this.locale;
+			
+			try {
+				while ((pathComponent = path.shift())){
+					current = current[pathComponent];
+				}
+				if (typeof current === 'string') {
+					return current;
+				}
+			} catch (e) {}
+			return '';
+		},
+		replacePlaceholders: function(){
+			var self = this;
+			$('[data-distro-localized-string]').each(function(){
+				var $el = $(this), stringPath = $el.attr('data-distro-localized-string'), string = self.str($el.attr('data-distro-localized-string'));
+				if (!string) {
+					console && console.error && console.error("Couldn't find localized string '" + stringPath + "'");
+				}
+				$el.replaceWith(document.createTextNode(string));
+			});
+		}
+	},
 	pyramidHead: function(message, retryback, giveupback){
-		var composedMessage = 'Pyramid head says\u2026\n' + message;
+		var composedMessage = distro.loc.str('global.pyramidHead.pre') + '\n' + message;
 		if (retryback) {
-			if (confirm(composedMessage + '\n\nDo you want me to try that request again now?')) {
+			if (confirm(composedMessage + '\n\n' + distro.loc.str('global.pyramidHead.tryAgain'))) {
 				retryback();
 			} else if (giveupback) {
 				giveupback();
@@ -28,7 +61,7 @@ var distro = {
 				try{
 					responseData = $.parseJSON(xhr.responseText);
 				} catch(e) {
-					distro.pyramidHead("The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken.", function(){
+					distro.pyramidHead(distro.loc.str('global.serverError'), function(){
 						distro.request(path, data, hollerback);
 					}, function(){
 						hollerback.fail(responseData, status, xhr);
@@ -36,7 +69,7 @@ var distro = {
 					return;
 				}
 				if (xhr.status === 500) {
-					distro.pyramidHead("The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken.", function(){
+					distro.pyramidHead(distro.loc.str('global.serverError'), function(){
 						distro.request(path, data, hollerback);
 					}, function(){
 						hollerback.fail(responseData, status, xhr);
@@ -122,17 +155,17 @@ distro.lightbox = new Lightbox;
 					lightbox.$lightbox.haml(['#loginRegisterBox.lightboxContent', {style: "max-height: 40em; overflow-y: auto;"},
 						['%form', {$:{$:function(){ $form = this; }}},
 							['%dl',
-								['%dt', ['%label', {'for':'emailAddress'}, "What's your email address?"]],
+								['%dt', ['%label', {'for':'emailAddress'}, distro.loc.str('registration.emailAddressQuery')]],
 								['%dd', ['%input#emailAddress', {$:{$:function(){
 									$emailField = this;
 									submitStatus.bind('change:submitting', function(m, submitting){ $emailField.attr('disabled', submitting ? true : null) });
 								}}, size:'35', placeholder:'s@distro.fm'}]],
-								['%dt', ['%label', {'for':'password'}, "What's your DISTRO password?"]],
+								['%dt', ['%label', {'for':'password'}, distro.loc.str('registration.passwordQuery')]],
 								['%dd', ['%input#password', {$:{$:function(){
 									$passwordField = this;
 									submitStatus.bind('change:submitting', function(m, submitting){ $passwordField.attr('disabled', submitting ? true : null) });
 								}}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
-								['%dt', ['%label', {'for':'registrationType'}, "Are you new here?"]],
+								['%dt', ['%label', {'for':'registrationType'}, distro.loc.str('registration.registerQuery')]],
 								['%dd', ['%input#registrationType', {$:{$:function(){
 									$registerCheckbox = this;
 									submitStatus.bind('change:submitting', function(m, submitting){ $registerCheckbox.attr('disabled', submitting ? true : null) });
@@ -142,24 +175,24 @@ distro.lightbox = new Lightbox;
 								['%button#submitButton', {$:{$:function(){
 									$submitButton = this;
 									submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
-								}}, 'class': "button lightboxButton"}, 'LOG IN'],
+								}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')],
 							]
 						]
 					]);
 					$registerCheckbox.change(function(){
-						$submitButton.text($registerCheckbox[0].checked ? 'REGISTER' : 'LOG IN');
+						$submitButton.text($registerCheckbox[0].checked ? distro.loc.str('registration.registerLabel') : distro.loc.str('registration.logInLabel'));
 					});
 					$form.submit(function(e){
 						e.preventDefault();
 						var email = $emailField.val(), password = $passwordField.val(), register = $registerCheckbox[0].checked;
 						if (!email || !password) {
-							alert('Please enter a username and a password.');
+							alert(distro.loc.str('registration.errors.noCredentials'));
 						} else {
 							submitStatus.set({submitting: true});
 							distro.request(register ? 'register' : 'login', {email: email, password: password}, new Hollerback({
 								failure: function(data){
 									if (data && data.errorMessage) {
-										alert(data.errorMessage);
+										alert(distro.loc.str(data.errorMessage) || data.errorMessage);
 									}
 								},
 								complete: function(){
@@ -387,23 +420,44 @@ Player.prototype.stop = function(){
 	this.audio.load();
 };
 
+function initMany(){
+	var callees = Array.prototype.slice.call(arguments, 0, arguments.length - 1),
+	    remaining = callees.length;
+		callback = arguments[arguments.length - 1];
+	if (callees.length === 0) {
+		setTimeout(callback, 0);
+	}
+	function ownCallback(){
+		if (--remaining === 0) {
+			callback();
+		}
+	}
+	callees.forEach(function(callee){
+		callee.init(ownCallback);
+	});
+}
+
 // Initialization
-var tracks = new Backbone.Collection(),
-	player = new Player(),
-	musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
+initMany(distro.loc, function(){
+	var tracks = window.tracks = new Backbone.Collection(),
+		player = window.player = new Player(),
+		musicListView = window.musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
+	
+	distro.loc.replacePlaceholders();
+	
+	distro.request('ping', null, new Hollerback({}));
 
-distro.request('ping', null, new Hollerback({}));
+	$('#logOut').click(function(){
+		distro.request('logout', {}, new Hollerback({}));
+	});
 
-$('#logOut').click(function(){
-	distro.request('logout', {}, new Hollerback({}));
-});
-
-// Miscellaneous UI
-$('.button').live('mousedown', function(e){
-	e.preventDefault();
-});
-$('a').live('click', function(e){
-	if (this.href.indexOf('#') !== -1) {
+	// Miscellaneous UI
+	$('.button').live('mousedown', function(e){
 		e.preventDefault();
-	};
+	});
+	$('a').live('click', function(e){
+		if (this.href.indexOf('#') !== -1) {
+			e.preventDefault();
+		};
+	});
 });

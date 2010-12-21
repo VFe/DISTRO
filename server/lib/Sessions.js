@@ -75,6 +75,7 @@ Sessions.prototype.endSession = function(sessionID, res, callback){
 	attachCookieToResponse("", {expires:new Date(0)}, res); //Destroy Cookie
 };
 Sessions.prototype.startSessionForUserID = function (userID, extendedSession, req, res, callback){
+	if (!userID) { callback(new Error("startSessionForUserID: null userID")); };
 	var sessionID = uuid.generate('ascii');
 	this.collection.insert({"userID":userID, "session":sessionID, "lastRenewal":new Date, "extended":extendedSession}, function(err, doc){
 		if (err){

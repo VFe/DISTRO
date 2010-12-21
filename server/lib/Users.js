@@ -33,11 +33,11 @@ Users.prototype.userExists = function(email, callback){
 		this.collection.findOne({"email":email}, function(err, result){
 			callback(err, !!result);
 		});
-	} else {callback(new error.ClientError("email invalid"), null);}
+	} else {callback(new error.ClientError("registration.errors.badEmail"), null);}
 };
 Users.prototype.userWithCredentials = function(email, password, callback){
 	if (!email || !password){
-		callback(new Error("Missing credentials"), false);
+		callback(new error.ClientError("registration.errors.noCredentials"), false);
 		return;
 	}
 	this.collection.findOne({"email":email}, function(err, result){
@@ -64,10 +64,14 @@ Users.prototype.registerUser = function(email, password, callback){
 		if(err){
 			callback(err, null);
 		} else if (exists){
-			callback(new error.ClientError("user already exists!"), null);
+			callback(new error.ClientError("registration.errors.existingUser"), null);
 		} else {
 			self.collection.insert({"email":email, "hash":hash(password, salt), "salt":salt}, function(err, doc){
-				callback(err, doc[0]._id);
+				if (doc && doc[0] && doc[0]._id) {
+					callback(err, doc[0]._id);
+				} else {
+					callback(err || new Error("registerUser: user could not be created"), null);
+				}
 			});
 		}
 	});
