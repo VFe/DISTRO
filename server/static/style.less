@@ -402,7 +402,7 @@ ul.dropdown>li>a{
 	display: inline-block;
 	background: #191919;
 	.border-radius(1em);
-	.box-shadow(0.3em 0.5em 1em rgba(0, 0, 0, 1));
+	.box-shadow(0.3em 0.5em 1em rgb(0, 0, 0));
 	cursor: pointer;
 }
 #howItWorksClickie>span{
@@ -424,12 +424,43 @@ ul.dropdown>li>a{
 	width: 100%;
 	//display: none;
 }
+#lightbox .lightboxHeader{
+	.simpleGradient(rgb(33, 33, 33), #333);
+	background-attachment: initial;
+	background-origin: initial;
+	background-clip: initial;
+	background-color: initial;
+	margin-bottom: 0.5em;
+	line-height: 2.3em;
+	width: 100%;
+	background-position: initial initial;
+	background-repeat: initial initial;
+}
+#lightbox .lightboxHeader .close{
+	float: right;
+	color: #555;
+	font-size: 1.5em;
+	line-height: 1.3;
+	margin-right: 0.5em;
+	vertical-align: top;
+}
+#lightbox .lightboxHeader h1{
+	color: #AAA;
+	font-weight: normal;
+	text-align: center;
+	font-size: 1.3em;
+	margin: 0;
+}
 #lightbox .lightboxContent{
-	background: black;
-	border: 0.2em solid white;
+	background: #1F1F1F;
 	color: white;
 	margin: 10em auto 0px;
 	vertical-align: middle;
+	max-height: 100em;
+	overflow-y: auto;
+	width: 60em;
+	padding: 0.5em 1em 1em 1em;
+	.border-radius(0.5em);
 }
 #lightbox button{
 	margin: 0 1.5em 1.5em 1.5em;
@@ -444,10 +475,40 @@ ul.dropdown>li>a{
 	.border-radius(0.2em);
 	.box-shadow(0px 0px 0.5em rgba(160, 255, 160, 0.5));
 }
+#lightbox .lightboxContent .content{
+	background: rgb(52, 52, 52);
+}
 #lightbox button:disabled{
 	color: #AAA;
 	cursor: default;
 	.box-shadow(none);
+}
+#bandBox{
+	width: 60em;
+}
+#bandBox .leftContent{
+	width: 500px;
+	max-height: 90em;
+	padding-bottom: 0.5em;
+	padding-top: 0.5em;
+	text-align: left;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+#bandBox .leftContent .photo{
+	display: block;
+	margin-bottom: 0.5em;
+}
+#bandBox .contentBox{
+	position: relative;
+}
+#bandBox .rightContent{
+	width: 16.5em;
+	text-align: right;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
 }
 #kmNetworkBox .tiers{
 	padding: 0;
