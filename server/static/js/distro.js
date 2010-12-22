@@ -189,7 +189,7 @@ distro.lightbox = new Lightbox;
 							alert(distro.loc.str('registration.errors.noCredentials'));
 						} else {
 							submitStatus.set({submitting: true});
-							distro.request(register ? 'register' : 'login', {email: email, password: password}, new Hollerback({
+							distro.request(register ? 'api/register' : 'api/login', {email: email, password: password}, new Hollerback({
 								failure: function(data){
 									if (data && data.errorMessage) {
 										alert(distro.loc.str(data.errorMessage) || data.errorMessage);
@@ -445,10 +445,10 @@ initMany(distro.loc, function(){
 	
 	distro.loc.replacePlaceholders();
 	
-	distro.request('ping', null, new Hollerback({}));
+	distro.request('api/ping', null, new Hollerback({}));
 
 	$('#logOut').click(function(){
-		distro.request('logout', {}, new Hollerback({}));
+		distro.request('api/logout', {}, new Hollerback({}));
 	});
 
 	// Miscellaneous UI
