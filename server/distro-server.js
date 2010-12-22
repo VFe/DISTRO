@@ -101,7 +101,7 @@ global.db.open(function(err, db){
 					successback();
 				}));
 				app.get('/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-					global.bands.findBandByID(req.bandID, function(err, bandDoc){
+					global.bands.findBandByID(req.params.bandID, function(err, bandDoc){
 						if(err){
 							errback(err);
 						} else if(JSON.stringify(bandDoc)){
