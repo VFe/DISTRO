@@ -34,7 +34,7 @@ global.db.open(function(err, db){
 	if (err){
 		throw err;
 	}
-	initMany(global.users, global.sessions, function(){
+	initMany(global.users, global.sessions, global.bands, function(){
 		connect.createServer(
 			connect.logger(),
 			connect.cookieDecoder(),
