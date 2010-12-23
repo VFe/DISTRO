@@ -462,31 +462,33 @@ initMany(distro.loc, function(){
 	});
 });
 
-function landingPage(){
-	$('#lightbox').haml([".lightboxContent#bandBox",
-		["%form", {},
-			[".lightboxHeader",
-				["%span.close", {}, "x"],
-				["%h1","^arcade_fire^"]
-			],
-			[".contentBox",
-				[".content .leftContent",
-					["%img.photo",{src:"http://farm5.static.flickr.com/4150/5042267992_242cfda7e2_d.jpg", width:"500", height:"335"}],
-					["%span.caption",{style:"color: rgb(119, 119, 119);"},
-						["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
-							["%a",{href:"#", style:"text-decoration:none;"}, "papazuba"]
-						],
-						["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, "Montreal, Quebec"],
-						["%p",{style:"margin-top:0px;"}, "Canada"]
-					],
-					["%span#artist",{style:"font-size:36px;"}, 
-						["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, "Arcade Fire"]
-					]
+function landingPage(bandID){
+	$.get("/api/"+bandID, function(data){
+		$('#lightbox').haml([".lightboxContent#bandBox",
+			["%form", {},
+				[".lightboxHeader",
+					["%span.close", {}, "x"],
+					["%h1","^"+data.bandID+"^"]
 				],
-				[".content .rightContent",
-					["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
+				[".contentBox",
+					[".content .leftContent",
+						["%img.photo",{src:"http://farm5.static.flickr.com/4150/5042267992_242cfda7e2_d.jpg", width:"500", height:"335"}],
+						["%span.caption",{style:"color: rgb(119, 119, 119);"},
+							["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
+								["%a",{href:"#", style:"text-decoration:none;"}, "papazuba"]
+							],
+							["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, "Montreal, Quebec"],
+							["%p",{style:"margin-top:0px;"}, "Canada"]
+						],
+						["%span#artist",{style:"font-size:36px;"}, 
+							["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, data.fullname]
+						]
+					],
+					[".content .rightContent",
+						["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
+					]
 				]
 			]
-		]
-	]);
+		]);		
+	});
 }
