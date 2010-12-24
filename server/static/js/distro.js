@@ -485,10 +485,25 @@ function landingPage(bandID){
 						]
 					],
 					[".content .rightContent",
+						["%ul#presence", 
+							["%li#email","arcadefire@arcadefire.com"],
+							["%li#twitter","@arcadefire"],
+							["%li#myspace","@arcadefire"],
+							["%li#lastFM","@arcadefire"],
+							["%li#soundcloud","@arcadefire"],
+							["%li#flickr","@arcadefire"],
+							["%li#youtube","@arcadefire"],
+							["%li#itunes","@arcadefire"],
+							["%li#vimeo","@arcadefire"],
+							["%li#facebook","@arcadefire"],
+							["%li#bandcamp","@arcadefire"],
+							["%li#blog","@arcadefire"]
+							
+						],
 						["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
 					]
 				]
 			]
-		]);		
+		]).fadeIn(100);		
 	});
 }
