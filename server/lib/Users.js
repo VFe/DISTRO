@@ -1,5 +1,4 @@
-var mongoDB = require('mongodb'),
-    crypto = require('crypto'),
+var crypto = require('crypto'),
     error = require('./error');
 
 function Users(){}
@@ -52,9 +51,6 @@ Users.prototype.userWithCredentials = function(email, password, callback){
 	});
 };
 Users.prototype.userWithUserID = function(userID, callback){
-	if (!(userID instanceof mongoDB.ObjectID)){
-		userID = new mongoDB.ObjectID(userID);
-	}
 	this.collection.findOne({"_id":userID}, callback);
 };
 Users.prototype.registerUser = function(email, password, callback){
