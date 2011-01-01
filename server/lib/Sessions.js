@@ -1,8 +1,12 @@
-var uuid = require('uuid'),
+var CollectionManager = require('./lib/CollectionManager'),
+    uuid = require('uuid'),
     connect = require('connect');
 
 function Sessions(){}
 module.exports = Sessions;
+Sessions.prototype = new CollectionManager();
+Sessions.prototype.constructor = Sessions;
+Sessions.collectionName = 'sessions';
 
 Sessions.SESSION_NAME = 'distro_session'; // Session cookie name
 Sessions.SESSION_LENGTH = 86400000; // Twenty four hours
@@ -29,19 +33,6 @@ function attachCookieToResponse(value, options, res){
 	};
 };
 
-Sessions.prototype.init = function(callback){
-	var self = this;
-	global.db.collection('sessions', function(err, collection){
-		if (err) {
-			throw err;
-		} else if (!collection) {
-			throw "sessions collection is not defined";
-		} else {
-			self.collection = collection;
-			callback();
-		}
-	});
-};
 Sessions.prototype.getRequestSession = function(req, res, callback){
 	var sessionID = req.cookies && req.cookies.distro_session;
 	if (sessionID){

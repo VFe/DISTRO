@@ -1,8 +1,12 @@
-var crypto = require('crypto'),
+var CollectionManager = require('./lib/CollectionManager'),
+    crypto = require('crypto'),
     error = require('./error');
 
 function Users(){}
 module.exports = Users;
+Users.prototype = new CollectionManager();
+Users.prototype.constructor = Users;
+Users.collectionName = 'users';
 
 function hash(password, salt){
 	return new crypto.Hash("sha1").update(password + salt).digest("hex");
@@ -11,19 +15,6 @@ function passwordIsAcceptable(password){
 	return (password.length > 2);
 };
 
-Users.prototype.init = function(callback){
-	var self = this;
-	global.db.collection('users', function(err, collection){
-		if (err) {
-			throw err;
-		} else if (!collection) {
-			throw "users collection is not defined";
-		} else {
-			self.collection = collection;
-			callback();
-		}
-	});
-};
 Users.prototype.userExists = function(email, callback){
 	//This regex isn't _nearly_ complete, but it mostly works (The alternative is a page long PCRE that is completely compliant with RFC 822)
 	//If we decide we want the _insanely_ long one, an example is here http://www.ex-parrot.com/pdw/Mail-RFC822-Address.html
