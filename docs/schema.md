@@ -21,9 +21,9 @@
 ### Session
 
     {
-    	userID: ObjectId("4d0b831f9f5bfc2687000001"),
+    	userID: new ObjectId("4d0b831f9f5bfc2687000001"),
     	session: "FFE3EF51-DF7B-4A0A-9A86-0873220733BE",
-    	lastRenewal: Date("Fri Dec 31 2010 17:53:28 GMT-0500 (EST)"),
+    	lastRenewal: new Date("Fri Dec 31 2010 17:53:28 GMT-0500 (EST)"),
     	extended: null
     }
 
@@ -42,9 +42,9 @@
 ### Subscription
 
     {
-    	network: ObjectId("4d20bcaa88f225377486f2e8"),
-    	start: Date("Sun Jan 02 2011 12:58:17 GMT-0500 (EST)"),
-    	end: Date("Sun Jan 02 2012 12:58:17 GMT-0500 (EST)"),
+    	network: new ObjectId("4d20bcaa88f225377486f2e8"),
+    	start: new Date("Sun Jan 02 2011 12:58:17 GMT-0500 (EST)"),
+    	end: new Date("Sun Jan 02 2012 12:58:17 GMT-0500 (EST)"),
     	cancelled: false
     }
 
@@ -53,18 +53,18 @@
 ### Searching for songs in a subscription
 
     {
-    	network: ObjectId("4d20bcaa88f225377486f2e8")
+    	network: new ObjectId("4d20bcaa88f225377486f2e8")
     	$or: [
     		{ onDeck: { $elemMatch: {
-    			start: { $lt: Date("Sun Jan 02 2011 12:58:17 GMT-0500 (EST)") },
+    			start: { $lt: new Date("Sun Jan 02 2011 12:58:17 GMT-0500 (EST)") },
     			end:   { $or: [
     				{ $exists: false },
-    				{ $gt: Date("Sun Jan 02 2011 12:58:17 GMT-0500 (EST)") }
+    				{ $gt: new Date("Sun Jan 02 2011 12:58:17 GMT-0500 (EST)") }
     			] }
     		} } },
     		{ release: {
-    			$gt: Date("Sun Jan 02 2011 12:58:17 GMT-0500 (EST)"),
-    			$lt: Date("Sun Jan 02 2012 12:58:17 GMT-0500 (EST)
+    			$gt: new Date("Sun Jan 02 2011 12:58:17 GMT-0500 (EST)"),
+    			$lt: new Date("Sun Jan 02 2012 12:58:17 GMT-0500 (EST)
     		} }
     	]
     }
