@@ -1,0 +1,26 @@
+# f4adf54d636433d0881ff4b86e9049a587597855 #
+
+Good stuff. I know the you're not finished with band landing pages, just keep this in mind for later:
+
+- Try distro.lightbox instead of modifying $('#lightbox') directly. It's not much now, but will be needed later and I want to give its API a workout. API looks like this right now (`hide` is optional):
+
+      distro.lightbox.show({
+      	show: function(lightbox){
+      		/* set up */
+      		lightbox.$lightbox.haml(/* … */);
+      	},
+      	hide: function(lightbox){
+      		/* clean up */
+      	}
+      });
+
+# a2edcee156c4c47e69da8c947bfb2da7880dd044 #
+
+- You should use distro.request instead of $.get; it has error handling (like 500s) and state handling (like session expiration)
+
+
+# f4b533bc74c0f99ff46e0f099d41e6920c553e6f #
+
+- I think classes work better than ids for presence; they can be scoped to the presence ul.
+- When this thing is closer to working, try using stencil to iterate through presence and only render the ones in the doc
+- distro.lightbox handles fade in.
