@@ -50,6 +50,24 @@
 
 - If a subscription does not have an end date, it is assumed to last forever
 
+### Track
+
+    {
+    	network: new ObjectId("4d20bcaa88f225377486f2e8"),
+    	name: "I can sing for ever and ever",
+    	release: new Date("Tue Dec 28 2010 18:36:32 GMT-0500 (EST)"),
+    	onDeck: [
+    		{
+    			start: new Date("Tue Dec 28 2010 18:36:32 GMT-0500 (EST)"),
+    			end: new Date("Fri Feb 28 2014 04:23:12 GMT-0500 (EST)")
+    		}
+    	]
+    }
+
+- Other track metadata goes here
+- A track may have one or more on-deck periods
+- An on-deck period may not have an end date
+
 ### Searching for songs in a subscription
 
     {
