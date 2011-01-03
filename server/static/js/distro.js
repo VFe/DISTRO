@@ -467,7 +467,7 @@ function landingPage(bandID){
 		$('#lightbox').haml([".lightboxContent#bandBox",
 			["%form", {},
 				[".lightboxHeader",
-					["%span.close", {}, "x"],
+					["%span.close.button", {}, "x"],
 					["%h1","^"+data.bandID+"^"]
 				],
 				[".contentBox",
@@ -484,11 +484,46 @@ function landingPage(bandID){
 							["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, data.fullname]
 						]
 					],
+					[".rightContent .presence", {style:"z-index: 2; top: 0px;"},
+						["%table", {style:"width: 100%;"},
+							["%tbody",
+								["%tr", {align:"center"},
+									["%td",
+										["%a", {href:"http://myspace.com/arcadefire"},
+											["%img", {src:"images/mypsace.jpg"}]
+										]
+									],
+									
+									["%td",
+										["%a", {href:"#facebook"},
+											["%img", {src:"images/facebook.jpg"}]
+										]
+									],
+									
+									["%td",
+										["%a", {href:"#soundcloud"},
+											["%img", {src:"images/soundcloud.jpg"}]
+										]
+									],
+									
+									["%td",
+										["%a", {href:"#bandcamp"},
+											["%img", {src:"images/bandcamp.jpg"}]
+										]
+									]
+								]
+							]
+						]
+					],
 					[".content .rightContent",
-						["%ul#presence", 
+						/*["%ul#presence", 
 							["%li#email","arcadefire@arcadefire.com"],
 							["%li#twitter","@arcadefire"],
-							["%li#myspace","@arcadefire"],
+							["%li#myspace",
+								["%a", {href:"//myspace.com/arcadefire"},
+									["%img", {src:"images/mypsace.jpg"}]
+								]
+							],
 							["%li#lastFM","@arcadefire"],
 							["%li#soundcloud","@arcadefire"],
 							["%li#flickr","@arcadefire"],
@@ -499,7 +534,7 @@ function landingPage(bandID){
 							["%li#bandcamp","@arcadefire"],
 							["%li#blog","@arcadefire"]
 							
-						],
+						],*/
 						["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
 					]
 				]
