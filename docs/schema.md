@@ -39,6 +39,8 @@
     	name: "arcadefire"
     }
 
+- A network's `name` should be unique and URL safe
+
 ### Subscription
 
     {
