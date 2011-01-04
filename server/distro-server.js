@@ -143,6 +143,22 @@ global.db.open(function(err, db){
 					if(err){
 						errback(err);
 					} else if(bandDoc){
+						if ('presence' in bandDoc) {
+							var presenceMap = bandDoc.presence, presenceArray = [], presenceItem;
+							distro.Bands.PRESENCE.forEach(function(presenceSpec){
+								if ((presenceItem = presenceMap[presenceSpec.name])) {
+									presenceArray.push({
+										name: presenceSpec.name,
+										url: (presenceSpec.prefix || '') + presenceItem + (presenceSpec.suffix || '')
+									});
+								}
+								if (presenceArray.length) {
+									bandDoc.presence = presenceArray;
+								} else {
+									delete bandDoc.presence;
+								}
+							});
+						}
 						successback(bandDoc);
 					} else {
 						errback(new distro.error.ClientError("bands.errors.noBand"));
