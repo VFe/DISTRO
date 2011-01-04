@@ -520,35 +520,6 @@ distro.LandingPage = distro.Model.extend({
 									["%li.bandcamp","@arcadefire"],
 									["%li.blog","@arcadefire"]
 								],
-								// ["%table", {style:"width: 100%;"},
-								// 	["%tbody",
-								// 		["%tr", {align:"center"},
-								// 			["%td",
-								// 				["%a", {href:"http://myspace.com/arcadefire"},
-								// 					["%img", {src:"images/mypsace.jpg"}]
-								// 				]
-								// 			],
-								// 		
-								// 			["%td",
-								// 				["%a", {href:"#facebook"},
-								// 					["%img", {src:"images/facebook.jpg"}]
-								// 				]
-								// 			],
-								// 		
-								// 			["%td",
-								// 				["%a", {href:"#soundcloud"},
-								// 					["%img", {src:"images/soundcloud.jpg"}]
-								// 				]
-								// 			],
-								// 		
-								// 			["%td",
-								// 				["%a", {href:"#bandcamp"},
-								// 					["%img", {src:"images/bandcamp.jpg"}]
-								// 				]
-								// 			]
-								// 		]
-								// 	]
-								// ]
 							],
 							[".content.rightContent",
 								["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
