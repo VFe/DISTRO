@@ -3,7 +3,9 @@
 	'error',
 	'Users',
 	'Sessions',
-	'Bands'
+	'Bands',
+	'Tracks',
+	'Networks'
 ].forEach(function(component){
 	exports[component] = require('./' + component);
 });
