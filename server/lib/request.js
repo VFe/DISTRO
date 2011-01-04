@@ -12,7 +12,7 @@ function endResponse(res, status, headers, body){
 
 exports.handleRequest = function(requireAuthentication, callback){
 	return function(req, res) {
-		var responseContent = {status: "OK"};
+		var responseContent = {};
 		function successback(response){
 			connect.utils.merge(responseContent, response);
 			endResponse(res, 200, {}, responseContent)
