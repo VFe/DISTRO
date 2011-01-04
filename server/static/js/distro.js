@@ -124,11 +124,13 @@ Lightbox.prototype.show = function(content){
 	content.show(this);
 	this.$lightbox.fadeIn();
 }
-Lightbox.prototype.hide = function(){
-	var self = this;
-	this.$lightbox.fadeOut(function(){
-		self.hideContent();
-	});
+Lightbox.prototype.hide = function(name){
+	if (!name || (this.content && name === this.content.name)) {
+		var self = this;
+		this.$lightbox.fadeOut(function(){
+			self.hideContent();
+		});
+	}
 }
 Lightbox.prototype.hideContent = function(){
 	if (this.content) {
@@ -141,15 +143,12 @@ distro.lightbox = new Lightbox;
 
 // Login/registration lightbox
 (function(){
-	var loginForm = null;
 	distro.global.bind('change:user', function(model, user){
 		if (user) {
-			if (distro.lightbox.content === loginForm) {
-				distro.lightbox.hide();
-			}
-			loginForm = null;
-		} else if (!loginForm) {
-			distro.lightbox.show((loginForm = {
+			distro.lightbox.hide('login');
+		} else {
+			distro.lightbox.show({
+				name: 'login',
 				show: function(lightbox){
 					var $form, $emailField, $passwordField, $registerCheckbox, $submitButton, submitStatus = new Backbone.Model({submitting:false});
 					lightbox.$lightbox.haml(['#loginRegisterBox.lightboxContent', {style: "max-height: 40em; overflow-y: auto;"},
@@ -203,7 +202,7 @@ distro.lightbox = new Lightbox;
 						return false;
 					});
 				}
-			}));
+			});
 		}
 	});
 })();
