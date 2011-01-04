@@ -139,7 +139,7 @@ global.db.open(function(err, db){
 				}
 			}));
 			app.get('/bands/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				global.bands.findBandByName(req.params.bandID, function(err, bandDoc){
+				global.bands.findBandByName(req.params.bandID, { _id: false }, function(err, bandDoc){
 					if(err){
 						errback(err);
 					} else if(bandDoc){
