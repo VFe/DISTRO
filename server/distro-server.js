@@ -138,7 +138,7 @@ global.db.open(function(err, db){
 					successback({library:[]});
 				}
 			}));
-			app.get('/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+			app.get('/bands/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				global.bands.findBandByName(req.params.bandID, function(err, bandDoc){
 					if(err){
 						errback(err);

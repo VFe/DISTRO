@@ -463,7 +463,7 @@ initMany(distro.loc, function(){
 });
 
 function landingPage(bandName){
-	distro.request(bandName, null, new Hollerback({
+	distro.request('bands/' + bandName, null, new Hollerback({
 		success: function(bandData){
 			$('#lightbox').haml([".lightboxContent#bandBox",
 				["%form", {},
