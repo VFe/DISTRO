@@ -1,5 +1,5 @@
 var distro = {
-	SERVER: "http://localhost:3000/",
+	SERVER: "http://localhost:3000/api/",
 	global: new Backbone.Model({}),
 	loc: {
 		init: function(callback){
@@ -189,7 +189,7 @@ distro.lightbox = new Lightbox;
 							alert(distro.loc.str('registration.errors.noCredentials'));
 						} else {
 							submitStatus.set({submitting: true});
-							distro.request(register ? 'api/register' : 'api/login', {email: email, password: password}, new Hollerback({
+							distro.request(register ? 'register' : 'login', {email: email, password: password}, new Hollerback({
 								failure: function(data){
 									if (data && data.errorMessage) {
 										alert(distro.loc.str(data.errorMessage) || data.errorMessage);
@@ -445,10 +445,10 @@ initMany(distro.loc, function(){
 	
 	distro.loc.replacePlaceholders();
 	
-	distro.request('api/ping', null, new Hollerback({}));
+	distro.request('ping', null, new Hollerback({}));
 
 	$('#logOut').click(function(){
-		distro.request('api/logout', {}, new Hollerback({}));
+		distro.request('logout', {}, new Hollerback({}));
 	});
 
 	// Miscellaneous UI
@@ -462,83 +462,85 @@ initMany(distro.loc, function(){
 	});
 });
 
-function landingPage(bandID){
-	$.get("/api/"+bandID, function(data){
-		$('#lightbox').haml([".lightboxContent#bandBox",
-			["%form", {},
-				[".lightboxHeader",
-					["%span.close.button", {}, "x"],
-					["%h1","^"+data.bandID+"^"]
-				],
-				[".contentBox",
-					[".content .leftContent",
-						["%img.photo",{src:"http://farm5.static.flickr.com/4150/5042267992_242cfda7e2_d.jpg", width:"500", height:"335"}],
-						["%span.caption",{style:"color: rgb(119, 119, 119);"},
-							["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
-								["%a",{href:"#", style:"text-decoration:none;"}, "papazuba"]
-							],
-							["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, "Montreal, Quebec"],
-							["%p",{style:"margin-top:0px;"}, "Canada"]
-						],
-						["%span#artist",{style:"font-size:36px;"}, 
-							["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, data.fullname]
-						]
+function landingPage(bandName){
+	distro.request(bandName, null, new Hollerback({
+		success: function(bandData){
+			$('#lightbox').haml([".lightboxContent#bandBox",
+				["%form", {},
+					[".lightboxHeader",
+						["%span.close.button", {}, "x"],
+						["%h1","^"+bandData.name+"^"]
 					],
-					[".rightContent .presence", {style:"z-index: 2; top: 0px;"},
-						["%table", {style:"width: 100%;"},
-							["%tbody",
-								["%tr", {align:"center"},
-									["%td",
-										["%a", {href:"http://myspace.com/arcadefire"},
-											["%img", {src:"images/mypsace.jpg"}]
-										]
-									],
+					[".contentBox",
+						[".content .leftContent",
+							["%img.photo",{src:"http://farm5.static.flickr.com/4150/5042267992_242cfda7e2_d.jpg", width:"500", height:"335"}],
+							["%span.caption",{style:"color: rgb(119, 119, 119);"},
+								["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
+									["%a",{href:"#", style:"text-decoration:none;"}, "papazuba"]
+								],
+								["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, "Montreal, Quebec"],
+								["%p",{style:"margin-top:0px;"}, "Canada"]
+							],
+							["%span#artist",{style:"font-size:36px;"}, 
+								["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, bandData.fullname]
+							]
+						],
+						[".rightContent .presence", {style:"z-index: 2; top: 0px;"},
+							["%table", {style:"width: 100%;"},
+								["%tbody",
+									["%tr", {align:"center"},
+										["%td",
+											["%a", {href:"http://myspace.com/arcadefire"},
+												["%img", {src:"images/mypsace.jpg"}]
+											]
+										],
 									
-									["%td",
-										["%a", {href:"#facebook"},
-											["%img", {src:"images/facebook.jpg"}]
-										]
-									],
+										["%td",
+											["%a", {href:"#facebook"},
+												["%img", {src:"images/facebook.jpg"}]
+											]
+										],
 									
-									["%td",
-										["%a", {href:"#soundcloud"},
-											["%img", {src:"images/soundcloud.jpg"}]
-										]
-									],
+										["%td",
+											["%a", {href:"#soundcloud"},
+												["%img", {src:"images/soundcloud.jpg"}]
+											]
+										],
 									
-									["%td",
-										["%a", {href:"#bandcamp"},
-											["%img", {src:"images/bandcamp.jpg"}]
+										["%td",
+											["%a", {href:"#bandcamp"},
+												["%img", {src:"images/bandcamp.jpg"}]
+											]
 										]
 									]
 								]
 							]
-						]
-					],
-					[".content .rightContent",
-						/*["%ul#presence", 
-							["%li#email","arcadefire@arcadefire.com"],
-							["%li#twitter","@arcadefire"],
-							["%li#myspace",
-								["%a", {href:"//myspace.com/arcadefire"},
-									["%img", {src:"images/mypsace.jpg"}]
-								]
-							],
-							["%li#lastFM","@arcadefire"],
-							["%li#soundcloud","@arcadefire"],
-							["%li#flickr","@arcadefire"],
-							["%li#youtube","@arcadefire"],
-							["%li#itunes","@arcadefire"],
-							["%li#vimeo","@arcadefire"],
-							["%li#facebook","@arcadefire"],
-							["%li#bandcamp","@arcadefire"],
-							["%li#blog","@arcadefire"]
+						],
+						[".content .rightContent",
+							/*["%ul#presence", 
+								["%li#email","arcadefire@arcadefire.com"],
+								["%li#twitter","@arcadefire"],
+								["%li#myspace",
+									["%a", {href:"//myspace.com/arcadefire"},
+										["%img", {src:"images/mypsace.jpg"}]
+									]
+								],
+								["%li#lastFM","@arcadefire"],
+								["%li#soundcloud","@arcadefire"],
+								["%li#flickr","@arcadefire"],
+								["%li#youtube","@arcadefire"],
+								["%li#itunes","@arcadefire"],
+								["%li#vimeo","@arcadefire"],
+								["%li#facebook","@arcadefire"],
+								["%li#bandcamp","@arcadefire"],
+								["%li#blog","@arcadefire"]
 							
-						],*/
-						["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
+							],*/
+							["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
+						]
 					]
 				]
-			]
-		]).fadeIn(100);		
-	});
+			]).fadeIn(100);		
+		}
+	}));
 }

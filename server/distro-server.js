@@ -139,10 +139,10 @@ global.db.open(function(err, db){
 				}
 			}));
 			app.get('/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				global.bands.findBandByID(req.params.bandID, function(err, bandDoc){
+				global.bands.findBandByName(req.params.bandID, function(err, bandDoc){
 					if(err){
 						errback(err);
-					} else if(JSON.stringify(bandDoc)){
+					} else if(bandDoc){
 						successback(bandDoc);
 					} else {
 						errback(new distro.error.ClientError("bands.errors.noBand"));

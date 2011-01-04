@@ -6,14 +6,12 @@ Bands.prototype = new CollectionManager();
 Bands.prototype.constructor = Bands;
 Bands.collectionName = 'bands';
 
-Bands.prototype.findBandByID = function(bandID, callback){
-	this.collection.findOne({"bandID":bandID}, function(err, bandDoc){ //this.collection seems to be undefined...
+Bands.prototype.findBandByName = function(name, callback){
+	this.collection.findOne({"name":name}, function(err, bandDoc){
 		if(err) {
 			callback(err, null);
-		} else if(!bandDoc){
-			callback("band not found", null);
 		} else {
-			callback(err, bandDoc);
+			callback(null, bandDoc);
 		}
 	});
 };
