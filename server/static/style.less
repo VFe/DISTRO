@@ -463,7 +463,6 @@ ul.dropdown>li>a{
 	vertical-align: middle;
 	max-height: 100em;
 	overflow-y: auto;
-	width: 60em;
 	padding: 0.5em 1em 1em 1em;
 	.border-radius(0.5em);
 }
@@ -489,7 +488,7 @@ ul.dropdown>li>a{
 	.box-shadow(none);
 }
 #bandBox{
-	width: 60em;
+	width: 65em;
 }
 #bandBox .leftContent{
 	width: 500px;
@@ -508,15 +507,50 @@ ul.dropdown>li>a{
 	position: relative;
 }
 #bandBox .rightContent{
-	width: 16.5em;
+	width: 21.5em;
 	text-align: right;
 	position: absolute;
 	top: 4em;
 	bottom: 0;
 	right: 0;
 }
-#presence{
+#bandBox ul.presence{
 	list-style: none;
+	margin: 0;
+	padding: 0;
+	a {
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+	}
+	li {
+		display: inline-block;
+		width: 3em;
+		height: 3em;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+	li.mail {
+		background-image: url('/images/presence/mail.jpg');
+	}
+	li.bandcamp {
+		background-image: url('/images/presence/bandcamp.jpg');
+	}
+	li.blogger {
+		background-image: url('/images/presence/blogger.jpg');
+	}
+	li.facebook {
+		background-image: url('/images/presence/facebook.jpg');
+	}
+	li.myspace {
+		background-image: url('/images/presence/myspace.jpg');
+	}
+	li.soundcloud {
+		background-image: url('/images/presence/soundcloud.jpg');
+	}
+	li.twitter {
+		background-image: url('/images/presence/twitter.jpg');
+	}
 }
 #kmNetworkBox .tiers{
 	padding: 0;

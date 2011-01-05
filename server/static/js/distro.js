@@ -489,10 +489,10 @@ distro.LandingPage = distro.Model.extend({
 			name: 'landingpage',
 			show: function($content){
 				$content.attr('id', 'bandBox');
-				$content.haml(["%form", {},
+				$content.stencil(["%form", {},
 					[".lightboxHeader",
 						["%span.close.button", {}, "x"],
-						["%h1","^"+bandData.name+"^"]
+						["%h1","^", { key: 'name' }, "^"]
 					],
 					[".contentBox",
 						[".content.leftContent",
@@ -504,31 +504,20 @@ distro.LandingPage = distro.Model.extend({
 								["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, "Montreal, Quebec"],
 								["%p",{style:"margin-top:0px;"}, "Canada"]
 							],
-							["%span#artist",{style:"font-size:36px;"}, 
-								["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, bandData.fullname]
+							["%span#artist",{style:"font-size:36px;"},
+								["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { key: "fullname"}]
 							]
 						],
-						[".rightContent.presence", {style:"z-index: 2; top: 0px;"},
-							["%ul.presence",
-								["%li.mail", ["%a", { href: "mailto:arcadefire@arcadefire.com" }]],
-								["%li.twitter",["%a", { href: "http://twitter.com/arcadefire" }]],
-								["%li.myspace", ["%a", {href:"//myspace.com/arcadefire"}]],
-								["%li.lastfm","@arcadefire"],
-								["%li.soundcloud","@arcadefire"],
-								["%li.flickr","@arcadefire"],
-								["%li.youtube","@arcadefire"],
-								["%li.itunes","@arcadefire"],
-								["%li.vimeo","@arcadefire"],
-								["%li.facebook","@arcadefire"],
-								["%li.bandcamp","@arcadefire"],
-								["%li.blog","@arcadefire"]
-							],
-						],
+						{ key: 'presence', conditional: [".rightContent.presence", {style:"z-index: 2; top: 0px;"},
+							["%ul.presence", { key: 'presence', children: [
+								['%li', { class: { key: 'name' } }, ['%a', { href: { key: 'url' } }]]
+							] } ]
+						] },
 						[".content.rightContent",
 							["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
 						]
 					]
-				]);
+				], model.attributes);
 			}
 		});
 	}
