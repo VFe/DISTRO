@@ -129,17 +129,22 @@ Hollerback.prototype.fail = function(){
 
 function Lightbox(){
 	this.$lightbox = $('#lightbox');
+	this.$contentWrapper = $('#lightboxWrapper');
 }
 Lightbox.prototype.show = function(content){
 	this.hideContent();
+	var $content = $('<div>', { class: 'lightboxContent' });
 	this.content = content;
-	content.show(this);
-	this.$lightbox.fadeIn();
+	this.$contentWrapper.html($content);
+	content.show($content, this);
+	this.$lightbox.fadeIn(200);
+	this.$contentWrapper.fadeIn(400);
 }
 Lightbox.prototype.hide = function(name){
 	if (!name || (this.content && name === this.content.name)) {
 		var self = this;
-		this.$lightbox.fadeOut(function(){
+		this.$lightbox.fadeOut();
+		this.$contentWrapper.fadeOut(function(){
 			self.hideContent();
 		});
 	}
@@ -149,7 +154,7 @@ Lightbox.prototype.hideContent = function(){
 		this.content.hide && this.content.hide(this);
 		this.content = null;
 	}
-	this.$lightbox.empty();
+	this.$contentWrapper.empty();
 }
 distro.lightbox = new Lightbox;
 
@@ -161,33 +166,32 @@ distro.lightbox = new Lightbox;
 		} else {
 			distro.lightbox.show({
 				name: 'login',
-				show: function(lightbox){
+				show: function($content){
 					var $form, $emailField, $passwordField, $registerCheckbox, $submitButton, submitStatus = new Backbone.Model({submitting:false});
-					lightbox.$lightbox.haml(['#loginRegisterBox.lightboxContent', {style: "max-height: 40em; overflow-y: auto;"},
-						['%form', {$:{$:function(){ $form = this; }}},
-							['%dl',
-								['%dt', ['%label', {'for':'emailAddress'}, distro.loc.str('registration.emailAddressQuery')]],
-								['%dd', ['%input#emailAddress', {$:{$:function(){
-									$emailField = this;
-									submitStatus.bind('change:submitting', function(m, submitting){ $emailField.attr('disabled', submitting ? true : null) });
-								}}, size:'35', placeholder:'s@distro.fm'}]],
-								['%dt', ['%label', {'for':'password'}, distro.loc.str('registration.passwordQuery')]],
-								['%dd', ['%input#password', {$:{$:function(){
-									$passwordField = this;
-									submitStatus.bind('change:submitting', function(m, submitting){ $passwordField.attr('disabled', submitting ? true : null) });
-								}}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
-								['%dt', ['%label', {'for':'registrationType'}, distro.loc.str('registration.registerQuery')]],
-								['%dd', ['%input#registrationType', {$:{$:function(){
-									$registerCheckbox = this;
-									submitStatus.bind('change:submitting', function(m, submitting){ $registerCheckbox.attr('disabled', submitting ? true : null) });
-								}}, type:'checkbox'}]]
-							],
-							['%div', {style:"text-align: right"},
-								['%button#submitButton', {$:{$:function(){
-									$submitButton = this;
-									submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
-								}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')],
-							]
+					$content.attr('id', 'loginRegisterBox');
+					$content.haml(['%form', {$:{$:function(){ $form = this; }}},
+						['%dl',
+							['%dt', ['%label', {'for':'emailAddress'}, distro.loc.str('registration.emailAddressQuery')]],
+							['%dd', ['%input#emailAddress', {$:{$:function(){
+								$emailField = this;
+								submitStatus.bind('change:submitting', function(m, submitting){ $emailField.attr('disabled', submitting ? true : null) });
+							}}, size:'35', placeholder:'s@distro.fm'}]],
+							['%dt', ['%label', {'for':'password'}, distro.loc.str('registration.passwordQuery')]],
+							['%dd', ['%input#password', {$:{$:function(){
+								$passwordField = this;
+								submitStatus.bind('change:submitting', function(m, submitting){ $passwordField.attr('disabled', submitting ? true : null) });
+							}}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
+							['%dt', ['%label', {'for':'registrationType'}, distro.loc.str('registration.registerQuery')]],
+							['%dd', ['%input#registrationType', {$:{$:function(){
+								$registerCheckbox = this;
+								submitStatus.bind('change:submitting', function(m, submitting){ $registerCheckbox.attr('disabled', submitting ? true : null) });
+							}}, type:'checkbox'}]]
+						],
+						['%div', {style:"text-align: right"},
+							['%button#submitButton', {$:{$:function(){
+								$submitButton = this;
+								submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
+							}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')],
 						]
 					]);
 					$registerCheckbox.change(function(){
@@ -480,50 +484,48 @@ distro.LandingPage = distro.Model.extend({
 	},
 	change: function(options){
 		Backbone.Model.prototype.change.call(this, options);
-		
-		var bandData = this.attributes;
+		var model = this;
 		distro.lightbox.show({
 			name: 'landingpage',
-			show: function(lightbox){
-				lightbox.$lightbox.haml([".lightboxContent#bandBox",
-					["%form", {},
-						[".lightboxHeader",
-							["%span.close.button", {}, "x"],
-							["%h1","^"+bandData.name+"^"]
-						],
-						[".contentBox",
-							[".content.leftContent",
-								["%img.photo",{src:"http://farm5.static.flickr.com/4150/5042267992_242cfda7e2_d.jpg", width:"500", height:"335"}],
-								["%span.caption",{style:"color: rgb(119, 119, 119);"},
-									["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
-										["%a",{href:"#", style:"text-decoration:none;"}, "papazuba"]
-									],
-									["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, "Montreal, Quebec"],
-									["%p",{style:"margin-top:0px;"}, "Canada"]
+			show: function($content){
+				$content.attr('id', 'bandBox');
+				$content.haml(["%form", {},
+					[".lightboxHeader",
+						["%span.close.button", {}, "x"],
+						["%h1","^"+bandData.name+"^"]
+					],
+					[".contentBox",
+						[".content.leftContent",
+							["%img.photo",{src:"http://farm5.static.flickr.com/4150/5042267992_242cfda7e2_d.jpg", width:"500", height:"335"}],
+							["%span.caption",{style:"color: rgb(119, 119, 119);"},
+								["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
+									["%a",{href:"#", style:"text-decoration:none;"}, "papazuba"]
 								],
-								["%span#artist",{style:"font-size:36px;"}, 
-									["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, bandData.fullname]
-								]
+								["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, "Montreal, Quebec"],
+								["%p",{style:"margin-top:0px;"}, "Canada"]
 							],
-							[".rightContent.presence", {style:"z-index: 2; top: 0px;"},
-								["%ul.presence",
-									["%li.mail", ["%a", { href: "mailto:arcadefire@arcadefire.com" }]],
-									["%li.twitter",["%a", { href: "http://twitter.com/arcadefire" }]],
-									["%li.myspace", ["%a", {href:"//myspace.com/arcadefire"}]],
-									["%li.lastfm","@arcadefire"],
-									["%li.soundcloud","@arcadefire"],
-									["%li.flickr","@arcadefire"],
-									["%li.youtube","@arcadefire"],
-									["%li.itunes","@arcadefire"],
-									["%li.vimeo","@arcadefire"],
-									["%li.facebook","@arcadefire"],
-									["%li.bandcamp","@arcadefire"],
-									["%li.blog","@arcadefire"]
-								],
-							],
-							[".content.rightContent",
-								["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
+							["%span#artist",{style:"font-size:36px;"}, 
+								["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, bandData.fullname]
 							]
+						],
+						[".rightContent.presence", {style:"z-index: 2; top: 0px;"},
+							["%ul.presence",
+								["%li.mail", ["%a", { href: "mailto:arcadefire@arcadefire.com" }]],
+								["%li.twitter",["%a", { href: "http://twitter.com/arcadefire" }]],
+								["%li.myspace", ["%a", {href:"//myspace.com/arcadefire"}]],
+								["%li.lastfm","@arcadefire"],
+								["%li.soundcloud","@arcadefire"],
+								["%li.flickr","@arcadefire"],
+								["%li.youtube","@arcadefire"],
+								["%li.itunes","@arcadefire"],
+								["%li.vimeo","@arcadefire"],
+								["%li.facebook","@arcadefire"],
+								["%li.bandcamp","@arcadefire"],
+								["%li.blog","@arcadefire"]
+							],
+						],
+						[".content.rightContent",
+							["%button#subscribeButon", {"class":"button lightboxButton"}, "Subscribe"]
 						]
 					]
 				]);
