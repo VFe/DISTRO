@@ -520,7 +520,11 @@ distro.LandingPage = distro.Model.extend({
 				], model.attributes);
 			}
 		});
+		$('.close').bind('mouseup', function(){landingPage.hide();})
+	},
+	hide: function(){
+		distro.lightbox.hide('landingpage');
 	}
 });
 
-(new distro.LandingPage({name: 'arcade_fire'})).fetch();
+landingPage = (new distro.LandingPage({name: 'arcade_fire'})).fetch();
