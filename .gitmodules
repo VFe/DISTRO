@@ -1,6 +1,3 @@
-[submodule "vendor/es5-shim"]
-	path = vendor/es5-shim
-	url = git://github.com/kriskowal/es5-shim.git
 [submodule "vendor/underscore"]
 	path = vendor/underscore
 	url = git://github.com/documentcloud/underscore.git
