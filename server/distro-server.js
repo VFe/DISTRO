@@ -24,7 +24,7 @@ global.db.open(function(err, db){
 			connect.logger(),
 			connect.cookieDecoder(),
 			connect.bodyDecoder(),
-			connect.staticProvider(process.cwd() + '/server/static/distro'),
+			connect.staticProvider(process.cwd() + '/server/static/main'),
 			connect.staticProvider(process.cwd() + '/server/static/common')
 		)
 		.use('/api/', connect.router(function(app) {
