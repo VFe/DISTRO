@@ -20,8 +20,8 @@ global.db.open(function(err, db){
 			connect.logger(),
 			connect.cookieDecoder(),
 			connect.bodyDecoder(),
-			connect.staticProvider(process.cwd() + '/server/static/upload'),
-			connect.staticProvider(process.cwd() + '/server/static/common')
+			connect.staticProvider(__dirname + '/static/upload'),
+			connect.staticProvider(__dirname + '/static/common')
 		)
 		.use('/api/', connect.router(function(app) {
 			
