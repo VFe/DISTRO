@@ -15,28 +15,11 @@ global.bands = new distro.Bands();
 global.tracks = new distro.Tracks();
 global.networks = new distro.Networks();
 
-function initMany(){
-	var callees = Array.prototype.slice.call(arguments, 0, arguments.length - 1),
-	    remaining = callees.length;
-		callback = arguments[arguments.length - 1];
-	if (callees.length === 0) {
-		setTimeout(callback, 0);
-	}
-	function ownCallback(){
-		if (--remaining === 0) {
-			callback();
-		}
-	}
-	callees.forEach(function(callee){
-		callee.init(ownCallback);
-	});
-}
-
 global.db.open(function(err, db){
 	if (err){
 		throw err;
 	}
-	initMany(global.users, global.sessions, global.bands, global.tracks, global.networks, function(){
+	distro.init(function(){
 		connect.createServer(
 			connect.logger(),
 			connect.cookieDecoder(),

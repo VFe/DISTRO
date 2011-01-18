@@ -1,6 +1,6 @@
 var CollectionManager = require('./lib/CollectionManager');
 
-function Tracks(){}
+function Tracks(){ require('./init').add(this); }
 module.exports = Tracks;
 Tracks.prototype = new CollectionManager();
 Tracks.prototype.constructor = Tracks;

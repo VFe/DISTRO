@@ -2,7 +2,7 @@ var CollectionManager = require('./lib/CollectionManager'),
     crypto = require('crypto'),
     error = require('./error');
 
-function Users(){}
+function Users(){ require('./init').add(this); }
 module.exports = Users;
 Users.prototype = new CollectionManager();
 Users.prototype.constructor = Users;

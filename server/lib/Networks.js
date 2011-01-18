@@ -1,6 +1,6 @@
 var CollectionManager = require('./lib/CollectionManager');
 
-function Networks(){}
+function Networks(){ require('./init').add(this); }
 module.exports = Networks;
 Networks.prototype = new CollectionManager();
 Networks.prototype.constructor = Networks;

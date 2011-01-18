@@ -5,7 +5,8 @@
 	'Sessions',
 	'Bands',
 	'Tracks',
-	'Networks'
+	'Networks',
+	'init',
 ].forEach(function(component){
 	exports[component] = require('./' + component);
 });
