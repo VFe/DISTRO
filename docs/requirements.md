@@ -15,3 +15,5 @@
 - [node-inspector](https://github.com/dannycoates/node-inspector) (NPM: `node-inspector`)
 
 The simplest way to run DISTRO is to start `mongod` in one shell and, in a separate shell, `cd` into the root of the DISTRO repository and run `node-dev distro-server.js` or `node-dev upload-server.js`
+
+You can run test/populate.sh to populate your local mongo instance with test data. One account will be installed, `test@distro.fm`:`password`.

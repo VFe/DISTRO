@@ -4,6 +4,12 @@
 			_id: new ObjectId("000000000000000000000000"),
 			name: "network_1"
 		}
+		{
+			_id: new ObjectId("000000000000000000000001"),
+			name: "bklyn",
+			fullName: "BKLYN Lounge",
+			allowsUploads: true
+		}
 	],
 	tracks: [
 		{
