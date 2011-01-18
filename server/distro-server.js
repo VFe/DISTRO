@@ -150,6 +150,13 @@ global.db.open(function(err, db){
 				});
 			}));
 		}))
+		.use('/', connect.router(function(app){
+			app.get('/:band', function(req, res){
+				var target = req.params && req.params.band || '';
+				res.writeHead(302, { Location: ("/#" + encodeURIComponent(target)) });
+				res.end();
+			});
+		}))
 		/*.use('/', connect.router())*/
 		.listen(3000);
 		util.log('Alive on port 3000');
