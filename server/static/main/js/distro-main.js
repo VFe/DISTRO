@@ -13,7 +13,7 @@ distro.pyramidHead = function(message, retryback, giveupback){
 	}
 };
 distro.request = function(path, data, hollerback){
-	var responseData = null
+	var responseData = null;
 	$.ajax({
 		url: (distro.SERVER + path),
 		data: (data ? JSON.stringify(data) : null),
@@ -400,31 +400,6 @@ Player.prototype.stop = function(){
 	this.audio.load();
 };
 
-// Initialization
-distro.init(function(){
-	var tracks = window.tracks = new Backbone.Collection(),
-		player = window.player = new Player(),
-		musicListView = window.musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
-	
-	distro.loc.replacePlaceholders();
-	
-	distro.request('ping', null, new Hollerback({}));
-
-	$('#logOut').click(function(){
-		distro.request('logout', {}, new Hollerback({}));
-	});
-
-	// Miscellaneous UI
-	$('.button').live('mousedown', function(e){
-		e.preventDefault();
-	});
-	$('a').live('click', function(e){
-		if (this.href.indexOf('#') !== -1) {
-			e.preventDefault();
-		};
-	});
-});
-
 distro.LandingPage = distro.Model.extend({
 	initialize: function(opts){
 		this.name = opts.name;
@@ -434,10 +409,11 @@ distro.LandingPage = distro.Model.extend({
 
 distro.Router = Backbone.Controller.extend({
 	routes: {
-		":band": "band"
+		":band": "band",
+		"/find": "find"
 	},
 	band: function(band){
-		distro.lightbox.hide('landingpage');
+		distro.lightbox.hide();
 		if (band) {
 			(new distro.LandingPage({name: band})).fetch({
 				success: function(model){
@@ -486,7 +462,66 @@ distro.Router = Backbone.Controller.extend({
 				}
 			})
 		}
+	},
+	find: function(){
+		distro.lightbox.show({
+			name: "findNetworks",
+			show: function($content){
+				var $close, $search, $text, $placeholder;
+				$content.attr('id', 'networkSearch');
+				$content.haml([
+					['%span.close.button', {$:{$:function(){ $close = this; }}}, 'x'],
+					['.search', {$:{$:function(){ $search = this; }}},
+						['%span.field', '^',
+							['%span.text', { contenteditable: 'plaintext-only', $:{$:function(){ $text = this; }}}],
+							['%span.placeholder', {$:{$:function(){ $placeholder = this; }}}, distro.loc.str('findNetworks.placeholder')],
+						'^' ]
+					]
+				]);
+				$close.click(function(){
+					window.location.hash = '';
+				});
+				$search.click(function(e){
+					if (e.target != $text[0]) {
+						$text.focus();
+						return false;
+					}
+				});
+				$text.focus(function(){
+					$placeholder.hide();
+				});
+				$text.blur(function(){
+					if(!$text.text()){
+						$placeholder.show();
+					}
+				});
+			},
+			// hide: function(){
+			// 	alert("BYE");
+			// }
+		});
 	}
 });
-distro.router = new distro.Router();
-Backbone.history.start();
+
+// Initialization
+distro.init(function(){
+	var tracks = window.tracks = new Backbone.Collection(),
+		player = window.player = new Player(),
+		musicListView = window.musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
+	
+	distro.loc.replacePlaceholders();
+	
+	distro.request('ping', null, new Hollerback({}));
+
+	$('#logOut').click(function(){
+		distro.request('logout', {}, new Hollerback({}));
+	});
+
+	// Miscellaneous UI
+	$('.button').live('mousedown', function(e){
+		e.preventDefault();
+	});
+	
+	distro.router = new distro.Router();
+	Backbone.history.start();
+});

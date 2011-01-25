@@ -7,15 +7,91 @@
 </head>
 
 <body>
-<div id="top"><div id="topContent">
-	<div class="right">
-		<div id="user" style="display:none">
+<div id="top">
+	<ul id="topNav">
+		<li id="findNetwork"><a href="#/find"><span>+</span></a></li>
+		<li id="account"><a href="#/login">LOG IN</a></li>
+		<li id="searchLibrary"></li>
+		<li id="moreStuff"></li>
+	</ul>
+		<!-- <div id="user" style="display:none">
 			<img id="userIcon" width="21" height="21" src="images/generic_avatar.png"><span id="userName"></span>
 			<ul class="dropdown">
-				<li><a href="#" id="logOut"><span data-distro-localized-string="chrome.logOut">&nbsp;</span></a></li>
+				<li><a href="#" id="logOut"><span data-distro-localized-string="chrome.logOut">[chrome.logOut]</span></a></li>
 			</ul>
+		</div> -->
+	<img height="25" id="mastheadLogo" src="images/mastheadLogo.png">
+</div>
+<div id="content">
+	<div id="networks">
+		<div id="networksDividier"></div>
+		<div id="networksTableBodyContainer">
+			<table id="networksTable">
+				<colgroup>
+					<col>
+				</colgroup>
+				<tbody>
+					<tr><td><div class="network muted">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network soloed">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr><td><div class="network">Network<div class="networkControls"><div class="delete">X</div><div class="mute">M</div><div class="solo">S</div></td></tr>
+					<tr class="filler">
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
+	<div id="library">
+		<table id="musicTableHead" border=0>
+			<colgroup>
+				<col>
+				<col width="60">
+				<col width="30%">
+				<col width="30%">
+			</colgroup>
+			<thead>
+				<tr>
+					<th><span data-distro-localized-string="library.name">[NAME]</span></th>
+					<th><span data-distro-localized-string="library.time">[time]</span></th>
+					<th><span data-distro-localized-string="library.artist">[artist]</span></th>
+					<th><span data-distro-localized-string="library.receivedFrom">[receivedFrom]</span></th>
+				</tr>
+			</thead>
+		</table>
+		<div id="musicTableBodyContainer" tabindex="3">
+			<table id="musicTableBody">
+				<colgroup>
+					<col>
+					<col width="60">
+					<col width="30%">
+					<col width="30%">
+				</colgroup>
+				<tbody>
+					<tr class="filler">
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div id="bottom">
 	<ul id="transport">
 		<li class="button" id="skipBackButton" style="letter-spacing: -0.3em">&#x2758;<span style="letter-spacing: -0.35em;">&#x25C0;&#x25C0;</span></li>
 		<!-- <li class="button" id="rewindButton" style="letter-spacing: -0.4em">&#x25C0;&#x25C0;</li> -->
@@ -24,94 +100,9 @@
 		<!-- <li class="button" id="fastForwardButton"style="letter-spacing: -0.25em">&#x25BA;&#x25BA;</li> -->
 		<li class="button" id="skipForwardButton"style="letter-spacing: -0.25em">&#x25BA;&#x25BA;&#x2758;</li>
 	</ul>
-	<img width="162" height="35" id="mastheadLogo" src="images/mastheadLogo.png">
-</div></div>
-<div id="backing">
-	<div id="content">
-		<div id="library">
-			<table id="musicTableHead" border=0>
-				<colgroup>
-					<col width="18px">
-					<col width="18px">
-					<col>
-					<col width="30%">
-					<col width="60">
-					<col width="30%">
-				</colgroup>
-				<thead>
-					<tr>
-						<th><div class="dot blue"></div></th>
-						<th><div class="dot red"></div></th>
-						<th><span data-distro-localized-string="library.name">&nbsp;</span></th>
-						<th><span data-distro-localized-string="library.receivedFrom">&nbsp;</span></th>
-						<th><span data-distro-localized-string="library.time">&nbsp;</span></th>
-						<th><span data-distro-localized-string="library.artist">&nbsp;</span></th>
-					</tr>
-				</thead>
-			</table>
-			<div id="musicTableBodyContainer" tabindex="3">
-				<table id="musicTableBody">
-					<colgroup>
-						<col width="18px">
-						<col width="18px">
-						<col>
-						<col width="30%">
-						<col width="60">
-						<col width="30%">
-					</colgroup>
-					<tbody>
-						<tr class="filler">
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<div id="sidebar">
-			<div id="sidebarContent">
-				<ul id="sidebarButtons">
-					<li><a class="button" id="uploadButton" href="#upload">add network</a></li>
-					<li><a class="button" id="newNetworkButton" href="#create">list networks</a></li>
-				</ul>
-				<!-- <div id="footer">
-					&copy; 2010 Distro &bull; <a href="#">Terms</a> &bull; <a href="#">Privacy Policy</a> &bull; <a href="#">Contact</a> &bull; <a href="">Facebook</a> &bull; <a href="">Twitter</a> &bull; <a href="">Help</a> &bull; <a href="">Copyright Policy</a>
-				</div> -->
-			</div>
-		</div>
-	</div>
-	<div id="lightbox" style="display: none">
-		<!--<div id="bandBox" class="lightboxContent">
-			<form>
-				<div class="lightboxHeader">
-					<span class="close">x</span>
-					<h1>^arcade_fire^</h1>
-				</div>
-				<div class="contentBox">
-					<div class="content leftContent">
-						<img src="http://farm5.static.flickr.com/4150/5042267992_242cfda7e2_d.jpg" width="500" height="335" class="photo">
-						<span class="caption" style="color: rgb(119, 119, 119); ">
-							<p style="margin-top: 0px; margin-right: 0.25em; margin-bottom: 0px; margin-left: 0px; text-align: right; float: right; ">Photo by <a href="#" style="text-decoration:none;">papazuba</a></p>
-							<p style="margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em; ">Montreal, Quebec</p>
-							<p style="margin-top: 0px; ">Canada</p>
-						</span>
-						<span id="artist" style="font-size: 36px; ">
-							<p style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; ">Arcade Fire</p>
-						</span>
-					</div>
-					<div class="content rightContent">
-						<button class="button lightboxButton" id="subscribeButton">Subscribe</button>
-					</div>
-				</div>
-			</form>
-		</div>-->
-		<div id="lightboxWrapper" style="display: none"></div>
-	</div>
 </div>
+<div id="lightbox" style="display: none"></div>
+<div id="lightboxWrapper" style="display: none"></div>
 <script src="js/jquery-1.4.4.js"></script>
 <script src="js/underscore.js"></script>
 <script src="js/backbone.js"></script>

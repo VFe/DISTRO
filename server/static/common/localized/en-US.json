@@ -32,5 +32,8 @@
 		"errors": {
 			"noBand": "This band doesn't exist"
 		}
+	},
+	"findNetworks": {
+		"placeholder": "Search for a network"
 	}
 }
