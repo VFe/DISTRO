@@ -28,6 +28,11 @@ importDB.open(function(err, db) {
 										return ("http://" + url);
 									}
 								}
+								for each (var key in doc){
+									if(doc.key && doc.key){
+										
+									}
+								}
 								if(doc['Facebook URL']){
 									record.presence.facebook = url.parse(doc['Facebook URL']).pathname;
 									delete record['Facebook URL'];
