@@ -1,6 +1,7 @@
 var mongoDB = require("mongodb"),
 	util = require('util'),
-	url = require('url');
+	url = require('url'),
+	_ = require('underscore');
 	
 importDB = new mongoDB.Db('Import', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 exportDB = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
@@ -14,7 +15,12 @@ importDB.open(function(err, db) {
 					(function nextRecord(){
 						cursor.nextObject(function(err, doc){
 							if(doc != null){
-								var myspaceRegEx = new RegExp("/\/(\w+$)/", "g");
+								var myspaceRegEx = new RegExp("/\/(\w+$)/", "g"),
+									urlKeyList = ['Facebook URL', 'Myspace URL', 'Twitter URL', 'LastFM URL', 
+									'Home Page URL', 'Pandora URL', 'SoundCloud URL', 'ExtensionFM URL', 
+									'LinkedIn URL', 'Flickr URL', 'Youtube URL', 'iLike URL', 'iTunes URL', 
+									'Vimeo URL', 'BandCamp URL', 'Blog URL', 'GigMaven', 
+									'Flickr Link (Photostream)', 'Jambase Link', 'ArchiveDOTorg'];
 								record = doc; //This could just be record = {}; but I'm leaving it like this for now
 								record.presence = {};
 								record.presence.email = {};
@@ -28,10 +34,30 @@ importDB.open(function(err, db) {
 										return ("http://" + url);
 									}
 								}
-								for each (var key in doc){
-									if(doc.key && doc.key){
-										
+								function subdomainSnip(url, key){
+									var subdomain = /^[hH][tT][tT][pP][sS]?:\/\/([^\.]*)/.exec(url);
+									util.log("Key: " + key + " is now just " + subdomain[1]);
+									doc[key] = subdomain[1];
+								}
+								function snipImportant(both, unimportant){
+									if(!unimportant){
+										unimportant = /^\/(.*)\/*/;
 									}
+									return unimportant.exec(both)[1];
+								}
+								for (var key in doc){
+									//util.log(key + " " + doc[key]);
+									if(doc[key]){
+										if(_.include(urlKeyList, key)){
+											//util.log("httpizing " + doc[key] + " \n \t \t - Result: " + httpize(doc[key]));
+											doc[key] = httpize(doc[key]);
+										}
+										var killTrailingSlash = /(.*)\/$/.exec(doc[key]);
+										if(killTrailingSlash){
+											doc[key] = killTrailingSlash[1];
+										}
+									}
+									
 								}
 								if(doc['Facebook URL']){
 									record.presence.facebook = url.parse(doc['Facebook URL']).pathname;
@@ -128,6 +154,8 @@ importDB.open(function(err, db) {
 								}
 								if(doc['iTunes URL']){
 									record.presence.itunes = url.parse(doc['iTunes URL']).pathname;
+									//record.presence.itunes = snipImportant(url.parse(doc['iTunes URL']).pathname, new RegExp(/^\/us\/artist\/(.*)/));
+									//^^This broke something, or slowed it down or something...
 									delete record['iTunes URL'];
 									util.log("    iTunes URL "+util.inspect(record.presence.itunes));
 								} else{
@@ -141,6 +169,7 @@ importDB.open(function(err, db) {
 									delete record['Vimeo URL'];
 								}
 								if(doc['BandCamp URL']){
+									//right now we could snip out just the subdomain, but they support non *.bandcamp.com urls see bandcamp.com/faq_custom_domains
 									record.presence.bandcamp = doc['BandCamp URL'];
 									delete record['BandCamp URL'];
 									util.log("    BandCamp URL "+util.inspect(record.presence.bandcamp));
