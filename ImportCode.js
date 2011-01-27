@@ -219,14 +219,14 @@ importDB.open(function(err, db) {
 									delete record['GigMaven'];
 								}
 								if(doc['Flickr Credit']){
-									record.presence.flickrcred = doc['Flickr Credit'];
+									record.flickrcred = doc['Flickr Credit'];
 									delete record['Flickr Credit'];
 									util.log("    Flickr Credit "+util.inspect(record.presence.flickrcred));
 								} else{
 									delete record['Flickr Credit'];
 								}
 								if(doc['Flickr Link (Photostream)']){
-									record.presence.flickrcredurl = url.parse(doc['Flickr Link (Photostream)']).pathname;
+									record.flickrcredurl = url.parse(doc['Flickr Link (Photostream)']).pathname;
 									delete record['Flickr Link (Photostream)'];
 									util.log("    Flickr Link (Photostream) "+util.inspect(record.presence.flickrcredurl));
 								} else{
