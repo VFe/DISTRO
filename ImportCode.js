@@ -233,14 +233,14 @@ importDB.open(function(err, db) {
 									delete record['Flickr Link (Photostream)'];
 								}
 								if(doc['Location (City, State)']){
-									record.location.citystate = doc['Location (City, State)'];
+									record.citystate = doc['Location (City, State)'];
 									delete record['Location (City, State)'];
 									util.log("    Location (City, State) "+util.inspect(record.location.citystate));
 								} else{
 									delete record['Location (City, State)'];
 								}
 								if(doc['Location (Country)']){
-									record.location.country = doc['Location (Country)'];
+									record.country = doc['Location (Country)'];
 									delete record['Location (Country)'];
 									util.log("    Location (Country) "+util.inspect(record.location.country));
 								} else{
