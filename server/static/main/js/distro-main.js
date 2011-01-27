@@ -428,13 +428,16 @@ distro.Router = Backbone.Controller.extend({
 								],
 								[".contentBox",
 									[".content.leftContent",
-										["%img.photo",{src:"http://farm5.static.flickr.com/4150/5042267992_242cfda7e2_d.jpg", width:"500", height:"335"}],
+															//How the fuck do you do this =\/= 	HINT: [Object object].jpg doesn't exist!
+										["%img.photo",{src:"http://distro.fm/PICS/"+{ key: "name"}+".jpg", width:"500", height:"335"}],
 										["%span.caption",{style:"color: rgb(119, 119, 119);"},
 											["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
-												["%a",{href:"#", style:"text-decoration:none;"}, "papazuba"]
+												["%a",{href:{ key: "flickrcredurl"}, style:"text-decoration:none;"}, { key: "flickrcred"}]
 											],
-											["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, "Montreal, Quebec"],
-											["%p",{style:"margin-top:0px;"}, "Canada"]
+											["#location",
+												["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "citystate"}],
+												["%p",{style:"margin-top:0px;"}, { key: "country"}]
+											]
 										],
 										["%span#artist",{style:"font-size:36px;"},
 											["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { key: "fullname"}]
