@@ -63,5 +63,5 @@ Bands.PRESENCE = [
 	{ name: "itunes", prefix: "http://itunes.apple.com/us/artist/" },
 	{ name: "vimeo", prefix: "http://vimeo.com/" },
 	{ name: "facebook", prefix: "http://www.facebook.com/" },
-	{ name: "bandcamp", prefix: "http://", suffix:".bandcamp.com/" }
+	{ name: "bandcamp"/*, prefix: "http://", suffix:".bandcamp.com/"*/ }
 ];
