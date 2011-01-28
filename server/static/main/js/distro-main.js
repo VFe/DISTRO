@@ -98,7 +98,7 @@ function Lightbox(){
 }
 Lightbox.prototype.show = function(content){
 	this.hideContent();
-	var $content = $('<div>', { class: 'lightboxContent' });
+	var $content = $('<div>', { 'class': 'lightboxContent' });
 	this.content = content;
 	this.$contentWrapper.html($content);
 	content.show($content, this);
@@ -428,8 +428,7 @@ distro.Router = Backbone.Controller.extend({
 								],
 								[".contentBox",
 									[".content.leftContent",
-															//How the fuck do you do this =\/= 	HINT: [Object object].jpg doesn't exist!
-										["%img.photo",{src:"http://distro.fm/PICS/"+{ key: "name"}+".jpg", width:"500", height:"335"}],
+										["%img.photo",{src: {key: 'name', handler: function(){ return "http://distro.fm/PICS/"+this+".jpg" }}, width:"500", height:"335"}],
 										["%span.caption",{style:"color: rgb(119, 119, 119);"},
 											["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
 												["%a",{href:{ key: "flickrcredurl"}, style:"text-decoration:none;"}, { key: "flickrcred"}]
@@ -446,7 +445,7 @@ distro.Router = Backbone.Controller.extend({
 									[".rightContent",
 										{ key: 'presence', conditional: [".presence",
 											["%ul.presence", { key: 'presence', children: [
-												['%li', { class: { key: 'name' } }, ['%a', { href: { key: 'url' } }]]
+												['%li', { 'class': { key: 'name' } }, ['%a', { href: { key: 'url' } }]]
 											] } ]
 										] },
 										[".content"],
@@ -498,7 +497,7 @@ distro.Router = Backbone.Controller.extend({
 						$placeholder.show();
 					}
 				});
-			},
+			}//,
 			// hide: function(){
 			// 	alert("BYE");
 			// }
