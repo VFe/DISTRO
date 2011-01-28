@@ -16,6 +16,41 @@ Bands.prototype.findBandByName = function(name, options, callback){
 	});
 };
 
+Bands.prototype.search = function(name, callback){
+	var searchRegex = new RegExp('^' + name, 'i'),
+		returnData = [];
+	this.collection.find({$or:[{"fullname":searchRegex},{"name":searchRegex}]}, function(err, cursor){
+		// util.log('Searching for: ' + name);
+		// 	_.forEach(cursor, function(value, key){
+		// 		try {
+		// 			value = JSON.stringify(value);
+		// 		} catch(x){
+		// 			value = value;
+		// 		}
+		// 		util.log(key + ": " + value + "\n`");
+		// 	});
+		// 	util.log("---------------------");
+		if(err){
+			callback(err, null);
+		} else{
+			(function nextRecord(){
+				cursor.nextObject(function(err, doc){
+					if(doc != null) {
+						var jsonData = {};
+						jsonData.name = doc.name;
+						jsonData.fullname = doc.fullname;
+						jsonData.id = JSON.stringify(doc.id);
+						returnData.push(jsonData);
+						process.nextTick(nextRecord);
+					} else{
+						callback(null, returnData);
+					}
+				});
+			})();
+		}
+	});
+};
+
 Bands.PRESENCE = [
 	{ name: "email", prefix: "mailto:" },
 	{ name: "website" },
@@ -28,5 +63,5 @@ Bands.PRESENCE = [
 	{ name: "itunes", prefix: "http://itunes.apple.com/us/artist/" },
 	{ name: "vimeo", prefix: "http://vimeo.com/" },
 	{ name: "facebook", prefix: "http://www.facebook.com/" },
-	{ name: "bandcamp", prefix: "http://", suffix:".bandcamp.com/" }
+	{ name: "bandcamp"/*, prefix: "http://", suffix:".bandcamp.com/"*/ }
 ];

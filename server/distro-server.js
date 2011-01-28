@@ -122,6 +122,11 @@ global.db.open(function(err, db){
 					successback({library:[]});
 				}
 			}));
+			app.get('/search/:search', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				global.bands.search(req.params.search, function(err, returnData){
+					successback(returnData);
+				});
+			}));
 			app.get('/bands/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				global.bands.findBandByName(req.params.bandID, { _id: false }, function(err, bandDoc){
 					if(err){
