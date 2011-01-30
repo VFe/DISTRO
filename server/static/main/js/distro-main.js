@@ -80,14 +80,14 @@ Hollerback.prototype.fail = function(){
 
 // Bind user menu
 (function(){
-	var $userMenu = $('#user'),
-	    $userName = $('#userName');
+	var $account = $('#account'),
+	    $accountName = $('#accountName');
 	distro.global.bind('change:user', function(model, user){
 		if (user) {
-			$userName.text(user);
-			$userMenu.fadeIn();
+			$accountName.text(user);
+			$account.addClass('loggedIn');
 		} else {
-			$userMenu.fadeOut();
+			$account.removeClass('loggedIn');
 		}
 	});
 })();
@@ -128,62 +128,9 @@ distro.lightbox = new Lightbox;
 	distro.global.bind('change:user', function(model, user){
 		if (user) {
 			distro.lightbox.hide('login');
-		} else {
-			distro.lightbox.show({
-				name: 'login',
-				show: function($content){
-					var $form, $emailField, $passwordField, $registerCheckbox, $submitButton, submitStatus = new Backbone.Model({submitting:false});
-					$content.attr('id', 'loginRegisterBox');
-					$content.haml(['%form', {$:{$:function(){ $form = this; }}},
-						['%dl',
-							['%dt', ['%label', {'for':'emailAddress'}, distro.loc.str('registration.emailAddressQuery')]],
-							['%dd', ['%input#emailAddress', {$:{$:function(){
-								$emailField = this;
-								submitStatus.bind('change:submitting', function(m, submitting){ $emailField.attr('disabled', submitting ? true : null) });
-							}}, size:'35', placeholder:'s@distro.fm'}]],
-							['%dt', ['%label', {'for':'password'}, distro.loc.str('registration.passwordQuery')]],
-							['%dd', ['%input#password', {$:{$:function(){
-								$passwordField = this;
-								submitStatus.bind('change:submitting', function(m, submitting){ $passwordField.attr('disabled', submitting ? true : null) });
-							}}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
-							['%dt', ['%label', {'for':'registrationType'}, distro.loc.str('registration.registerQuery')]],
-							['%dd', ['%input#registrationType', {$:{$:function(){
-								$registerCheckbox = this;
-								submitStatus.bind('change:submitting', function(m, submitting){ $registerCheckbox.attr('disabled', submitting ? true : null) });
-							}}, type:'checkbox'}]]
-						],
-						['%div', {style:"text-align: right"},
-							['%button#submitButton', {$:{$:function(){
-								$submitButton = this;
-								submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
-							}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')],
-						]
-					]);
-					$registerCheckbox.change(function(){
-						$submitButton.text($registerCheckbox[0].checked ? distro.loc.str('registration.registerLabel') : distro.loc.str('registration.logInLabel'));
-					});
-					$form.submit(function(e){
-						e.preventDefault();
-						var email = $emailField.val(), password = $passwordField.val(), register = $registerCheckbox[0].checked;
-						if (!email || !password) {
-							alert(distro.loc.str('registration.errors.noCredentials'));
-						} else {
-							submitStatus.set({submitting: true});
-							distro.request(register ? 'register' : 'login', {email: email, password: password}, new Hollerback({
-								failure: function(data){
-									if (data && data.errorMessage) {
-										alert(distro.loc.str(data.errorMessage) || data.errorMessage);
-									}
-								},
-								complete: function(){
-									submitStatus.set({submitting: false});
-								}
-							}));
-						}
-						return false;
-					});
-				}
-			});
+			if (document.location.hash === '#/login') {
+				Backbone.history.saveLocation('');
+			}
 		}
 	});
 })();
@@ -409,8 +356,14 @@ distro.LandingPage = distro.Model.extend({
 
 distro.Router = Backbone.Controller.extend({
 	routes: {
+		"": "blank",
+		"/": "blank",
 		":band": "band",
-		"/find": "find"
+		"/find": "find",
+		"/login": "login"
+	},
+	blank: function(){
+		distro.lightbox.hide();
 	},
 	band: function(band){
 		distro.lightbox.hide();
@@ -501,6 +454,63 @@ distro.Router = Backbone.Controller.extend({
 			// hide: function(){
 			// 	alert("BYE");
 			// }
+		});
+	},
+	login: function(){
+		distro.lightbox.show({
+			name: 'login',
+			show: function($content){
+				var $form, $emailField, $passwordField, $registerCheckbox, $submitButton, submitStatus = new Backbone.Model({submitting:false});
+				$content.attr('id', 'loginRegisterBox');
+				$content.haml(['%form', {$:{$:function(){ $form = this; }}},
+					['%dl',
+						['%dt', ['%label', {'for':'emailAddress'}, distro.loc.str('registration.emailAddressQuery')]],
+						['%dd', ['%input#emailAddress', {$:{$:function(){
+							$emailField = this;
+							submitStatus.bind('change:submitting', function(m, submitting){ $emailField.attr('disabled', submitting ? true : null) });
+						}}, size:'35', placeholder:'s@distro.fm'}]],
+						['%dt', ['%label', {'for':'password'}, distro.loc.str('registration.passwordQuery')]],
+						['%dd', ['%input#password', {$:{$:function(){
+							$passwordField = this;
+							submitStatus.bind('change:submitting', function(m, submitting){ $passwordField.attr('disabled', submitting ? true : null) });
+						}}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
+						['%dt', ['%label', {'for':'registrationType'}, distro.loc.str('registration.registerQuery')]],
+						['%dd', ['%input#registrationType', {$:{$:function(){
+							$registerCheckbox = this;
+							submitStatus.bind('change:submitting', function(m, submitting){ $registerCheckbox.attr('disabled', submitting ? true : null) });
+						}}, type:'checkbox'}]]
+					],
+					['%div', {style:"text-align: right"},
+						['%button#submitButton', {$:{$:function(){
+							$submitButton = this;
+							submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
+						}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')],
+					]
+				]);
+				$registerCheckbox.change(function(){
+					$submitButton.text($registerCheckbox[0].checked ? distro.loc.str('registration.registerLabel') : distro.loc.str('registration.logInLabel'));
+				});
+				$form.submit(function(e){
+					e.preventDefault();
+					var email = $emailField.val(), password = $passwordField.val(), register = $registerCheckbox[0].checked;
+					if (!email || !password) {
+						alert(distro.loc.str('registration.errors.noCredentials'));
+					} else {
+						submitStatus.set({submitting: true});
+						distro.request(register ? 'register' : 'login', {email: email, password: password}, new Hollerback({
+							failure: function(data){
+								if (data && data.errorMessage) {
+									alert(distro.loc.str(data.errorMessage) || data.errorMessage);
+								}
+							},
+							complete: function(){
+								submitStatus.set({submitting: false});
+							}
+						}));
+					}
+					return false;
+				});
+			}
 		});
 	}
 });

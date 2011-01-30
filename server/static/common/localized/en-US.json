@@ -7,6 +7,7 @@
 		"serverError": "The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken."
 	},
 	"chrome": {
+		"logIn": "Log in",
 		"logOut": "Log out"
 	},
 	"library": {

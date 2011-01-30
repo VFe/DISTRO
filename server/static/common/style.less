@@ -135,15 +135,31 @@ tr.filler>td{
 	line-height: 2.25em;
 	font-weight: 100;
 }
+#account>a{
+	text-transform: uppercase;
+}
+#account:hover>a{
+	color: #EEE;
+}
+#account{
+	&:not(.loggedIn){
+		#accountName, #logOut{
+			display: none;
+		}
+	}
+	&.loggedIn{
+		#logIn, &:not(:hover) #logOut, &:hover #accountName{
+			display: none;
+		}
+	}
+}
 #findNetwork>a, #account>a{
 	color: inherit;
 	text-decoration: none;
 	display: inline-block;
 	width: 100%;
 	height: 100%;
-}
-#account:hover>a{
-	color: #CCC;
+	cursor: pointer;
 }
 #bottom{
 	background: black;

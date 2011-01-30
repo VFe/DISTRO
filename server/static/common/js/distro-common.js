@@ -56,7 +56,7 @@
 				if (!string) {
 					console && console.error && console.error("Couldn't find localized string '" + stringPath + "'");
 				}
-				$el.replaceWith(document.createTextNode(string));
+				$el.text(string);
 			});
 		}
 	};
