@@ -19,34 +19,11 @@ Bands.prototype.findBandByName = function(name, options, callback){
 Bands.prototype.search = function(name, callback){
 	var searchRegex = new RegExp('^' + name, 'i'),
 		returnData = [];
-	this.collection.find({$or:[{"fullname":searchRegex},{"name":searchRegex}]}, function(err, cursor){
-		// util.log('Searching for: ' + name);
-		// 	_.forEach(cursor, function(value, key){
-		// 		try {
-		// 			value = JSON.stringify(value);
-		// 		} catch(x){
-		// 			value = value;
-		// 		}
-		// 		util.log(key + ": " + value + "\n`");
-		// 	});
-		// 	util.log("---------------------");
+	this.collection.find({$or:[{"fullname":searchRegex},{"name":searchRegex}]}, { name:1, fullname: 1}, function(err, cursor){
 		if(err){
 			callback(err, null);
 		} else{
-			(function nextRecord(){
-				cursor.nextObject(function(err, doc){
-					if(doc != null) {
-						var jsonData = {};
-						jsonData.name = doc.name;
-						jsonData.fullname = doc.fullname;
-						jsonData.id = JSON.stringify(doc.id);
-						returnData.push(jsonData);
-						process.nextTick(nextRecord);
-					} else{
-						callback(null, returnData);
-					}
-				});
-			})();
+			cursor.toArray(callback);
 		}
 	});
 };
