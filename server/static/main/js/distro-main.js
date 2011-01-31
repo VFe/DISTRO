@@ -222,7 +222,7 @@ distro.lightbox = new Lightbox;
 	distro.global.bind('change:user', function(model, user){
 		if (user) {
 			distro.lightbox.hide('login');
-			if (document.location.hash === '#/login') {
+			if (window.location.hash === '#/login') {
 				Backbone.history.saveLocation('');
 			}
 		}
@@ -506,7 +506,8 @@ distro.Router = Backbone.Controller.extend({
 					});
 				},
 				error: function(){
-					alert('failsauce');
+					alert("There's no network by this name");
+					window.location.hash = '';
 				}
 			})
 		}
@@ -550,6 +551,10 @@ distro.Router = Backbone.Controller.extend({
 		});
 	},
 	login: function(){
+		if (distro.global.get('user')) {
+			window.location.hash = '';
+			return;
+		}
 		distro.lightbox.show({
 			name: 'login',
 			show: function($content){
