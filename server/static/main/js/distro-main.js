@@ -75,69 +75,87 @@ distro.library = {
 		}, this));
 	}
 };
-distro.library.networksView = new (Backbone.View.extend({
-		el: $('#networksTable>tbody')[0],
-		template: ['%tr', ['%td',
-			['.network', { key: 'id' }, ['.networkControls', ['.delete', 'X'], ['.mute', 'M'], ['.solo', 'S']]]
-		]],
-		callbacks: {
-			unsubscribeNetwork: function(userInfo){
-				
-			}
-		},
-		events: {
-//			"dblclick tr:not(.filler)": "play",
-//			"click": "select"
-		},
-		initialize: function() {
-			_.bindAll(this, 'add', 'remove', 'refresh');
-			// _.bindAll doesn't support binding to a different object
-			for (var key in this.callbacks){
-				this.callbacks[key] = _.bind(this.callbacks[key], this);
-			}
-			this.map = [],
-			this.$el = $(this.el);
-			//this.$foot = this.$el.children(':first');
-			this.collection.bind('add', this.add);
-			this.collection.bind('remove', this.remove);
-			this.collection.bind('refresh', this.refresh);
-			this.render();
-		},
-		add: function(newObject){
-			var $container = $('<div>'), $newElement, lastItem;
-			$container.stencil(this.template, newObject.toJSON());
-			$newElement = $container.children(':first');
-			if ((lastItem = this.map.push({$element: $newElement, model: newObject}) - 2) >= 0) {
-				lastItem.$element.after($newElement);
-			} else {
-				this.$el.prepend($newElement);
-			}
-		},
-		remove: function(removed){
-			_.each(map, function(item){
-				if (item.model == removed) {
-					item.$element.remove();
-					this.map.splice(index, 1);
-					_.breakLoop();
-				};
-			}, this);
-		},
-		refresh: function(){
-			var item;
-			while((item = this.map.pop())){
-				item.$element.remove();
-			}
-			this.map = [];
-			this.collection.each(this.add);
-		}
-		// render: function(){
-		// 	var $el = $(this.el), self = this;
-		// 	$el.empty();
-		// 	this.collection.toJSON().forEach(function(item){
-		// 		$el.stencil(self.template, item);
-		// 	})
-		// }
-	}))({collection: distro.library.networks});
+distro.library.networkListView = new (Backbone.View.extend({
+	el: $('#networksTable>tbody')[0],
+	initialize: function() {
+		_.bindAll(this, 'add', 'render');
+		this.$el = $(this.el);
+		this.$foot = this.$el.children('.filler:first');
+		this.collection.bind('refresh', this.render);
+	},
+	add: function(network){
+		this.$foot.before((new distro.library.NetworkView({ model: network })).el);
+	},
+	render: function(){
+		this.$el.empty().append(this.$foot);
+		this.collection.each(this.add);
+	}
+}))({ collection: distro.library.networks });
+
+distro.library.NetworkView = Backbone.View.extend({
+	tagName: 'tr',
+	template: ['%td',
+		['.network', { key: 'id' }, ['.networkControls', ['.delete', 'X'], ['.mute', 'M'], ['.solo', 'S']]]
+	],
+	events: {
+		"click .delete": "delete",
+		"click .mute": "mute",
+		"click .solo": "solo"
+	},
+	initialize: function() {
+		_.bindAll(this, 'render');
+		this.model.bind('change', this.render);
+		this.model.view = this;
+		this.render();
+	},
+	render: function(){
+		$(this.el).stencil(this.template, this.model.toJSON());
+	},
+	'delete': function(){
+		alert('remove '+this.model.id);
+	},
+	mute: function(){
+		alert('mute '+this.model.id);
+	},
+	solo: function(){
+		alert('solo '+this.model.id);
+	}
+});
+distro.library.trackListView = new (Backbone.View.extend({
+	el: $('#musicTableBody>tbody')[0],
+	initialize: function() {
+		_.bindAll(this, 'add', 'render');
+		this.$el = $(this.el);
+		this.$foot = this.$el.children('.filler:first');
+		this.collection.bind('refresh', this.render);
+	},
+	add: function(network){
+		this.$foot.before((new distro.library.TrackView({ model: network })).el);
+	},
+	render: function(){
+		this.$el.empty().append(this.$foot);
+		this.collection.each(this.add);
+	}
+}))({ collection: distro.library.tracks });
+
+distro.library.TrackView = Backbone.View.extend({
+	tagName: 'tr',
+	template: [['%td', { key: 'name' }], ['%td'], ['%td'], ['%td', { key: 'network' }]],
+	// events: {
+	// 	"click .delete": "delete",
+	// 	"click .mute": "mute",
+	// 	"click .solo": "solo"
+	// },
+	initialize: function() {
+		_.bindAll(this, 'render');
+		this.model.bind('change', this.render);
+		this.model.view = this;
+		this.render();
+	},
+	render: function(){
+		$(this.el).stencil(this.template, this.model.toJSON());
+	},
+});
 
 // Simple success/failure callback abstraction layer
 function Hollerback(callbacks, context){
@@ -161,6 +179,7 @@ Hollerback.prototype.fail = function(){
 		if (user) {
 			$accountName.text(user);
 			$account.addClass('loggedIn');
+			distro.library.refresh();
 		} else {
 			$account.removeClass('loggedIn');
 		}
@@ -601,6 +620,8 @@ distro.init(function(){
 	distro.request('ping', null, new Hollerback({}));
 
 	$('#logOut').click(function(){
+		distro.library.networks.refresh([]);
+		distro.library.tracks.refresh([]);
 		distro.request('logout', {}, new Hollerback({}));
 	});
 
