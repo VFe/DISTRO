@@ -330,7 +330,6 @@ var MusicListView = Backbone.View.extend({
 		this.model.each(this.add);
 	},
 	play: function(e){
-		tour.advance('startedPlayback');
 		var $target = $(e.target).closest('tr:not(.filler)'), trackModel;
 		if ($target.length) {
 			if ((trackModel = $target.data('model'))) {
