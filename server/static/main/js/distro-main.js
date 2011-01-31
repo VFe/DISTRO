@@ -63,6 +63,81 @@ distro.Model = Backbone.Model.extend({
 		}));
 	}
 });
+distro.library = {
+	networks: new Backbone.Collection,
+	tracks: new Backbone.Collection,
+	refresh: function(){
+		distro.request('library', null, new Hollerback({
+			success: function(data){
+				this.networks.refresh(data.networks || []);
+				this.tracks.refresh(data.tracks || []);
+			}
+		}, this));
+	}
+};
+distro.library.networksView = new (Backbone.View.extend({
+		el: $('#networksTable>tbody')[0],
+		template: ['%tr', ['%td',
+			['.network', { key: 'id' }, ['.networkControls', ['.delete', 'X'], ['.mute', 'M'], ['.solo', 'S']]]
+		]],
+		callbacks: {
+			unsubscribeNetwork: function(userInfo){
+				
+			}
+		},
+		events: {
+//			"dblclick tr:not(.filler)": "play",
+//			"click": "select"
+		},
+		initialize: function() {
+			_.bindAll(this, 'add', 'remove', 'refresh');
+			// _.bindAll doesn't support binding to a different object
+			for (var key in this.callbacks){
+				this.callbacks[key] = _.bind(this.callbacks[key], this);
+			}
+			this.map = [],
+			this.$el = $(this.el);
+			//this.$foot = this.$el.children(':first');
+			this.collection.bind('add', this.add);
+			this.collection.bind('remove', this.remove);
+			this.collection.bind('refresh', this.refresh);
+			this.render();
+		},
+		add: function(newObject){
+			var $container = $('<div>'), $newElement, lastItem;
+			$container.stencil(this.template, newObject.toJSON());
+			$newElement = $container.children(':first');
+			if ((lastItem = this.map.push({$element: $newElement, model: newObject}) - 2) >= 0) {
+				lastItem.$element.after($newElement);
+			} else {
+				this.$el.prepend($newElement);
+			}
+		},
+		remove: function(removed){
+			_.each(map, function(item){
+				if (item.model == removed) {
+					item.$element.remove();
+					this.map.splice(index, 1);
+					_.breakLoop();
+				};
+			}, this);
+		},
+		refresh: function(){
+			var item;
+			while((item = this.map.pop())){
+				item.$element.remove();
+			}
+			this.map = [];
+			this.collection.each(this.add);
+		}
+		// render: function(){
+		// 	var $el = $(this.el), self = this;
+		// 	$el.empty();
+		// 	this.collection.toJSON().forEach(function(item){
+		// 		$el.stencil(self.template, item);
+		// 	})
+		// }
+	}))({collection: distro.library.networks});
 
 // Simple success/failure callback abstraction layer
 function Hollerback(callbacks, context){
