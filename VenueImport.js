@@ -21,7 +21,7 @@ importDB.open(function(err, db) {
 									'LinkedIn URL', 'Flickr URL', 'Youtube URL', 'iLike URL', 'iTunes URL', 
 									'Vimeo URL', 'BandCamp URL', 'Blog URL', 'GigMaven', 
 									'Flickr Link (Photostream)', 'Jambase Link', 'ArchiveDOTorg'],
-                  basicRenameList = [{old:"", new:""}],
+                  basicRenameList = [{oldName:"", newName:"", object:""}],
                   urlPathList = [];
 								record = doc; //This could just be record = {}; but I'm leaving it like this for now
 								record.presence = {};
@@ -59,9 +59,8 @@ importDB.open(function(err, db) {
 											doc[key] = killTrailingSlash[1];
 										}
 									}
-									
 								}
-                function basicRename({old:oldRecordName, new:newRecordName, object:subObject}){
+                function basicRename({oldName:oldRecordName, newName:newRecordName, object:subObject}){
                     if(doc[oldRecordName]){
                       if(subObject){
                         if(record[subObject] == undefined){ record[subObject] = {};}
@@ -75,7 +74,7 @@ importDB.open(function(err, db) {
                       delete record[oldRecordName];
                     } 
                 }
-                function urlPathnameRename({old:oldRecordName, new:newRecordName, object:subObject}){
+                function urlPathnameRename({oldName:oldRecordName, newName:newRecordName, object:subObject}){
                   if(doc[oldRecordName]){
                     if(subObject){
                       if(record[subObject] == undefined){ record[subObject] = {};}
