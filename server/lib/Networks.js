@@ -10,7 +10,6 @@ Networks.prototype.batchNetworkNameFromId = function(ids, callback){
 	this.collection.find({ _id: { $in: ids } }, function(err, cursor){
 		var networks = {};
 		cursor.each(function(err, network){
-			console.log('HIT INSIDE EACH');
 			if (err) {
 				callback(err, null);
 			} else if (network) {
