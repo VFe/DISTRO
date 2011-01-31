@@ -111,7 +111,7 @@ global.db.open(function(err, db){
 										track.network = networkMap[track.network.toHexString()] || '';
 									});
 									for (var id in networkMap){
-										networkNames.push(networkMap[id]);
+										networkNames.push({id: networkMap[id]});
 									}
 									successback({tracks: tracks, networks: networkNames});
 								}
