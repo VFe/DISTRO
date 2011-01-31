@@ -20,7 +20,9 @@ importDB.open(function(err, db) {
 									'Home Page URL', 'Pandora URL', 'SoundCloud URL', 'ExtensionFM URL', 
 									'LinkedIn URL', 'Flickr URL', 'Youtube URL', 'iLike URL', 'iTunes URL', 
 									'Vimeo URL', 'BandCamp URL', 'Blog URL', 'GigMaven', 
-									'Flickr Link (Photostream)', 'Jambase Link', 'ArchiveDOTorg'];
+									'Flickr Link (Photostream)', 'Jambase Link', 'ArchiveDOTorg'],
+                  basicRenameList = [{old:"", new:""}],
+                  urlPathList = [];
 								record = doc; //This could just be record = {}; but I'm leaving it like this for now
 								record.presence = {};
 								record.presence.email = {};
@@ -59,19 +61,28 @@ importDB.open(function(err, db) {
 									}
 									
 								}
-                function basicRename(oldRecordName, newRecordName, subObject){
-                    if(doc[oldRecordName]{
-                      subObject ? record[subObject][newRecordName] = record[oldRecordName] : record[newRecordName] = record[oldRecordName];
+                function basicRename({old:oldRecordName, new:newRecordName, object:subObject}){
+                    if(doc[oldRecordName]){
+                      if(subObject){
+                        if(record[subObject] == undefined){ record[subObject] = {};}
+                        record[subObject][newRecordName] = record[oldRecordName];
+                      } else {
+                        record[newRecordName] = record[oldRecordName];
+                      }
                       delete record[oldRecordName];
                       util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]);
                     } else{
                       delete record[oldRecordName];
                     } 
                 }
-                function urlPathnameRename(oldRecordName, newRecordName, subObject){
+                function urlPathnameRename({old:oldRecordName, new:newRecordName, object:subObject}){
                   if(doc[oldRecordName]){
-                    record[newRecordName] = url.parse(doc[oldRecordName]).pathname;
-                    subObject ? record[subObject][newRecordName] = url.parse(record[oldRecordName]).pathname : record[newRecordName] = url.parse(record[oldRecordName]).pathname;
+                    if(subObject){
+                      if(record[subObject] == undefined){ record[subObject] = {};}
+                      record[subObject][newRecordName] = url.parse(record[oldRecordName]).pathname;
+                    } else{
+                      record[newRecordName] = url.parse(record[oldRecordName]).pathname;
+                    }
                     delete record[oldRecordName];
                     util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]);
                   } else{
