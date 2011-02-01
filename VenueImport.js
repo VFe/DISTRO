@@ -9,7 +9,7 @@ exportDB = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_D
 importDB.open(function(err, db) {
 	exportDB.open(function(err, exportDB){
 		exportDB.collection('bands', function(err, exportColl){
-			db.collection('i3', function(err, coll){
+			db.collection('venue', function(err, coll){
 				coll.find(function(err, cursor){
 					var counter = 1;
 					(function nextRecord(){
@@ -21,7 +21,10 @@ importDB.open(function(err, db) {
 									'LinkedIn URL', 'Flickr URL', 'Youtube URL', 'iLike URL', 'iTunes URL', 
 									'Vimeo URL', 'BandCamp URL', 'Blog URL', 'GigMaven', 
 									'Flickr Link (Photostream)', 'Jambase Link', 'ArchiveDOTorg'],
-                  basicRenameList = [{oldName:"", newName:"", object:""}],
+                  basicRenameList = [{oldName:"Network Name", newName:"name"}, {oldName:"Venue Name", newName:"fullname"}, {oldName:"Street Address", newName:"streetAddress"},
+                                    {oldName:"City, State", newName:"citystate"}, {oldName:"Venue Home Page", newName:"homepage"}, {oldName:"Booking E-mail", newName:"booking", object:"email"}, 
+                                    {oldName:"General E-mail", newName:"general", object:"email"}, {oldName:"Phone Number", newName:"phone"}, {oldName:"Zip", newName:"zip"}, {oldName:"Photo By", newName:"photoCred"},
+                                    {oldName:"Venue Calendar Page", newName:"calendarURL"} ],
                   urlPathList = [];
 								record = doc; //This could just be record = {}; but I'm leaving it like this for now
 								record.presence = {};
@@ -74,7 +77,7 @@ importDB.open(function(err, db) {
                       delete record[oldRecordName];
                     } 
                 }
-                function urlPathnameRename({oldName:oldRecordName, newName:newRecordName, object:subObject}){
+                function urlPathnameRename({oldName:oldRecordName, new:newRecordName, object:subObject}){
                   if(doc[oldRecordName]){
                     if(subObject){
                       if(record[subObject] == undefined){ record[subObject] = {};}
