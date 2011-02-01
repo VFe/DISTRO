@@ -192,6 +192,7 @@ function Lightbox(){
 }
 Lightbox.prototype.show = function(content){
 	this.hideContent();
+	this.hiding = false;
 	var $content = $('<div>', { 'class': 'lightboxContent' });
 	this.content = content;
 	this.$contentWrapper.html($content);
@@ -203,12 +204,16 @@ Lightbox.prototype.hide = function(name){
 	if (!name || (this.content && name === this.content.name)) {
 		var self = this;
 		this.$lightbox.fadeOut();
+		this.hiding = true;
 		this.$contentWrapper.fadeOut(function(){
 			self.hideContent();
 		});
 	}
 }
 Lightbox.prototype.hideContent = function(){
+	if (!this.hiding){
+		return;
+	}
 	if (this.content) {
 		this.content.hide && this.content.hide(this);
 		this.content = null;
