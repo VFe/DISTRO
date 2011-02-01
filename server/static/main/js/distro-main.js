@@ -1,4 +1,4 @@
-distro.SERVER = "http://localhost:3000/api/",
+distro.SERVER = "/api/",
 distro.global = new Backbone.Model({}),
 distro.pyramidHead = function(message, retryback, giveupback){
 	var composedMessage = distro.loc.str('global.pyramidHead.pre') + '\n' + message;
