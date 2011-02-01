@@ -129,8 +129,8 @@ importDB.open(function(err, db) {
 								//record.name = doc['^NETWORKname^'].replace(/\^/g, "");
 								//delete record['Band Name'];
 								//delete record['^NETWORKname^'];
-								record.lname = record.name.toLowercase();
-								record.lfullname = record.fullname.toLowercase();
+								record.lname = record.name.toLowerCase();
+								record.lfullname = record.fullname.toLowerCase();
 								exportColl.insert(record, function(err){
 									if(err) util.log(new Error(err));
 									util.log('Wrote record for '+record.fullname+" #: "+counter++);
