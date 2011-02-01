@@ -453,7 +453,7 @@ distro.Router = Backbone.Controller.extend({
 									["%img.photo",{src: {key: 'name', handler: function(){ return "http://distro-images.s3.amazonaws.com/"+this+".jpg" }}, width:"500", height:"335"}],
 									["%span.caption",{style:"color: rgb(119, 119, 119);"},
 										["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
-											["%a",{href:{ key: "flickrcredurl"}, style:"text-decoration:none;"}, { key: "flickrcred"}]
+											["%a",{href:{ key: "photoCredURL"}, style:"text-decoration:none;"}, { key: "photoCred"}]
 										],
 										["#location",
 											["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "citystate"}],
