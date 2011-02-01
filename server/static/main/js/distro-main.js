@@ -1,3 +1,7 @@
+distro.util = {
+	pad: function(input, length, char){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(char || '0') + input : input); },
+	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); }
+};
 distro.SERVER = "/api/",
 distro.global = new Backbone.Model({}),
 distro.pyramidHead = function(message, retryback, giveupback){
@@ -173,6 +177,43 @@ distro.library.TrackView = Backbone.View.extend({
 		player.play(this.model);
 	}
 });
+
+distro.Slider = function (element, callback){
+	var self = this,
+	    $slider = $(element),
+	    $channel = $slider.find('.channel'),
+	    $backing = $slider.find('.backing'),
+	    $handle = $slider.find('.handle');
+	
+	this.position = 0;
+	
+	this.setPosition = function(position, actuated){
+		this.position = Math.min(Math.max(position, 0), 1);
+		$backing.width(this.position * 100 + '%');
+		if (actuated === true) {
+			callback.call(this, this.position);
+		}
+	}
+	this.enable = function(){
+		$slider.addClass('enabled');
+	}
+	this.disable = function(){
+		$slider.removeClass('enabled');
+	}
+	$slider.mousedown(function(e){
+		if (!$slider.hasClass('enabled')) { return false; }
+		var $document = $(document), left = $backing.offset().left, width = $channel.width();
+		function move(e){
+			self.setPosition(Math.min(Math.max(e.pageX - left - 6, 0), width) / width, true);
+		}
+		$document.mousemove(move);
+		$document.mouseup(function(){
+			$document.unbind('mousemove', move);
+		});
+		move(e);
+		return false;
+	});
+}
 
 // Simple success/failure callback abstraction layer
 function Hollerback(callbacks, context){
@@ -383,8 +424,18 @@ function Player(){
 		}
 	}, this);
 	
+	var player = this,
+	    currentTime = document.getElementById('currentTime').firstChild,
+	    totalTime   = document.getElementById('totalTime').firstChild,
+		slider = new distro.Slider($('#scrubber'), function(position, actuated){
+			if (player.current) {
+				player.current.setPosition(position * player.current.duration);
+			}
+		});
+	
 	function onplay(){
 		player.$transport.addClass('enabled playing');
+		slider.enable();
 	}
 	function onpause(){
 		player.$transport.removeClass('playing');
@@ -394,6 +445,18 @@ function Player(){
 	}
 	function onstop(){
 		player.$transport.removeClass('enabled playing');
+		slider.setPosition(0);
+		slider.disable();
+		currentTime.data = totalTime.data = '0:00';
+	}
+	function onfinish(){
+		onstop();
+		player.next();
+	}
+	function onwhileplaying(){
+		currentTime.data = distro.util.formatTime(Math.floor(this.position/1000));
+		totalTime.data = distro.util.formatTime(Math.floor(this.duration/1000));
+		slider.setPosition(this.position/this.duration);
 	}
 	this.play = function(track){
 		if (!soundManager.ok()) {
@@ -410,7 +473,9 @@ function Player(){
 				onplay: onplay,
 				onresume: onplay,
 				onpause: onpause,
-				onstop: onstop
+				onstop: onstop,
+				onfinish: onfinish,
+				whileplaying: onwhileplaying
 			}).play();
 			distro.library.trackListView.setPlaying(track);
 		}
