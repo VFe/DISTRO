@@ -59,6 +59,7 @@ importDB.open(function(err, db) {
 										if(_.include(urlKeyList, key)){
 											//util.log("httpizing " + doc[key] + " \n \t \t - Result: " + httpize(doc[key]));
 											doc[key] = httpize(doc[key]);
+											if(var snipped = snipImportant(doc[key]){doc[key] = snipped[1];}
 										}
 										//var killTrailingSlash = /(.*)\/$/.exec(doc[key]);
 										/*if(killTrailingSlash){*/
@@ -124,8 +125,8 @@ importDB.open(function(err, db) {
 								//record.name = doc['^NETWORKname^'].replace(/\^/g, "");
 								//delete record['Band Name'];
 								//delete record['^NETWORKname^'];
-								record.lname = record.name.toLower();
-								record.lfullname = record.fullname.toLower();
+								record.lname = record.name.toLowercase();
+								record.lfullname = record.fullname.toLowercase();
 								exportColl.insert(record, function(err){
 									if(err) util.log(new Error(err));
 									util.log('Wrote record for '+record.fullname+" #: "+counter++);
