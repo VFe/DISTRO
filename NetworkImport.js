@@ -48,10 +48,10 @@ importDB.open(function(err, db) {
 									doc[key] = subdomain[1];
 								}
 								function snipImportant(both, unimportant){
-									if(!unimportant){
+									if(unimportant == undefined || unimportant == null){
 										unimportant = /^\/(.*)\/*/;
 									}
-									return unimportant.exec(both)[1];
+									return unimportant ? null : unimportant.exec(both)[1];
 								}
 								for (var key in doc){
 									//util.log(key + " " + doc[key]);
