@@ -439,6 +439,7 @@ distro.Router = Backbone.Controller.extend({
 		}
 		(new distro.LandingPage({name: name})).fetch({
 			success: function(model){
+				Backbone.history.saveLocation('/' + model.attributes.name);
 				distro.lightbox.show({
 					name: 'landingpage',
 					show: function($content){
