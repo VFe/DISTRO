@@ -59,7 +59,8 @@ importDB.open(function(err, db) {
 										if(_.include(urlKeyList, key)){
 											//util.log("httpizing " + doc[key] + " \n \t \t - Result: " + httpize(doc[key]));
 											doc[key] = httpize(doc[key]);
-											if(var snipped = snipImportant(doc[key]){doc[key] = snipped[1];}
+											var snipped = snipImportant(doc[key]);
+											if(snipped){doc[key] = snipped[1];}
 										}
 										//var killTrailingSlash = /(.*)\/$/.exec(doc[key]);
 										/*if(killTrailingSlash){*/
