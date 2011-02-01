@@ -26,7 +26,7 @@ importDB.open(function(err, db) {
 													{oldName:"PHONE", newName:"phone"}, {oldName:"ZIP", newName:"zip"}, {oldName:"PHOTO_BY", newName:"photoCred"}, {oldName:"CAL_MAIN", newName:"calendar"}, 
 													{oldName:"CAL_GOOG", newName:"calendarGoogle"}],
 
-									urlPathList = [{oldName:"FOURSQUARE", newName:"foursquare", object:"presence"}, {oldName:"FACEBOOK", newName:"facebook", object:"presence"}, {oldName:"TWITTER", newName:"twitter", object:"presence"}, 
+									urlPathList = [{oldName:"FOURSQUARE", newName:"foursquare", object:"presence"}, {oldName:"FACEBOOK", newName:"facebook", object:"presence", hashable:true}, {oldName:"TWITTER", newName:"twitter", object:"presence", hashable:true}, 
 												{oldName:"MYSPACE", newName:"myspace", object:"presence"}, {oldName:"LASTFM", newName:"lastfm", object:"presence"}, {oldName:"PANDORA", newName:"pandora", object:"presence"}, 
 												{oldName:"SOUNDCLOUD", newName:"soundcloud", object:"presence"}, {oldName:"PHOTO_LINK", newName:"photoCredURL"}, {oldName:"ILIKE", newName:"ilike", object:"presence"},
 												{oldName:"VIMEO", newName:"vimeo", object:"presence"}, {oldName:"GIGMAVEN", newName:"gigmaven", object:"presence"}, {oldName:"ARCHIVE", newName:"archive", object:"presence"}, 
@@ -88,19 +88,36 @@ importDB.open(function(err, db) {
 								function urlPathnameRename(acceptObj){
 									var oldRecordName = acceptObj.oldName,
 										newRecordName = acceptObj.newName,
-										subObject = acceptObj.object;
-								  if(doc[oldRecordName]){
-									if(subObject){
-									  if(record[subObject] == undefined){ record[subObject] = {};}
-									  record[subObject][newRecordName] = url.parse(record[oldRecordName]).pathname;
+										subObject = acceptObj.object, 
+										hashPossible = acceptObj.hashable;
+									if(hashPossible && doc[oldRecordName]){
+										if(subObject){
+											if(record[subObject] == undefined){ record[subObject] = {};}
+											record[subObject][newRecCan you let me kordName] = url.parse(record[oldRecordName]);
+											if(record[subObject][newRecordName].pathname === "/") record[subObject][newRecordName] = record[subObject][newRecordName].hash;
+											else record[subObject][newRecordName] = record[subObject][newRecordName].pathname;
+											delete record[subObject][oldRecordName];
+											util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]));
+										} else {
+											record[newRecordName] = url.parse(record[oldRecordName]);
+											if(record[newRecordName].pathname === "/") record[newRecordName] = record[newRecordName].hash;
+											else record[newRecordName] = record[newRecordName].pathname;
+											delete record[oldRecordName];
+											util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]));
+										}
+									} else if(doc[oldRecordName]){
+										if(subObject){
+											if(record[subObject] == undefined){ record[subObject] = {};}
+											record[subObject][newRecordName] = url.parse(record[oldRecordName]).pathname;
+										} else{
+										record[newRecordName] = url.parse(record[oldRecordName]).pathname;
+										}
+										delete record[oldRecordName];
+										util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]));
 									} else{
-									  record[newRecordName] = url.parse(record[oldRecordName]).pathname;
+									delete record[oldRecordName];
 									}
-									delete record[oldRecordName];
-									util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]));
-								  } else{
-									delete record[oldRecordName];
-								  }
+									//if((/^\//).exec(record[newRecordName] || record[subObject][newRecordName])){console.log("boom");}
 								}
 							_.each(basicRenameList, basicRename);
 							_.each(urlPathList, urlPathnameRename);
