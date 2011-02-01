@@ -29,9 +29,9 @@
 			"existingUser": "This email address already has an account with DISTRO."
 		}
 	},
-	"bands": {
+	"networks": {
 		"errors": {
-			"noBand": "This band doesn't exist"
+			"noNetwork": "This network doesn't exist"
 		}
 	},
 	"findNetworks": {

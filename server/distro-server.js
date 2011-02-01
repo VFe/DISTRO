@@ -11,7 +11,6 @@ var util = require('util'),
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 global.users = new distro.Users();
 global.sessions = new distro.Sessions();
-global.bands = new distro.Bands();
 global.tracks = new distro.Tracks();
 global.networks = new distro.Networks();
 
@@ -123,18 +122,18 @@ global.db.open(function(err, db){
 				}
 			}));
 			app.get('/search/:search', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				global.bands.search(req.params.search, function(err, returnData){
+				global.networks.search(req.params.search, function(err, returnData){
 					successback(returnData);
 				});
 			}));
-			app.get('/bands/:bandID', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				global.bands.findBandByName(req.params.bandID, { _id: false }, function(err, bandDoc){
+			app.get('/networks/:name', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				global.networks.findNetworkByName(req.params.name, { _id: false }, function(err, doc){
 					if(err){
 						errback(err);
-					} else if(bandDoc){
-						if ('presence' in bandDoc) {
-							var presenceMap = bandDoc.presence, presenceArray = [], presenceItem;
-							distro.Bands.PRESENCE.forEach(function(presenceSpec){
+					} else if(doc){
+						if ('presence' in doc) {
+							var presenceMap = doc.presence, presenceArray = [], presenceItem;
+							distro.Networks.PRESENCE.forEach(function(presenceSpec){
 								if ((presenceItem = presenceMap[presenceSpec.name])) {
 									presenceArray.push({
 										name: presenceSpec.name,
@@ -142,22 +141,22 @@ global.db.open(function(err, db){
 									});
 								}
 								if (presenceArray.length) {
-									bandDoc.presence = presenceArray;
+									doc.presence = presenceArray;
 								} else {
-									delete bandDoc.presence;
+									delete doc.presence;
 								}
 							});
 						}
-						successback(bandDoc);
+						successback(doc);
 					} else {
-						errback(new distro.error.ClientError("bands.errors.noBand"));
+						errback(new distro.error.ClientError("networks.errors.noNetwork"));
 					}
 				});
 			}));
 		}))
 		.use('/', connect.router(function(app){
-			app.get('/:band', function(req, res){
-				var target = req.params && req.params.band || '';
+			app.get('/:network', function(req, res){
+				var target = req.params && req.params.network || '';
 				res.writeHead(302, { Location: ("/#" + encodeURIComponent(target)) });
 				res.end();
 			});

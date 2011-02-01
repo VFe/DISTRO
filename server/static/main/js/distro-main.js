@@ -448,7 +448,7 @@ Player.prototype.stop = function(){
 distro.LandingPage = distro.Model.extend({
 	initialize: function(opts){
 		this.name = opts.name;
-		this.url = 'bands/' + opts.name;
+		this.url = 'networks/' + opts.name;
 	},
 });
 
@@ -456,22 +456,22 @@ distro.Router = Backbone.Controller.extend({
 	routes: {
 		"": "blank",
 		"/": "blank",
-		":band": "band",
+		":network": "network",
 		"/find": "find",
 		"/login": "login"
 	},
 	blank: function(){
 		distro.lightbox.hide();
 	},
-	band: function(band){
+	network: function(name){
 		distro.lightbox.hide();
-		if (band) {
-			(new distro.LandingPage({name: band})).fetch({
+		if (name) {
+			(new distro.LandingPage({name: name})).fetch({
 				success: function(model){
 					distro.lightbox.show({
 						name: 'landingpage',
 						show: function($content){
-							$content.attr('id', 'bandBox');
+							$content.attr('id', 'landingBox');
 							$content.stencil(["%form", {},
 								[".lightboxHeader",
 									["%span.close.button", {}, "x"],

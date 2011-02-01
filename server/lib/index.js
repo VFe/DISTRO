@@ -3,7 +3,6 @@
 	'error',
 	'Users',
 	'Sessions',
-	'Bands',
 	'Tracks',
 	'Networks',
 	'init',

@@ -26,3 +26,40 @@ Networks.prototype.batchNetworkNameFromId = function(ids, callback){
 // 		callback(err, (networks ? networks[0] : networks));
 // 	});
 // }
+
+Networks.prototype.findNetworkByName = function(name, options, callback){
+	this.collection.findOne({"name":name}, { fields: { _id: (options._id === false ? 0 : 1) } }, function(err, doc){
+		if(err) {
+			callback(err, null);
+		} else {
+			callback(null, doc);
+		}
+	});
+};
+
+Networks.prototype.search = function(name, callback){
+	var searchRegex = new RegExp('^' + name, 'i'),
+		returnData = [];
+	this.collection.find({$or:[{"fullname":searchRegex},{"name":searchRegex}]}, { name:1, fullname: 1}, function(err, cursor){
+		if(err){
+			callback(err, null);
+		} else{
+			cursor.toArray(callback);
+		}
+	});
+};
+
+Networks.PRESENCE = [
+	{ name: "email", prefix: "mailto:" },
+	{ name: "website" },
+	{ name: "twitter", prefix: "http://twitter.com/" },
+	{ name: "myspace", prefix: "http://www.myspace.com/" },
+	{ name: "lastfm", prefix: "http://www.last.fm/music/" },
+	{ name: "soundcloud", prefix: "http://soundcloud.com/" },
+	{ name: "flickr", prefix: "http://www.flickr.com/photos/" },
+	{ name: "youtube", prefix: "http://www.youtube.com/user/" },
+	{ name: "itunes", prefix: "http://itunes.apple.com/us/artist/" },
+	{ name: "vimeo", prefix: "http://vimeo.com/" },
+	{ name: "facebook", prefix: "http://www.facebook.com/" },
+	{ name: "bandcamp"/*, prefix: "http://", suffix:".bandcamp.com/"*/ }
+];
