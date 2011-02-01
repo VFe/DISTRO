@@ -130,31 +130,48 @@ distro.library.trackListView = new (Backbone.View.extend({
 		this.collection.bind('refresh', this.render);
 	},
 	add: function(network){
-		this.$foot.before((new distro.library.TrackView({ model: network })).el);
+		this.$foot.before((new distro.library.TrackView({ model: network, parent: this })).el);
 	},
 	render: function(){
 		this.$el.empty().append(this.$foot);
 		this.collection.each(this.add);
+	},
+	setPlaying: function(track){
+		if (this.playingTrack) {
+			this.playingTrack.view.setPlaying(false);
+		}
+		if (track) {
+			track.view.setPlaying(true);
+		}
+		this.playingTrack = track;
+	},
+	relativeTrack: function(shift){
+		return this.playingTrack && this.collection.models[this.collection.indexOf(this.playingTrack) + shift];
 	}
 }))({ collection: distro.library.tracks });
 
 distro.library.TrackView = Backbone.View.extend({
 	tagName: 'tr',
 	template: [['%td', { key: 'name' }], ['%td'], ['%td'], ['%td', { key: 'network' }]],
-	// events: {
-	// 	"click .delete": "delete",
-	// 	"click .mute": "mute",
-	// 	"click .solo": "solo"
-	// },
+	events: {
+		"dblclick": "play"
+	},
 	initialize: function() {
-		_.bindAll(this, 'render');
+		_.bindAll(this, 'render', 'setPlaying', 'play');
 		this.model.bind('change', this.render);
 		this.model.view = this;
+		this.$el = $(this.el);
 		this.render();
 	},
 	render: function(){
-		$(this.el).stencil(this.template, this.model.toJSON());
+		this.$el.stencil(this.template, this.model.toJSON());
 	},
+	setPlaying: function(playing){
+		this.$el[playing ? 'addClass' : 'removeClass']('playing');
+	},
+	play: function(){
+		player.play(this.model);
+	}
 });
 
 // Simple success/failure callback abstraction layer
@@ -354,95 +371,96 @@ var MusicListView = Backbone.View.extend({
 
 // Music player
 function Player(){
-	var $audio = $(this.audio = new Audio()), that = this;
-	if (!this.audio) { return null };
-	$audio.attr({autoplay:'', autobuffer:''})
+	// SoundManager initialization
+	soundManager.debugMode = false;
+	soundManager.url = '/soundmanager/';
+	soundManager.useFlashBlock = true;
+	soundManager.useHTML5Audio = true;
+	soundManager.onload = _.bind(function() {
+		if (this.heldTrack) {
+			this.play(this.heldTrack);
+			delete this.heldTrack;
+		}
+	}, this);
+	
+	function onplay(){
+		player.$transport.addClass('enabled playing');
+	}
+	function onpause(){
+		player.$transport.removeClass('playing');
+	}
+	function onresume(){
+		player.$transport.addClass('playing');
+	}
+	function onstop(){
+		player.$transport.removeClass('enabled playing');
+	}
+	this.play = function(track){
+		if (!soundManager.ok()) {
+			this.heldTrack = track;
+			return;
+		}
+		if (this.current) {
+			this.stop();
+		}
+		if (track && track.attributes.network && track.attributes.filename) {
+			this.current = soundManager.createSound({
+				id: "track",
+				url: "//distro-music.s3.amazonaws.com/" + track.get('network') + "/" + track.get('filename') + ".mp3",
+				onplay: onplay,
+				onresume: onplay,
+				onpause: onpause,
+				onstop: onstop
+			}).play();
+			distro.library.trackListView.setPlaying(track);
+		}
+	};
+	
 	this.$transport = $('#transport');
-	$audio.bind('play', function(){
-		that.$transport.addClass('playing');
-	});
-	$audio.bind('pause', function(){
-		that.$transport.removeClass('playing');
-	});
-	$audio.bind('emptied', function(){
-		that.delegate.willStopPlayingTrack.call(this, that.userInfo);
-		that.$transport.removeClass('playing enabled');
-		that.canPlay = false;
-	});
-	$audio.bind('loadstart', function(){
-		that.$transport.addClass('enabled');
-		that.canPlay = true;
-	});
-	$audio.bind('ended', function(){
-		that.playNext();
-	});
 	$('#pauseButton').click(function(){
-		that.audio.pause();
+		if (player.current) {
+			player.current.pause();
+		}
 	});
 	$('#playButton').click(function(){
-		if (that.canPlay) {
-			that.audio.play();
+		if (player.current) {
+			player.current.play();
+		} else {
+			player.play(distro.library.tracks.models[0]);
 		}
 	});
 	$('#skipBackButton').click(function(){
-		if (that.canPlay) {
-			if (that.audio.currentTime > 1 || !that.playPrevious()) {
-				that.audio.currentTime = 0;
-				that.audio.play();
+		if (player.current) {
+			if (player.current.position > 1000) {
+				player.current.setPosition(0);
+			} else {
+				player.previous();
 			}
 		}
 	});
 	$('#skipForwardButton').click(function(){
-		if (that.canPlay) {
-			that.playNext();
+		if (player.current) {
+			player.next();
 		}
 	});
 };
-Player.prototype.start = function(files, delegate, userInfo){
-	this.delegate && this.delegate.willStopPlayingTrack.call(this, this.userInfo);
-	this.stop();
-	if (files) {
-		this.delegate = delegate;
-		this.userInfo = userInfo;
-		this.delegate && this.delegate.willStartPlayingTrack.call(this, this.userInfo);
-		this.playFile(files);
+Player.prototype.next = function(){
+	if (player.current) {
+		this.play(distro.library.trackListView.relativeTrack(1));
 	}
 };
-Player.prototype.playFile = function(variants){
-	var sourceElement;
-	this.stop();
-	for (var i = 0, l = variants.length; i < l; i++){
-		sourceElement = document.createElement('source');
-		$(sourceElement).attr(variants[i]);
-		this.audio.appendChild(sourceElement);
+Player.prototype.previous = function(){
+	if (player.current) {
+		this.play(distro.library.trackListView.relativeTrack(-1));
 	}
-	this.audio.play();
-}
-Player.prototype.playNext = function(){
-	this.delegate && this.delegate.willStopPlayingTrack.call(this, this.userInfo);
-	var next = this.delegate.relativeTrack.call(this, this.userInfo, 1);
-	if (next) {
-		this.playFile(next);
-		this.delegate && this.delegate.willStartPlayingTrack.call(this, this.userInfo);
-		return true;
-	}
-	this.stop();
-	return false;
-}
-Player.prototype.playPrevious = function(){
-	this.delegate && this.delegate.willStopPlayingTrack.call(this, this.userInfo);
-	var prev = this.delegate.relativeTrack.call(this, this.userInfo, -1);
-	if (prev) {
-		this.playFile(prev);
-		this.delegate && this.delegate.willStartPlayingTrack.call(this, this.userInfo);
-		return true;
-	}
-	this.delegate && this.delegate.willStartPlayingTrack.call(this, this.userInfo);
-	return false;
-}
+};
 Player.prototype.stop = function(){
-	while(this.audio.lastChild){ this.audio.removeChild(this.audio.lastChild); }
-	this.audio.load();
+	if (this.current) {
+		this.current.stop();
+		this.current.destruct();
+		this.current = null;
+		distro.library.trackListView.setPlaying(null);
+	}
 };
 
 distro.LandingPage = distro.Model.extend({
@@ -625,11 +643,12 @@ distro.Router = Backbone.Controller.extend({
 	}
 });
 
+var tracks = window.tracks = new Backbone.Collection(),
+	player = window.player = new Player(),
+	musicListView = window.musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
+
 // Initialization
 distro.init(function(){
-	var tracks = window.tracks = new Backbone.Collection(),
-		player = window.player = new Player(),
-		musicListView = window.musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
 	
 	distro.loc.replacePlaceholders();
 	
