@@ -62,6 +62,9 @@ importDB.open(function(err, db) {
 											var snipped = snipImportant(doc[key]);
 											if(snipped){doc[key] = snipped[1];}
 										}
+										if(typeof doc[key] != "string" && (key == "NETWORK_NAME" || key == "FULL_NAME")){
+											doc[key] = doc[key].toString();
+										}
 										//var killTrailingSlash = /(.*)\/$/.exec(doc[key]);
 										/*if(killTrailingSlash){*/
 											//doc[key] = killTrailingSlash[1];
