@@ -174,7 +174,7 @@ distro.library.TrackView = Backbone.View.extend({
 		this.$el[playing ? 'addClass' : 'removeClass']('playing');
 	},
 	play: function(){
-		player.play(this.model);
+		distro.player.play(this.model);
 	}
 });
 
@@ -292,241 +292,126 @@ distro.lightbox = new Lightbox;
 	});
 })();
 
-// Music list view
-var TrackDetailView = Backbone.View.extend({
-	el: $('<div/>', {'class':'infoBoxContent'})[0],
-	template: [
-		['%p', 'Track from: ^', {key:'source'}, '^'],
-		['%p', 'Name: ', {key:'name'}],
-		['%p', 'Artist: ', {key:'artist'}],
-		['%p', 'Album: ', {key:'album'}],
-	],
-	initialize: function(){
-		_.bindAll(this, 'update');
-		this.placeholder = $.haml.placeholder(stencil.placeholder(this.template));
-		$(this.el).append(this.placeholder.inject());
-		this.model.bind('change:selection', this.update);
-	},
-	update: function(){
-		if (this.model.attributes.selection) {
-			this.placeholder.update(this.model.attributes.selection.toJSON());
-		}
-	}
-});
-var LibrarySelection = Backbone.Model.extend({
-	set: function(attributes, options){
-		this.attributes.selection && $(this.attributes.selection.element).removeClass('selected');
-		Backbone.Model.prototype.set.call(this, attributes, options);
-		this.attributes.selection && $(this.attributes.selection.element).addClass('selected');
-	}
-});
-var MusicListView = Backbone.View.extend({
-		template: ['%tr',
-		['%td', {'class':{key:'freshness'}}],
-		['%td', {'class':{key:'upcoming'}}],
-		['%td', {key:'name'}],
-		['%td', {key:'source', conditional:['^', {key:'source'}, '^']}],
-		['%td', {key:'time'}],
-		['%td', {key:'artist'}]
-	],
-	callbacks: {
-		relativeTrack: function(userInfo, shift){
-			var next = this.model.models[this.model.indexOf(userInfo.model) + shift];
-			if (next) {
-				userInfo.model = next;
-				return this.fileNamesForModel(next);
-			}
-		},
-		willStopPlayingTrack: function(userInfo){
-			userInfo.model.element && $(userInfo.model.element).removeClass('playing');
-		},
-		willStartPlayingTrack: function(userInfo){
-			userInfo.model.element && $(userInfo.model.element).addClass('playing');
-		}
-	},
-	map: [],
-	selection: [],
-	events: {
-		"dblclick tr:not(.filler)": "play",
-		"click": "select"
-	},
-	initialize: function() {
-		_.bindAll(this, 'add', 'remove', 'refresh', 'play', 'select');
-		// _.bindAll doesn't support binding to a different object
-		for (var key in this.callbacks){
-			this.callbacks[key] = _.bind(this.callbacks[key], this);
-		}
-		this.$el = $(this.el);
-		this.$foot = this.$el.children(':first');
-		this.model.bind('add', this.add);
-		this.model.bind('remove', this.remove);
-		this.model.bind('refresh', this.refresh);
-		this.selection = new LibrarySelection();
-		new TrackDetailView({model: this.selection});
-		this.map = [];
-		this.refresh();
-	},
-	add: function(newObject){
-		var $container = $('<div>'), newItem;
-		$container.stencil(this.template, newObject.toJSON());
-		newItem = $container.children(':first')[0];
-	
-		newObject.element = newItem;
-		$(newItem).data('model', newObject);
-		this.map.push({element: newItem, model: newObject});
-		this.$foot.before(newItem);
-	},
-	remove: function(removed){
-		_.each(this.map, function(item){
-			if (item.model == removed) {
-				item.element.remove();
-				this.map.splice(index, 1);
-				_.breakLoop();
-			};
-		});
-	},
-	refresh: function(){
-		var item;
-		while((item = this.map.pop())){
-			item.element.remove();
-		}
-		this.model.each(this.add);
-	},
-	play: function(e){
-		var $target = $(e.target).closest('tr:not(.filler)'), trackModel;
-		if ($target.length) {
-			if ((trackModel = $target.data('model'))) {
-				player.start(this.fileNamesForModel(trackModel), this.callbacks, {model: trackModel});
-			}
-		}
-	},
-	select: function(e){
-		var $target = $(e.target).closest('tr');
-		this.selection.set({selection: ($target.is(':not(.filler)') ? $target.data('model') : null)});
-	},
-	fileNamesForModel: function(model){
-		var baseName = 'music/' + model.get('name');
-		return [{src: baseName+'.mp3', type:'audio/mpeg'}, {src: baseName+'.ogg', type:'audio/ogg'}];
-	}
-});
-
 // Music player
-function Player(){
-	// SoundManager initialization
-	soundManager.debugMode = false;
-	soundManager.url = '/soundmanager/';
-	soundManager.useFlashBlock = true;
-	soundManager.useHTML5Audio = true;
-	soundManager.onload = _.bind(function() {
-		if (this.heldTrack) {
-			this.play(this.heldTrack);
-			delete this.heldTrack;
-		}
-	}, this);
-	
-	var player = this,
-	    currentTime = document.getElementById('currentTime').firstChild,
-	    totalTime   = document.getElementById('totalTime').firstChild,
-		slider = new distro.Slider($('#scrubber'), function(position, actuated){
-			if (player.current) {
-				player.current.setPosition(position * player.current.duration);
+distro.player = new (function(){
+	function Player(){
+		// SoundManager initialization
+		soundManager.debugMode = false;
+		soundManager.url = '/soundmanager/';
+		soundManager.useFlashBlock = true;
+		soundManager.useHTML5Audio = true;
+		soundManager.onload = _.bind(function() {
+			if (this.heldTrack) {
+				this.play(this.heldTrack);
+				delete this.heldTrack;
 			}
-		});
+		}, this);
 	
-	function onplay(){
-		player.$transport.addClass('enabled playing');
-		slider.enable();
-	}
-	function onpause(){
-		player.$transport.removeClass('playing');
-	}
-	function onresume(){
-		player.$transport.addClass('playing');
-	}
-	function onstop(){
-		player.$transport.removeClass('enabled playing');
-		slider.setPosition(0);
-		slider.disable();
-		currentTime.data = totalTime.data = '0:00';
-	}
-	function onfinish(){
-		onstop();
-		player.next();
-	}
-	function onwhileplaying(){
-		currentTime.data = distro.util.formatTime(Math.floor(this.position/1000));
-		totalTime.data = distro.util.formatTime(Math.floor(this.duration/1000));
-		slider.setPosition(this.position/this.duration);
-	}
-	this.play = function(track){
-		if (!soundManager.ok()) {
-			this.heldTrack = track;
-			return;
-		}
-		if (this.current) {
-			this.stop();
-		}
-		if (track && track.attributes.network && track.attributes.filename) {
-			this.current = soundManager.createSound({
-				id: "track",
-				url: "//distro-music.s3.amazonaws.com/" + track.get('network') + "/" + track.get('filename') + ".mp3",
-				onplay: onplay,
-				onresume: onplay,
-				onpause: onpause,
-				onstop: onstop,
-				onfinish: onfinish,
-				whileplaying: onwhileplaying
-			}).play();
-			distro.library.trackListView.setPlaying(track);
-		}
-	};
+		var player = this,
+		    currentTime = document.getElementById('currentTime').firstChild,
+		    totalTime   = document.getElementById('totalTime').firstChild,
+			slider = new distro.Slider($('#scrubber'), function(position, actuated){
+				if (player.current) {
+					player.current.setPosition(position * player.current.duration);
+				}
+			});
 	
-	this.$transport = $('#transport');
-	$('#pauseButton').click(function(){
-		if (player.current) {
-			player.current.pause();
+		function onplay(){
+			player.$transport.addClass('enabled playing');
+			slider.enable();
 		}
-	});
-	$('#playButton').click(function(){
-		if (player.current) {
-			player.current.play();
-		} else {
-			player.play(distro.library.tracks.models[0]);
+		function onpause(){
+			player.$transport.removeClass('playing');
 		}
-	});
-	$('#skipBackButton').click(function(){
-		if (player.current) {
-			if (player.current.position > 1000) {
-				player.current.setPosition(0);
-			} else {
-				player.previous();
-			}
+		function onresume(){
+			player.$transport.addClass('playing');
 		}
-	});
-	$('#skipForwardButton').click(function(){
-		if (player.current) {
+		function onstop(){
+			player.$transport.removeClass('enabled playing');
+			slider.setPosition(0);
+			slider.disable();
+			currentTime.data = totalTime.data = '0:00';
+		}
+		function onfinish(){
+			onstop();
 			player.next();
 		}
-	});
-};
-Player.prototype.next = function(){
-	if (player.current) {
-		this.play(distro.library.trackListView.relativeTrack(1));
-	}
-};
-Player.prototype.previous = function(){
-	if (player.current) {
-		this.play(distro.library.trackListView.relativeTrack(-1));
-	}
-};
-Player.prototype.stop = function(){
-	if (this.current) {
-		this.current.stop();
-		this.current.destruct();
-		this.current = null;
-		distro.library.trackListView.setPlaying(null);
-	}
-};
+		function onwhileplaying(){
+			currentTime.data = distro.util.formatTime(Math.floor(this.position/1000));
+			totalTime.data = distro.util.formatTime(Math.floor(this.duration/1000));
+			slider.setPosition(this.position/this.duration);
+		}
+		this.play = function(track){
+			if (!soundManager.ok()) {
+				this.heldTrack = track;
+				return;
+			}
+			if (this.current) {
+				this.stop();
+			}
+			if (track && track.attributes.network && track.attributes.filename) {
+				this.current = soundManager.createSound({
+					id: "track",
+					url: "//distro-music.s3.amazonaws.com/" + track.get('network') + "/" + track.get('filename') + ".mp3",
+					onplay: onplay,
+					onresume: onplay,
+					onpause: onpause,
+					onstop: onstop,
+					onfinish: onfinish,
+					whileplaying: onwhileplaying
+				}).play();
+				distro.library.trackListView.setPlaying(track);
+			}
+		};
+	
+		this.$transport = $('#transport');
+		$('#pauseButton').click(function(){
+			if (player.current) {
+				player.current.pause();
+			}
+		});
+		$('#playButton').click(function(){
+			if (player.current) {
+				player.current.play();
+			} else {
+				player.play(distro.library.tracks.models[0]);
+			}
+		});
+		$('#skipBackButton').click(function(){
+			if (player.current) {
+				if (player.current.position > 1000) {
+					player.current.setPosition(0);
+				} else {
+					player.previous();
+				}
+			}
+		});
+		$('#skipForwardButton').click(function(){
+			if (player.current) {
+				player.next();
+			}
+		});
+	};
+	Player.prototype.next = function(){
+		if (this.current) {
+			this.play(distro.library.trackListView.relativeTrack(1));
+		}
+	};
+	Player.prototype.previous = function(){
+		if (this.current) {
+			this.play(distro.library.trackListView.relativeTrack(-1));
+		}
+	};
+	Player.prototype.stop = function(){
+		if (this.current) {
+			this.current.stop();
+			this.current.destruct();
+			this.current = null;
+			distro.library.trackListView.setPlaying(null);
+		}
+	};
+	return Player;
+}())();
 
 distro.LandingPage = distro.Model.extend({
 	initialize: function(opts){
@@ -707,10 +592,6 @@ distro.Router = Backbone.Controller.extend({
 		}
 	}
 });
-
-var tracks = window.tracks = new Backbone.Collection(),
-	player = window.player = new Player(),
-	musicListView = window.musicListView = new MusicListView({model: tracks, el:$('#musicTableBody tbody:first')[0]});
 
 // Initialization
 distro.init(function(){
