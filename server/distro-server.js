@@ -157,7 +157,7 @@ global.db.open(function(err, db){
 		.use('/', connect.router(function(app){
 			app.get('/:network', function(req, res){
 				var target = req.params && req.params.network || '';
-				res.writeHead(302, { Location: ("/#" + encodeURIComponent(target)) });
+				res.writeHead(302, { Location: ("/#/" + encodeURIComponent(target)) });
 				res.end();
 			});
 		}))

@@ -456,9 +456,9 @@ distro.Router = Backbone.Controller.extend({
 	routes: {
 		"": "blank",
 		"/": "blank",
-		":network": "network",
 		"/find": "find",
-		"/login": "login"
+		"/login": "login",
+		"/:network": "network"
 	},
 	blank: function(){
 		distro.lightbox.hide();
