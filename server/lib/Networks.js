@@ -28,7 +28,8 @@ Networks.prototype.batchNetworkNameFromId = function(ids, callback){
 // }
 
 Networks.prototype.findNetworkByName = function(name, options, callback){
-	this.collection.findOne({"name":name}, { fields: { _id: (options._id === false ? 0 : 1) } }, function(err, doc){
+	name = name.toLowerCase();
+	this.collection.findOne({"lname":name}, { fields: { _id: (options._id === false ? 0 : 1) } }, function(err, doc){
 		if(err) {
 			callback(err, null);
 		} else {
@@ -50,12 +51,13 @@ Networks.prototype.search = function(name, callback){
 
 Networks.PRESENCE = [
 	{ name: "email", prefix: "mailto:" },
-	{ name: "website" },
+	{ name: "homepage" },
 	{ name: "twitter", prefix: "http://twitter.com/" },
 	{ name: "myspace", prefix: "http://www.myspace.com/" },
 	{ name: "lastfm", prefix: "http://www.last.fm/music/" },
 	{ name: "soundcloud", prefix: "http://soundcloud.com/" },
 	{ name: "flickr", prefix: "http://www.flickr.com/photos/" },
+	{ name: "foursquare", prefix: "http://foursquare.com/" },
 	{ name: "youtube", prefix: "http://www.youtube.com/user/" },
 	{ name: "itunes", prefix: "http://itunes.apple.com/us/artist/" },
 	{ name: "vimeo", prefix: "http://vimeo.com/" },
