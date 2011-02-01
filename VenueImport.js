@@ -93,7 +93,7 @@ importDB.open(function(err, db) {
 									if(hashPossible && doc[oldRecordName]){
 										if(subObject){
 											if(record[subObject] == undefined){ record[subObject] = {};}
-											record[subObject][newRecCan you let me kordName] = url.parse(record[oldRecordName]);
+											record[subObject][newRecordName] = url.parse(record[oldRecordName]);
 											if(record[subObject][newRecordName].pathname === "/") record[subObject][newRecordName] = record[subObject][newRecordName].hash;
 											else record[subObject][newRecordName] = record[subObject][newRecordName].pathname;
 											delete record[subObject][oldRecordName];
