@@ -198,14 +198,14 @@ Lightbox.prototype.show = function(content){
 	this.$contentWrapper.html($content);
 	content.show($content, this);
 	this.$lightbox.fadeIn(200);
-	this.$contentWrapper.fadeIn(400);
+	this.$contentWrapper.fadeIn(200);
 }
 Lightbox.prototype.hide = function(name){
 	if (!name || (this.content && name === this.content.name)) {
 		var self = this;
-		this.$lightbox.fadeOut();
+		this.$lightbox.fadeOut(200);
 		this.hiding = true;
-		this.$contentWrapper.fadeOut(function(){
+		this.$contentWrapper.fadeOut(200, function(){
 			self.hideContent();
 		});
 	}
