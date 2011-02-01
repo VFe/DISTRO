@@ -15,8 +15,7 @@ importDB.open(function(err, db) {
 					(function nextRecord(){
 						cursor.nextObject(function(err, doc){
 							if(doc != null){
-								var myspaceRegEx = new RegExp("/\/(\w+$)/", "g"),
-									  urlKeyList = ['FOURSQUARE', 'HOME_PAGE', 'FACEBOOK', 'MYSPACE', 'TWITTER', 'YELP', 'GOOGLE_MAP', 'FLICKR_STREAM', 'YOUTUBE', 'REVERB_NATION', 
+								var urlKeyList = ['FOURSQUARE', 'HOME_PAGE', 'FACEBOOK', 'MYSPACE', 'TWITTER', 'YELP', 'GOOGLE_MAP', 'FLICKR_STREAM', 'YOUTUBE', 'REVERB_NATION', 
 													'CAL_GOOG', 'CAL_MAIN', 'PHOTO_LINK', 'LASTFM', 'PANDORA', 'SOUNDCLOUD', 'LINKEDIN', 'ILIKE', 'ITUNES', 'VIMEO', 'BANDCAMP', 'BLOG', 'GIGMAVEN', 'ARCHIVE', 'JAMBASE'], 
 
 									basicRenameList = [{oldName:"TYPE", newName:"type"}, {oldName:"NETWORK_NAME", newName:"name"}, {oldName:"FULL_NAME", newName:"fullname"}, {oldName:"STREET_ADDRESS", newName:"streetAddress", object:"location"},
@@ -125,6 +124,8 @@ importDB.open(function(err, db) {
 								//record.name = doc['^NETWORKname^'].replace(/\^/g, "");
 								//delete record['Band Name'];
 								//delete record['^NETWORKname^'];
+								record.lname = record.name.toLower();
+								record.lfullname = record.fullname.toLower();
 								exportColl.insert(record, function(err){
 									if(err) util.log(new Error(err));
 									util.log('Wrote record for '+record.fullname+" #: "+counter++);
