@@ -61,6 +61,6 @@ Networks.PRESENCE = [
 	{ name: "youtube", prefix: "http://www.youtube.com/user/" },
 	{ name: "itunes", prefix: "http://itunes.apple.com/us/artist/" },
 	{ name: "vimeo", prefix: "http://vimeo.com/" },
-	{ name: "facebook", prefix: "http://www.facebook.com/" },
+	{ name: "facebook", prefix: "http://www.facebook.com" },
 	{ name: "bandcamp"/*, prefix: "http://", suffix:".bandcamp.com/"*/ }
 ];
