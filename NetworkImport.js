@@ -103,7 +103,7 @@ importDB.open(function(err, db) {
 										}
 										(mapping.object ? record[mapping.object] : record)[mapping.newName] = out;
 									}catch(e){
-										console.error(e.message);
+										util.error('['+doc.NETWORK_NAME+'] '+e.message);
 									}
 								}
 								record.lname = record.name.toLowerCase();
