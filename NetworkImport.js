@@ -25,8 +25,8 @@ importDB.open(function(err, db) {
 													{oldName:"PHONE", newName:"phone"}, {oldName:"ZIP", newName:"zip"}, {oldName:"PHOTO_BY", newName:"photoCred"}, {oldName:"CAL_MAIN", newName:"calendar"}, 
 													{oldName:"CAL_GOOG", newName:"calendarGoogle"}],
 
-									urlPathList = [{oldName:"FOURSQUARE", newName:"foursquare", object:"presence"}, {oldName:"FACEBOOK", newName:"facebook", object:"presence", hashable:true, regex:/^\/(.*)/i}, {oldName:"TWITTER", newName:"twitter", object:"presence", hashable:true}, 
-												{oldName:"MYSPACE", newName:"myspace", object:"presence"}, {oldName:"LASTFM", newName:"lastfm", object:"presence", regex:/^\/music\/(.*)/i}, {oldName:"PANDORA", newName:"pandora", object:"presence"}, 
+									urlPathList = [{oldName:"FOURSQUARE", newName:"foursquare", object:"presence"}, {oldName:"FACEBOOK", newName:"facebook", object:"presence", hashable:true, regex:/^\/(.*)/i}, {oldName:"TWITTER", newName:"twitter", object:"presence", hashable:true, regex:/^\/(.*)/i}, 
+												{oldName:"MYSPACE", newName:"myspace", object:"presence", regex:/^\/(.*)/i}, {oldName:"LASTFM", newName:"lastfm", object:"presence", regex:/^\/music\/(.*)/i}, {oldName:"PANDORA", newName:"pandora", object:"presence"}, 
 												{oldName:"SOUNDCLOUD", newName:"soundcloud", object:"presence"}, {oldName:"PHOTO_LINK", newName:"photoCredURL", regex:/^\/photos\/(.*)/i}, {oldName:"ILIKE", newName:"ilike", object:"presence"},
 												{oldName:"VIMEO", newName:"vimeo", object:"presence"}, {oldName:"GIGMAVEN", newName:"gigmaven", object:"presence"}, {oldName:"ARCHIVE", newName:"archive", object:"presence"}, 
 												{oldName:"JAMBASE", newName:"jambase", object:"presence"}, {oldName:"REVERB_NATION", newName:"reverbnation", object:"presence"}, {oldName:"YELP", newName:"yelp", object:"presence"}, {oldName:"YOUTUBE", newName:"youtube", object:"presence"}, {oldName:"FLICKR_STREAM", newName:"flickr", object:"presence"}];
