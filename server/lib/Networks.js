@@ -28,8 +28,7 @@ Networks.prototype.batchNetworkNameFromId = function(ids, callback){
 // }
 
 Networks.prototype.findNetworkByName = function(name, options, callback){
-	name = name.toLowerCase();
-	this.collection.findOne({"lname":name}, { fields: { _id: (options._id === false ? 0 : 1) } }, function(err, doc){
+	this.collection.findOne({"name":name}, { fields: { _id: (options._id === false ? 0 : 1) } }, function(err, doc){
 		if(err) {
 			callback(err, null);
 		} else {
@@ -39,8 +38,9 @@ Networks.prototype.findNetworkByName = function(name, options, callback){
 };
 
 Networks.prototype.search = function(name, callback){
-	name = name.toLowerCase();
-	this.collection.find({$or:[{"lfullname":name},{"lname":name}]}, { name:1, fullname: 1}, function(err, cursor){
+	var searchRegex = new RegExp('^' + name, 'i'),
+		returnData = [];
+	this.collection.find({$or:[{"fullname":searchRegex},{"name":searchRegex}]}, { name:1, fullname: 1}, function(err, cursor){
 		if(err){
 			callback(err, null);
 		} else{
@@ -51,16 +51,15 @@ Networks.prototype.search = function(name, callback){
 
 Networks.PRESENCE = [
 	{ name: "email", prefix: "mailto:" },
-	{ name: "homepage" },
+	{ name: "website" },
 	{ name: "twitter", prefix: "http://twitter.com/" },
 	{ name: "myspace", prefix: "http://www.myspace.com/" },
 	{ name: "lastfm", prefix: "http://www.last.fm/music/" },
 	{ name: "soundcloud", prefix: "http://soundcloud.com/" },
-	{ name: "flickr", prefix: "http://www.flickr.com/photos/" },
-	{ name: "foursquare", prefix: "http://foursquare.com/" },
-	{ name: "youtube", prefix: "http://www.youtube.com/user/" },
+	{ name: "flickr", prefix: "http://www.flickr.com/" },
+	{ name: "youtube", prefix: "http://www.youtube.com/" },
 	{ name: "itunes", prefix: "http://itunes.apple.com/us/artist/" },
 	{ name: "vimeo", prefix: "http://vimeo.com/" },
-	{ name: "facebook", prefix: "http://www.facebook.com" },
+	{ name: "facebook", prefix: "http://www.facebook.com/" },
 	{ name: "bandcamp"/*, prefix: "http://", suffix:".bandcamp.com/"*/ }
 ];
