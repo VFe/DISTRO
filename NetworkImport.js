@@ -2,6 +2,52 @@ var mongoDB = require("mongodb"),
 	util = require('util'),
 	url = require('url'),
 	_ = require('underscore');
+
+var httpRegExp = /^https?:\/\/(.*)$/i,
+	leadingSlashRegExp = /^\/(.*)$/,
+	keys = {
+		"TYPE": {newName:"type"},
+		"NETWORK_NAME": {newName:"name"},
+		"FULL_NAME": {newName:"fullname"},
+		"STREET_ADDRESS": {newName:"streetAddress", object:"location"},
+		"CITY, STATE": {newName:"citystate", object:"location"},
+		"COUNTRY": {newName:"country", object:"location"},
+		"HOME_PAGE": {newName:"homepage", object:"presence"},
+		"EMAIL_VENUE_BOOKING": {newName:"booking", object:"email"},
+		"EMAIL_GENERAL": {newName:"general", object:"email"},
+		"EMAIL_US": {newName:"usbooking", object:"email"},
+		"EMAIL_EU": {newName:"eubooking", object:"email"},
+		"EMAIL_PRESS": {newName:"press", object:"email"},
+		"EMAIL_MANAGER": {newName:"manager", object:"email"},
+		"PHONE": {newName:"phone"},
+		"ZIP": {newName:"zip"},
+		"PHOTO_BY": {newName:"photoCred"},
+		"CAL_MAIN": {newName:"calendar"},
+		"CAL_GOOG": {newName:"calendarGoogle"},
+		"GOOGLE_MAP": {newName:"map"},
+		// begin urlPathList
+		"LINKEDIN": {newName:'linkedin', object:'presence', host:"www.linkedin.com"},
+		"ITUNES": {newName: 'itunes', object:'presence', host: "itunes.apple.com"},
+		"BANDCAMP": {newName: 'bandcamp', object:'presence', regexp: /http:\/\/([^.]+).bandcamp.com\//i},
+		"FLICKR_STREAM": {newName: 'flickr', object:'presence', host:"www.flickr.com"},
+		"BLOG": {newName: 'blog', object:"presence"},
+		"YOUTUBE": {newName:'youtube', object:"presence", host:"www.youtube.com"},
+		"FOURSQUARE": {newName:"foursquare", object:"presence", host: "foursquare.com", qs: false},
+		"FACEBOOK": {newName:"facebook", object:"presence", hashable:true, host: "www.facebook.com", qs: true},
+		"TWITTER": {newName:"twitter", object:"presence", hashable:true, host: "twitter.com"},
+		"MYSPACE": {newName:"myspace", object:"presence", host: "www.myspace.com"},
+		"LASTFM": {newName:"lastfm", object:"presence", host: "www.last.fm"},
+		"PANDORA": {newName:"pandora", object:"presence", host: "www.pandora.com"},
+		"SOUNDCLOUD": {newName:"soundcloud", object:"presence", host: "www.soundcloud.com"},
+		"PHOTO_LINK": {newName:"photoCredURL"},
+		"ILIKE": {newName:"ilike", object:"presence", host: "www.ilike.com"},
+		"VIMEO": {newName:"vimeo", object:"presence", host: "www.vimeo.com"},
+		"GIGMAVEN": {newName:"gigmaven", object:"presence", host: "www.gigmaven.com"},
+		"ARCHIVE": {newName:"archive", object:"presence", host: "www.archive.org"},
+		"JAMBASE": {newName:"jambase", object:"presence", host: "www.jambase.com"},
+		"REVERB_NATION": {newName:"reverbnation", object:"presence", host: "www.reverbnation.com"},
+		"YELP": {newName:"yelp", object:"presence", host: "www.yelp.com"}
+	};
 	
 importDB = new mongoDB.Db('Import', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 exportDB = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
@@ -15,166 +61,62 @@ importDB.open(function(err, db) {
 					(function nextRecord(){
 						cursor.nextObject(function(err, doc){
 							if(doc != null){
-								var urlKeyList = [
-									'FOURSQUARE', 'HOME_PAGE', 'FACEBOOK', 'MYSPACE', 'TWITTER', 'YELP', 'GOOGLE_MAP', 'FLICKR_STREAM', 'YOUTUBE', 'REVERB_NATION', 
-									'CAL_GOOG', 'CAL_MAIN', 'PHOTO_LINK', 'LASTFM', 'PANDORA', 'SOUNDCLOUD', 'LINKEDIN', 'ILIKE', 'ITUNES', 'VIMEO', 'BANDCAMP',
-									'BLOG', 'GIGMAVEN', 'ARCHIVE', 'JAMBASE'
-									], 
-
-									basicRenameList = [
-										{oldName:"TYPE", newName:"type"},
-										{oldName:"NETWORK_NAME", newName:"name"},
-										{oldName:"FULL_NAME", newName:"fullname"},
-										{oldName:"STREET_ADDRESS", newName:"streetAddress", object:"location"},
-										{oldName:"CITY, STATE", newName:"citystate", object:"location"},
-										{oldName:"COUNTRY", newName:"country", object:"location"},
-										{oldName:"HOME_PAGE", newName:"homepage", object:"presence"},
-										{oldName:"EMAIL_VENUE_BOOKING", newName:"booking", object:"email"},
-										{oldName:"EMAIL_GENERAL", newName:"general", object:"email"},
-										{oldName:"EMAIL_US", newName:"usbooking", object:"email"},
-										{oldName:"EMAIL_EU", newName:"eubooking", object:"email"},
-										{oldName:"EMAIL_PRESS", newName:"press", object:"email"},
-										{oldName:"EMAIL_MANAGER", newName:"manager", object:"email"},
-										{oldName:"PHONE", newName:"phone"},
-										{oldName:"ZIP", newName:"zip"},
-										{oldName:"PHOTO_BY", newName:"photoCred"},
-										{oldName:"CAL_MAIN", newName:"calendar"},
-										{oldName:"CAL_GOOG", newName:"calendarGoogle"}
-									],
-
-									urlPathList = [
-										{oldName:"FOURSQUARE", newName:"foursquare", object:"presence"},
-										{oldName:"FACEBOOK", newName:"facebook", object:"presence", hashable:true},
-										{oldName:"TWITTER", newName:"twitter", object:"presence", hashable:true},
-										{oldName:"MYSPACE", newName:"myspace", object:"presence"},
-										{oldName:"LASTFM", newName:"lastfm", object:"presence"},
-										{oldName:"PANDORA", newName:"pandora", object:"presence"},
-										{oldName:"SOUNDCLOUD", newName:"soundcloud", object:"presence"},
-										{oldName:"PHOTO_LINK", newName:"photoCredURL"},
-										{oldName:"ILIKE", newName:"ilike", object:"presence"},
-										{oldName:"VIMEO", newName:"vimeo", object:"presence"},
-										{oldName:"GIGMAVEN", newName:"gigmaven", object:"presence"},
-										{oldName:"ARCHIVE", newName:"archive", object:"presence"},
-										{oldName:"JAMBASE", newName:"jambase", object:"presence"},
-										{oldName:"REVERB_NATION", newName:"reverbnation", object:"presence"},
-										{oldName:"YELP", newName:"yelp", object:"presence"}
-									];
-
-								record = doc; //This could just be record = {}; but I'm leaving it like this for now
-								record.presence = {};
-								record.location = {};
-								record.Timestamp = new Date(doc.Timestamp);
-								function httpize(url){
-									if(/^[hH][tT][tT][pP][sS]?:\/\/(.*)/.exec(url)){
-										return url;
-									} else {
-										return ("http://" + url);
-									}
-								}
-								function subdomainSnip(url, key){
-									var subdomain = /^[hH][tT][tT][pP][sS]?:\/\/([^\.]*)/.exec(url);
-									util.log("Key: " + key + " is now just " + subdomain[1]);
-									doc[key] = subdomain[1];
-								}
-								function snipImportant(both, unimportant){
-									if(unimportant == undefined || unimportant == null){
-										unimportant = /^\/(.*)\/*/;
-									}
-									return unimportant ? null : unimportant.exec(both)[1];
-								}
-								for (var key in doc){
-									//util.log(key + " " + doc[key]);
-									if(doc[key]){
-										if(_.include(urlKeyList, key)){
-											//util.log("httpizing " + doc[key] + " \n \t \t - Result: " + httpize(doc[key]));
-											doc[key] = httpize(doc[key]);
-											var snipped = snipImportant(doc[key]);
-											if(snipped){doc[key] = snipped[1];}
+								var record = { presence: {}, email: {}, location: {}, timestamp: new Date(doc.Timestamp) },
+								    key, mapping;
+								delete doc.Timestamp;
+								delete doc._id;
+								
+								for (key in doc){
+									var mapping = keys[key], property = doc[key], out = '';
+									try{
+										//util.debug(key + " " + doc[key]);
+										if (!(mapping = keys[key])) {
+											throw new Error('Unknown key: '+key+' : '+property);
 										}
-										if(typeof doc[key] != "string" && (key == "NETWORK_NAME" || key == "FULL_NAME")){
-											doc[key] = doc[key].toString();
-										}
-										//var killTrailingSlash = /(.*)\/$/.exec(doc[key]);
-										/*if(killTrailingSlash){*/
-											//doc[key] = killTrailingSlash[1];
-										/*}*/
-									}
-								}
-								function basicRename(acceptObj){
-									var oldRecordName = acceptObj.oldName,
-										newRecordName = acceptObj.newName,
-										subObject = acceptObj.object;
-
-									if(doc[oldRecordName]){
-									  if(subObject){
-										if(record[subObject] == undefined){ record[subObject] = {};}
-										record[subObject][newRecordName] = record[oldRecordName];
-									  } else {
-										record[newRecordName] = record[oldRecordName];
-									  }
-									  delete record[oldRecordName];
-									  util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]));
-									} else{
-									  delete record[oldRecordName];
-									} 
-								}
-								function urlPathnameRename(acceptObj){
-									var oldRecordName = acceptObj.oldName,
-										newRecordName = acceptObj.newName,
-										subObject = acceptObj.object, 
-										hashPossible = acceptObj.hashable,
-										regex = acceptObj.regex,
-										target = subObject ? record : record[subObject];
-									if(hashPossible && doc[oldRecordName]){
-										if(subObject){
-											if(record[subObject] == undefined){ record[subObject] = {};}
-											record[subObject][newRecordName] = url.parse(record[oldRecordName]);
-											if(record[subObject][newRecordName].pathname === "/") record[subObject][newRecordName] = record[subObject][newRecordName].hash;
-											else record[subObject][newRecordName] = record[subObject][newRecordName].pathname;
-											delete record[subObject][oldRecordName];
-											util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]));
+										if (mapping.host) { // If this key a URL
+											var httpworthy = 'http://' + property.replace(httpRegExp, "$1"),
+												parsed = url.parse(httpworthy), path;
+											if (!parsed || !parsed.host || !parsed.pathname) {
+												throw new Error('Failed to parse '+key+' : '+property+' / '+httpworthy+' as a URL');
+											}
+											if (parsed.host !== mapping.host) {
+												throw new Error('Unexpected hostname on '+key+' : '+util.inspect(property));
+											}
+											if (mapping.hashable && parsed.pathname === '/' && parsed.hash) {
+												path = parsed.hash.substring((parsed.hash.indexOf('#!') === 0) ? 2 : 1);
+											} else {
+												path = parsed.pathname;
+											}
+											out += path.replace(leadingSlashRegExp, '$1');
+											if (mapping.qs && parsed.search) {
+												out += parsed.search;
+											}
 										} else {
-											record[newRecordName] = url.parse(record[oldRecordName]);
-											if(record[newRecordName].pathname === "/") record[newRecordName] = record[newRecordName].hash;
-											else record[newRecordName] = record[newRecordName].pathname;
-											delete record[oldRecordName];
-											util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]));
+											out = property.toString();
 										}
-									} else if(doc[oldRecordName]){
-										if(subObject){
-											if(record[subObject] == undefined){ record[subObject] = {};}
-											record[subObject][newRecordName] = url.parse(record[oldRecordName]).pathname;
-										} else{
-										record[newRecordName] = url.parse(record[oldRecordName]).pathname;
+										if (mapping.regexp) {
+											var match = out.match(mapping.regexp);
+											if (match && match.length === 2) {
+												out = match[1];
+											} else {
+												throw new Error('Didn\'t match regexp '+key+' : '+util.inspect(property));
+											}
 										}
-										delete record[oldRecordName];
-										util.log(newRecordName + " " + util.inspect(subObject ? record[subObject][newRecordName] : record[newRecordName]));
-									} else{
-									delete record[oldRecordName];
+										(mapping.object ? record[mapping.object] : record)[mapping.newName] = out;
+									}catch(e){
+										console.error(e.message);
 									}
-									if(regex){
-										notClean = regex.exec((subObject ? record[subObject][newRecordName] : record[newRecordName]));
-										if(notClean){ (subObject ? record[subObject][newRecordName] = notClean[1] : record[newRecordName] = notClean[1]);}
-									}
-									//if((/^\//).exec(record[newRecordName] || record[subObject][newRecordName])){console.log("boom");}
 								}
-							_.each(basicRenameList, basicRename);
-							_.each(urlPathList, urlPathnameRename);
-								// record.myspace = myspaceRegEx.exec(doc['Myspace URL']);
-								//record.name = doc['^NETWORKname^'].replace(/\^/g, "");
-								//delete record['Band Name'];
-								//delete record['^NETWORKname^'];
 								record.lname = record.name.toLowerCase();
 								record.lfullname = record.fullname.toLowerCase();
 								exportColl.insert(record, function(err){
 									if(err) util.log(new Error(err));
-									util.log('Wrote record for '+record.fullname+" #: "+counter++);
 									process.nextTick(nextRecord);
 								});
 							}
 							else{
 								if(err) util.log(new Error(err));
-								//util.log(util.inspect(exportColl.find()));
+								//util.debug(util.inspect(exportColl.find()));
 								db.close();
 								exportDB.close();
 							}
