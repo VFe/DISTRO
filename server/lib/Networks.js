@@ -28,7 +28,7 @@ Networks.prototype.batchNetworkNameFromId = function(ids, callback){
 // }
 
 Networks.prototype.findNetworkByName = function(name, options, callback){
-	this.collection.findOne({"name":name}, { fields: { _id: (options._id === false ? 0 : 1) } }, function(err, doc){
+	this.collection.findOne({"name":name}, { fields: { _id: (options._id === false ? 0 : 1), lname: 0, lfullname: 0 } }, function(err, doc){
 		if(err) {
 			callback(err, null);
 		} else {
