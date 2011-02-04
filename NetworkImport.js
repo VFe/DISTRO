@@ -15,21 +15,50 @@ importDB.open(function(err, db) {
 					(function nextRecord(){
 						cursor.nextObject(function(err, doc){
 							if(doc != null){
-								var urlKeyList = ['FOURSQUARE', 'HOME_PAGE', 'FACEBOOK', 'MYSPACE', 'TWITTER', 'YELP', 'GOOGLE_MAP', 'FLICKR_STREAM', 'YOUTUBE', 'REVERB_NATION', 
-													'CAL_GOOG', 'CAL_MAIN', 'PHOTO_LINK', 'LASTFM', 'PANDORA', 'SOUNDCLOUD', 'LINKEDIN', 'ILIKE', 'ITUNES', 'VIMEO', 'BANDCAMP', 'BLOG', 'GIGMAVEN', 'ARCHIVE', 'JAMBASE'], 
+								var urlKeyList = [
+									'FOURSQUARE', 'HOME_PAGE', 'FACEBOOK', 'MYSPACE', 'TWITTER', 'YELP', 'GOOGLE_MAP', 'FLICKR_STREAM', 'YOUTUBE', 'REVERB_NATION', 
+									'CAL_GOOG', 'CAL_MAIN', 'PHOTO_LINK', 'LASTFM', 'PANDORA', 'SOUNDCLOUD', 'LINKEDIN', 'ILIKE', 'ITUNES', 'VIMEO', 'BANDCAMP',
+									'BLOG', 'GIGMAVEN', 'ARCHIVE', 'JAMBASE'
+									], 
 
-									basicRenameList = [{oldName:"TYPE", newName:"type"}, {oldName:"NETWORK_NAME", newName:"name"}, {oldName:"FULL_NAME", newName:"fullname"}, {oldName:"STREET_ADDRESS", newName:"streetAddress", object:"location"},
-													{oldName:"CITY, STATE", newName:"citystate", object:"location"}, {oldName:"COUNTRY", newName:"country", object:"location"}, {oldName:"HOME_PAGE", newName:"homepage", object:"presence"},
-													{oldName:"EMAIL_VENUE_BOOKING", newName:"booking", object:"email"}, {oldName:"EMAIL_GENERAL", newName:"general", object:"email"}, {oldName:"EMAIL_US", newName:"usbooking", object:"email"}, 
-													{oldName:"EMAIL_EU", newName:"eubooking", object:"email"}, {oldName:"EMAIL_PRESS", newName:"press", object:"email"}, {oldName:"EMAIL_MANAGER", newName:"manager", object:"email"},
-													{oldName:"PHONE", newName:"phone"}, {oldName:"ZIP", newName:"zip"}, {oldName:"PHOTO_BY", newName:"photoCred"}, {oldName:"CAL_MAIN", newName:"calendar"}, 
-													{oldName:"CAL_GOOG", newName:"calendarGoogle"}],
+									basicRenameList = [
+										{oldName:"TYPE", newName:"type"},
+										{oldName:"NETWORK_NAME", newName:"name"},
+										{oldName:"FULL_NAME", newName:"fullname"},
+										{oldName:"STREET_ADDRESS", newName:"streetAddress", object:"location"},
+										{oldName:"CITY, STATE", newName:"citystate", object:"location"},
+										{oldName:"COUNTRY", newName:"country", object:"location"},
+										{oldName:"HOME_PAGE", newName:"homepage", object:"presence"},
+										{oldName:"EMAIL_VENUE_BOOKING", newName:"booking", object:"email"},
+										{oldName:"EMAIL_GENERAL", newName:"general", object:"email"},
+										{oldName:"EMAIL_US", newName:"usbooking", object:"email"},
+										{oldName:"EMAIL_EU", newName:"eubooking", object:"email"},
+										{oldName:"EMAIL_PRESS", newName:"press", object:"email"},
+										{oldName:"EMAIL_MANAGER", newName:"manager", object:"email"},
+										{oldName:"PHONE", newName:"phone"},
+										{oldName:"ZIP", newName:"zip"},
+										{oldName:"PHOTO_BY", newName:"photoCred"},
+										{oldName:"CAL_MAIN", newName:"calendar"},
+										{oldName:"CAL_GOOG", newName:"calendarGoogle"}
+									],
 
-									urlPathList = [{oldName:"FOURSQUARE", newName:"foursquare", object:"presence"}, {oldName:"FACEBOOK", newName:"facebook", object:"presence", hashable:true, regex:/^\/(.*)/i}, {oldName:"TWITTER", newName:"twitter", object:"presence", hashable:true, regex:/^\/(.*)/i}, 
-												{oldName:"MYSPACE", newName:"myspace", object:"presence", regex:/^\/(.*)/i}, {oldName:"LASTFM", newName:"lastfm", object:"presence", regex:/^\/music\/(.*)/i}, {oldName:"PANDORA", newName:"pandora", object:"presence"}, 
-												{oldName:"SOUNDCLOUD", newName:"soundcloud", object:"presence"}, {oldName:"PHOTO_LINK", newName:"photoCredURL", regex:/^\/photos\/(.*)/i}, {oldName:"ILIKE", newName:"ilike", object:"presence"},
-												{oldName:"VIMEO", newName:"vimeo", object:"presence"}, {oldName:"GIGMAVEN", newName:"gigmaven", object:"presence"}, {oldName:"ARCHIVE", newName:"archive", object:"presence"}, 
-												{oldName:"JAMBASE", newName:"jambase", object:"presence"}, {oldName:"REVERB_NATION", newName:"reverbnation", object:"presence"}, {oldName:"YELP", newName:"yelp", object:"presence"}, {oldName:"YOUTUBE", newName:"youtube", object:"presence"}, {oldName:"FLICKR_STREAM", newName:"flickr", object:"presence"}];
+									urlPathList = [
+										{oldName:"FOURSQUARE", newName:"foursquare", object:"presence"},
+										{oldName:"FACEBOOK", newName:"facebook", object:"presence", hashable:true},
+										{oldName:"TWITTER", newName:"twitter", object:"presence", hashable:true},
+										{oldName:"MYSPACE", newName:"myspace", object:"presence"},
+										{oldName:"LASTFM", newName:"lastfm", object:"presence"},
+										{oldName:"PANDORA", newName:"pandora", object:"presence"},
+										{oldName:"SOUNDCLOUD", newName:"soundcloud", object:"presence"},
+										{oldName:"PHOTO_LINK", newName:"photoCredURL"},
+										{oldName:"ILIKE", newName:"ilike", object:"presence"},
+										{oldName:"VIMEO", newName:"vimeo", object:"presence"},
+										{oldName:"GIGMAVEN", newName:"gigmaven", object:"presence"},
+										{oldName:"ARCHIVE", newName:"archive", object:"presence"},
+										{oldName:"JAMBASE", newName:"jambase", object:"presence"},
+										{oldName:"REVERB_NATION", newName:"reverbnation", object:"presence"},
+										{oldName:"YELP", newName:"yelp", object:"presence"}
+									];
 
 								record = doc; //This could just be record = {}; but I'm leaving it like this for now
 								record.presence = {};
