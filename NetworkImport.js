@@ -2,7 +2,7 @@ var mongoDB = require("mongodb"),
 	util = require('util'),
 	url = require('url');
 
-var httpRegExp = /^https?:\/\/(.*)$/i,
+var urlLeaderRegExp = /^(?:https?:\/\/)?(?:www.)?(.*)$/i,
 	leadingSlashRegExp = /^\/(.*)$/,
 	keys = {
 		"TYPE": {newName:"type"},
@@ -25,27 +25,27 @@ var httpRegExp = /^https?:\/\/(.*)$/i,
 		"CAL_GOOG": {newName:"calendarGoogle"},
 		"GOOGLE_MAP": {newName:"map"},
 		// begin urlPathList
-		"LINKEDIN": {newName:'linkedin', object:'presence', host:"www.linkedin.com"},
+		"LINKEDIN": {newName:'linkedin', object:'presence', host:"linkedin.com"},
 		"ITUNES": {newName: 'itunes', object:'presence', host: "itunes.apple.com"},
 		"BANDCAMP": {newName: 'bandcamp', object:'presence', regexp: /http:\/\/([^.]+).bandcamp.com\//i},
-		"FLICKR_STREAM": {newName: 'flickr', object:'presence', host:"www.flickr.com"},
+		"FLICKR_STREAM": {newName: 'flickr', object:'presence', host:"flickr.com"},
 		"BLOG": {newName: 'blog', object:"presence"},
-		"YOUTUBE": {newName:'youtube', object:"presence", host:"www.youtube.com"},
+		"YOUTUBE": {newName:'youtube', object:"presence", host:"youtube.com"},
 		"FOURSQUARE": {newName:"foursquare", object:"presence", host: "foursquare.com", qs: false},
-		"FACEBOOK": {newName:"facebook", object:"presence", hashable:true, host: "www.facebook.com", qs: true},
+		"FACEBOOK": {newName:"facebook", object:"presence", hashable:true, host: "facebook.com", qs: true},
 		"TWITTER": {newName:"twitter", object:"presence", hashable:true, host: "twitter.com"},
-		"MYSPACE": {newName:"myspace", object:"presence", host: "www.myspace.com"},
-		"LASTFM": {newName:"lastfm", object:"presence", host: "www.last.fm"},
-		"PANDORA": {newName:"pandora", object:"presence", host: "www.pandora.com"},
-		"SOUNDCLOUD": {newName:"soundcloud", object:"presence", host: "www.soundcloud.com"},
+		"MYSPACE": {newName:"myspace", object:"presence", host: "myspace.com"},
+		"LASTFM": {newName:"lastfm", object:"presence", host: "last.fm"},
+		"PANDORA": {newName:"pandora", object:"presence", host: "pandora.com"},
+		"SOUNDCLOUD": {newName:"soundcloud", object:"presence", host: "soundcloud.com"},
 		"PHOTO_LINK": {newName:"photoCredURL"},
-		"ILIKE": {newName:"ilike", object:"presence", host: "www.ilike.com"},
-		"VIMEO": {newName:"vimeo", object:"presence", host: "www.vimeo.com"},
-		"GIGMAVEN": {newName:"gigmaven", object:"presence", host: "www.gigmaven.com"},
-		"ARCHIVE": {newName:"archive", object:"presence", host: "www.archive.org"},
-		"JAMBASE": {newName:"jambase", object:"presence", host: "www.jambase.com"},
-		"REVERB_NATION": {newName:"reverbnation", object:"presence", host: "www.reverbnation.com"},
-		"YELP": {newName:"yelp", object:"presence", host: "www.yelp.com"}
+		"ILIKE": {newName:"ilike", object:"presence", host: "ilike.com"},
+		"VIMEO": {newName:"vimeo", object:"presence", host: "vimeo.com"},
+		"GIGMAVEN": {newName:"gigmaven", object:"presence", host: "gigmaven.com"},
+		"ARCHIVE": {newName:"archive", object:"presence", host: "archive.org"},
+		"JAMBASE": {newName:"jambase", object:"presence", host: "jambase.com"},
+		"REVERB_NATION": {newName:"reverbnation", object:"presence", host: "reverbnation.com"},
+		"YELP": {newName:"yelp", object:"presence", host: "yelp.com"}
 	};
 	
 importDB = new mongoDB.Db('Import', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
@@ -73,13 +73,13 @@ importDB.open(function(err, db) {
 											throw new Error('Unknown key: '+key+' : '+property);
 										}
 										if (mapping.host) { // If this key a URL
-											var httpworthy = 'http://' + property.replace(httpRegExp, "$1"),
-												parsed = url.parse(httpworthy), path;
+											var canonicalURL = property.replace(urlLeaderRegExp, "http://$1"),
+												parsed = url.parse(canonicalURL), path;
 											if (!parsed || !parsed.host || !parsed.pathname) {
-												throw new Error('Failed to parse '+key+' : '+property+' / '+httpworthy+' as a URL');
+												throw new Error('Failed to parse '+key+' : '+property+' / '+canonicalURL+' as a URL');
 											}
 											if (parsed.host !== mapping.host) {
-												throw new Error('Unexpected hostname on '+key+' : '+util.inspect(property));
+												throw new Error('Unexpected hostname on '+key+' : '+property+' / '+canonicalURL);
 											}
 											if (mapping.hashable && parsed.pathname === '/' && parsed.hash) {
 												path = parsed.hash.substring((parsed.hash.indexOf('#!') === 0) ? 2 : 1);
