@@ -29,7 +29,7 @@ Networks.prototype.batchNetworkNameFromId = function(ids, callback){
 
 Networks.prototype.findNetworkByName = function(name, options, callback){
 	name = name.toLowerCase();
-	this.collection.findOne({"name":name}, { fields: { _id: (options._id === false ? 0 : 1), lname: 0, lfullname: 0 } }, function(err, doc){
+	this.collection.findOne({"lname":name}, { fields: { _id: (options._id === false ? 0 : 1), lname: 0, lfullname: 0 } }, function(err, doc){
 		if(err) {
 			callback(err, null);
 		} else {
@@ -41,7 +41,7 @@ Networks.prototype.findNetworkByName = function(name, options, callback){
 Networks.prototype.search = function(name, callback){
 	var searchRegex = new RegExp('^' + name.toLowerCase(), 'i'),
 		returnData = [];
-	this.collection.find({$or:[{"fullname":searchRegex},{"name":searchRegex}]}, { name:1, fullname: 1}, function(err, cursor){
+	this.collection.find({$or:[{"lfullname":searchRegex},{"lname":searchRegex}]}, { name:1, fullname: 1}, function(err, cursor){
 		if(err){
 			callback(err, null);
 		} else{
