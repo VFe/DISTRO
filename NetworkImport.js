@@ -27,7 +27,7 @@ var urlLeaderRegExp = /^(?:https?:\/\/)?(?:www.)?(.*)$/i,
 		// begin urlPathList
 		"LINKEDIN": {newName:'linkedin', object:'presence', host:"linkedin.com"},
 		"ITUNES": {newName: 'itunes', object:'presence', host: "itunes.apple.com"},
-		"BANDCAMP": {newName: 'bandcamp', object:'presence', regexp: /http:\/\/([^.]+).bandcamp.com\//i},
+		"BANDCAMP": {newName: 'bandcamp', object:'presence', regexp: /(?:https?:\/\/)?([^.]+).bandcamp.com\/?/i},
 		"FLICKR_STREAM": {newName: 'flickr', object:'presence', host:"flickr.com"},
 		"BLOG": {newName: 'blog', object:"presence"},
 		"YOUTUBE": {newName:'youtube', object:"presence", host:"youtube.com"},
@@ -103,7 +103,7 @@ importDB.open(function(err, db) {
 										}
 										(mapping.object ? record[mapping.object] : record)[mapping.newName] = out;
 									}catch(e){
-										util.error('['+doc.NETWORK_NAME+'] '+e.message);
+										util.error('['+doc.NETWORK_NAME+'] '+e.message+"\n");
 									}
 								}
 								record.lname = record.name.toLowerCase();
