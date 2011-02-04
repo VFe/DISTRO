@@ -1,7 +1,6 @@
 var mongoDB = require("mongodb"),
 	util = require('util'),
-	url = require('url'),
-	_ = require('underscore');
+	url = require('url');
 
 var httpRegExp = /^https?:\/\/(.*)$/i,
 	leadingSlashRegExp = /^\/(.*)$/,
