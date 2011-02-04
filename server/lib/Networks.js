@@ -54,13 +54,13 @@ Networks.PRESENCE = [
 	{ name: "homepage" },
 	{ name: "twitter", prefix: "http://twitter.com/" },
 	{ name: "myspace", prefix: "http://www.myspace.com/" },
-	{ name: "lastfm", prefix: "http://www.last.fm/music/" },
+	{ name: "lastfm", prefix: "http://www.last.fm/" },
 	{ name: "soundcloud", prefix: "http://soundcloud.com/" },
 	{ name: "flickr", prefix: "http://www.flickr.com/" },
-	{ name: "foursquare", prefix:"http://foursquare.com/venue/"},
+	{ name: "foursquare", prefix:"http://foursquare.com/"},
 	{ name: "youtube", prefix: "http://www.youtube.com/" },
-	{ name: "itunes", prefix: "http://itunes.apple.com/us/artist/" },
+	{ name: "itunes", prefix: "http://itunes.apple.com/" },
 	{ name: "vimeo", prefix: "http://vimeo.com/" },
 	{ name: "facebook", prefix: "http://www.facebook.com/" },
-	{ name: "bandcamp"/*, prefix: "http://", suffix:".bandcamp.com/"*/ }
+	{ name: "bandcamp", prefix: "http://", suffix:".bandcamp.com/" }
 ];
