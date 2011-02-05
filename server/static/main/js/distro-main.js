@@ -538,6 +538,9 @@ distro.Router = Backbone.Controller.extend({
 							distro.loadLandingPage($text.text(), function(){});
 						}
 						return false;
+					} else if (e.keyCode === 32) {
+						document.execCommand('InsertHTML', false, '_');
+						return false;
 					}
 				})
 			}//,
