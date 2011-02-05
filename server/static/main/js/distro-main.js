@@ -439,10 +439,10 @@ distro.loadLandingPage = function(name, callback){
 									["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
 										["%a",{target:"_blank", href:{ key: "photoCredURL"}, style:"text-decoration:none;"}, { key: "photoCred"}]
 									],
-									["#location",
+									["%a#location", {href: {key: "map"}}, {key: "location", template:[
 										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "citystate"}],
 										["%p",{style:"margin-top:0px;"}, { key: "country"}]
-									]
+									]}]
 								],
 								["%span#artist",{style:"font-size:36px;"},
 									["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { key: "fullname"}]
