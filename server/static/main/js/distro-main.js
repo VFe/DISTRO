@@ -420,6 +420,60 @@ distro.LandingPage = distro.Model.extend({
 	},
 });
 
+distro.loadLandingPage = function(name, callback){
+	(new distro.LandingPage({name: name})).fetch({
+		success: function(model){
+			Backbone.history.saveLocation('/' + model.attributes.name);
+			distro.lightbox.show({
+				name: 'landingpage',
+				show: function($content){
+					$content.attr('id', 'landingBox');
+					$content.stencil(["%form", {},
+						[".lightboxHeader",
+							["%span.close.button", {}, "x"],
+							["%h1","^", { key: 'name' }, "^"]
+						],
+						[".contentBox",
+							[".content.leftContent",
+								["%img.photo",{src: {key: 'name', handler: function(){ return "http://distro-images.s3.amazonaws.com/"+this+".jpg" }}, width:"500", height:"335"}],
+								["%span.caption",{style:"color: rgb(119, 119, 119);"},
+									["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
+										["%a",{target:"_blank", href:{ key: "photoCredURL"}, style:"text-decoration:none;"}, { key: "photoCred"}]
+									],
+									["#location",
+										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "citystate"}],
+										["%p",{style:"margin-top:0px;"}, { key: "country"}]
+									]
+								],
+								["%span#artist",{style:"font-size:36px;"},
+									["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { key: "fullname"}]
+								]
+							],
+							[".rightContent",
+								{ key: 'presence', conditional: [".presence",
+									["%ul.presence", { key: 'presence', children: [
+										['%li', { 'class': { key: 'name' } }, ['%a', { target:"_blank", href: { key: 'url' } }]]
+									] } ]
+								] },
+								[".content"],
+								[".subscribeButton", { type: "button" }, [".label"], "^", { key: 'name' }, "^"]
+							]
+						]
+					], model.attributes);
+				}
+			});
+			$('.close').bind('click', function(){
+				window.location.hash = '';
+			});
+			callback(model);
+		},
+		error: function(){
+			alert("There's no network by this name");
+			callback(null);
+		}
+	});
+}
+
 distro.Router = Backbone.Controller.extend({
 	routes: {
 		"": "blank",
@@ -437,56 +491,11 @@ distro.Router = Backbone.Controller.extend({
 			window.location.hash = '';
 			return;
 		}
-		(new distro.LandingPage({name: name})).fetch({
-			success: function(model){
-				Backbone.history.saveLocation('/' + model.attributes.name);
-				distro.lightbox.show({
-					name: 'landingpage',
-					show: function($content){
-						$content.attr('id', 'landingBox');
-						$content.stencil(["%form", {},
-							[".lightboxHeader",
-								["%span.close.button", {}, "x"],
-								["%h1","^", { key: 'name' }, "^"]
-							],
-							[".contentBox",
-								[".content.leftContent",
-									["%img.photo",{src: {key: 'name', handler: function(){ return "http://distro-images.s3.amazonaws.com/"+this+".jpg" }}, width:"500", height:"335"}],
-									["%span.caption",{style:"color: rgb(119, 119, 119);"},
-										["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
-											["%a",{target:"_blank", href:{ key: "photoCredURL"}, style:"text-decoration:none;"}, { key: "photoCred"}]
-										],
-										["#location",
-											["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "citystate"}],
-											["%p",{style:"margin-top:0px;"}, { key: "country"}]
-										]
-									],
-									["%span#artist",{style:"font-size:36px;"},
-										["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { key: "fullname"}]
-									]
-								],
-								[".rightContent",
-									{ key: 'presence', conditional: [".presence",
-										["%ul.presence", { key: 'presence', children: [
-											['%li', { 'class': { key: 'name' } }, ['%a', { target:"_blank", href: { key: 'url' } }]]
-										] } ]
-									] },
-									[".content"],
-									[".subscribeButton", { type: "button" }, [".label"], "^", { key: 'name' }, "^"]
-								]
-							]
-						], model.attributes);
-					}
-				});
-				$('.close').bind('click', function(){
-					window.location.hash = '';
-				});
-			},
-			error: function(){
-				alert("There's no network by this name");
+		distro.loadLandingPage(name, function(model){
+			if (!model) {
 				window.location.hash = '';
 			}
-		})
+		});
 	},
 	find: function(){
 		distro.lightbox.show({
