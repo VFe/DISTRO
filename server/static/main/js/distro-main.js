@@ -531,6 +531,12 @@ distro.Router = Backbone.Controller.extend({
 					}
 					$field.removeClass('focus');
 				});
+				$text.keydown(function(e){
+					if (e.keyCode === 13){
+						distro.loadLandingPage($text.text(), function(){});
+						return false;
+					}
+				})
 			}//,
 			// hide: function(){
 			// 	alert("BYE");
