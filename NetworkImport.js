@@ -108,7 +108,7 @@ importDB.open(function(err, db) {
 								}
 								record.lname = record.name.toLowerCase();
 								record.lfullname = record.fullname.toLowerCase();
-								exportColl.update({"name":record.name}, record, {upsert:true}, function(err){
+								exportColl.update({"name":record.name}, {$set: record}, {upsert:true}, function(err){
 									if(err) util.log(new Error(err));
 									process.nextTick(nextRecord);
 								});
