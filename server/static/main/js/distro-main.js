@@ -249,29 +249,28 @@ function Lightbox(){
 	this.$contentWrapper = $('#lightboxWrapper');
 }
 Lightbox.prototype.show = function(content){
-	this.hideContent();
-	this.hiding = false;
-	var $content = $('<div>', { 'class': 'lightboxContent' });
-	this.content = content;
-	this.$contentWrapper.html($content);
-	content.show($content, this);
+	var self = this;
+	this.$contentWrapper.fadeOut(200).queue(function(next){
+		var $content;
+		self.hideContent();
+		$content = $('<div>', { 'class': 'lightboxContent' });
+		self.content = content;
+		self.$contentWrapper.html($content);
+		content.show($content, self);
+		next();
+	}).fadeIn(200);
 	this.$lightbox.fadeIn(200);
-	this.$contentWrapper.fadeIn(200);
 }
 Lightbox.prototype.hide = function(name){
 	if (!name || (this.content && name === this.content.name)) {
 		var self = this;
 		this.$lightbox.fadeOut(200);
-		this.hiding = true;
 		this.$contentWrapper.fadeOut(200, function(){
 			self.hideContent();
 		});
 	}
 }
 Lightbox.prototype.hideContent = function(){
-	if (!this.hiding){
-		return;
-	}
 	if (this.content) {
 		this.content.hide && this.content.hide(this);
 		this.content = null;
@@ -486,7 +485,7 @@ distro.Router = Backbone.Controller.extend({
 		distro.lightbox.hide();
 	},
 	network: function(name){
-		distro.lightbox.hide();
+//		distro.lightbox.hide();
 		if (!name) {
 			window.location.hash = '';
 			return;
