@@ -532,8 +532,11 @@ distro.Router = Backbone.Controller.extend({
 					$field.removeClass('focus');
 				});
 				$text.keydown(function(e){
+					var search;
 					if (e.keyCode === 13){
-						distro.loadLandingPage($text.text(), function(){});
+						if ((search = $text.text())) {
+							distro.loadLandingPage($text.text(), function(){});
+						}
 						return false;
 					}
 				})
