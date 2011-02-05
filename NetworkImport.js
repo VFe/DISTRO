@@ -22,7 +22,7 @@ var urlLeaderRegExp = /^(?:https?:\/\/)?(?:www.)?(.*)$/i,
 		"ZIP": {newName:"zip"},
 		"PHOTO_BY": {newName:"photoCred"},
 		"CAL_MAIN": {newName:"calendar"},
-		"CAL_GOOG": {newName:"calendarGoogle"},
+		"CAL_GOOG": {newName:"calendarGoogle", host:"www.google.com", qs:true},
 		"GOOGLE_MAP": {newName:"map"},
 		// begin urlPathList
 		"LINKEDIN": {newName:'linkedin', object:'presence', host:"linkedin.com"},
@@ -108,7 +108,7 @@ importDB.open(function(err, db) {
 								}
 								record.lname = record.name.toLowerCase();
 								record.lfullname = record.fullname.toLowerCase();
-								exportColl.insert(record, function(err){
+								exportColl.update({"name":record.name}, record, {upsert:true}, function(err){
 									if(err) util.log(new Error(err));
 									process.nextTick(nextRecord);
 								});
