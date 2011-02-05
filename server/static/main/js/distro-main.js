@@ -501,12 +501,12 @@ distro.Router = Backbone.Controller.extend({
 		distro.lightbox.show({
 			name: "findNetworks",
 			show: function($content){
-				var $close, $search, $text, $placeholder;
+				var $close, $field, $text, $placeholder;
 				$content.attr('id', 'networkSearch');
 				$content.haml([
 					['%span.close.button', {$:{$:function(){ $close = this; }}}, 'x'],
-					['.search', {$:{$:function(){ $search = this; }}},
-						['%span.field', '^',
+					['.search',
+						['%span.field', {$:{$:function(){ $field = this; }}}, '^',
 							['%span.text', { contenteditable: 'plaintext-only', $:{$:function(){ $text = this; }}}],
 							['%span.placeholder', {$:{$:function(){ $placeholder = this; }}}, distro.loc.str('findNetworks.placeholder')],
 						'^' ]
@@ -515,7 +515,7 @@ distro.Router = Backbone.Controller.extend({
 				$close.click(function(){
 					window.location.hash = '';
 				});
-				$search.click(function(e){
+				$field.click(function(e){
 					if (e.target != $text[0]) {
 						$text.focus();
 						return false;
@@ -523,11 +523,13 @@ distro.Router = Backbone.Controller.extend({
 				});
 				$text.focus(function(){
 					$placeholder.hide();
+					$field.addClass('focus');
 				});
 				$text.blur(function(){
 					if(!$text.text()){
 						$placeholder.show();
 					}
+					$field.removeClass('focus');
 				});
 			}//,
 			// hide: function(){
