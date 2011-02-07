@@ -244,40 +244,42 @@ Hollerback.prototype.fail = function(){
 	});
 })();
 
-function Lightbox(){
-	this.$lightbox = $('#lightbox');
-	this.$contentWrapper = $('#lightboxWrapper');
-}
-Lightbox.prototype.show = function(content){
-	var self = this;
-	this.$contentWrapper.fadeOut(200).queue(function(next){
-		var $content;
-		self.hideContent();
-		$content = $('<div>', { 'class': 'lightboxContent' });
-		self.content = content;
-		self.$contentWrapper.html($content);
-		content.show($content, self);
-		next();
-	}).fadeIn(200);
-	this.$lightbox.fadeIn(200);
-}
-Lightbox.prototype.hide = function(name){
-	if (!name || (this.content && name === this.content.name)) {
+distro.lightbox = new (function(){
+	function Lightbox(){
+		this.$lightbox = $('#lightbox');
+		this.$contentWrapper = $('#lightboxWrapper');
+	}
+	Lightbox.prototype.show = function(content){
 		var self = this;
-		this.$lightbox.fadeOut(200);
-		this.$contentWrapper.fadeOut(200, function(){
+		this.$contentWrapper.fadeOut(200).queue(function(next){
+			var $content;
 			self.hideContent();
-		});
+			$content = $('<div>', { 'class': 'lightboxContent' });
+			self.content = content;
+			self.$contentWrapper.html($content);
+			content.show($content, self);
+			next();
+		}).fadeIn(200);
+		this.$lightbox.fadeIn(200);
 	}
-}
-Lightbox.prototype.hideContent = function(){
-	if (this.content) {
-		this.content.hide && this.content.hide(this);
-		this.content = null;
+	Lightbox.prototype.hide = function(name){
+		if (!name || (this.content && name === this.content.name)) {
+			var self = this;
+			this.$lightbox.fadeOut(200);
+			this.$contentWrapper.fadeOut(200, function(){
+				self.hideContent();
+			});
+		}
 	}
-	this.$contentWrapper.empty();
-}
-distro.lightbox = new Lightbox;
+	Lightbox.prototype.hideContent = function(){
+		if (this.content) {
+			this.content.hide && this.content.hide(this);
+			this.content = null;
+		}
+		this.$contentWrapper.empty();
+	}
+	return Lightbox;
+}())();
 
 // Login/registration lightbox
 (function(){
@@ -485,7 +487,6 @@ distro.Router = Backbone.Controller.extend({
 		distro.lightbox.hide();
 	},
 	network: function(name){
-//		distro.lightbox.hide();
 		if (!name) {
 			window.location.hash = '';
 			return;
