@@ -459,10 +459,10 @@ distro.loadLandingPage = function(name, callback){
 							]
 						]
 					], model.attributes);
+					$('.close').bind('click', function(){
+						window.location.hash = '';
+					});
 				}
-			});
-			$('.close').bind('click', function(){
-				window.location.hash = '';
 			});
 			callback(model);
 		},
