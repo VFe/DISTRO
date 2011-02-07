@@ -1,8 +1,21 @@
+Backbone.sync = function(method, model, success, error){
+	if (!(model && model.url)) throw new Error("A 'url' property or function must be specified");
+	if (method !== 'read') {
+		throw new Error("distro.Model can only read");
+	}
+	distro.request((_.isFunction(model.url) ? model.url() : model.url), null, new Hollerback({
+		success: success,
+		failure: error
+	}));
+}
+
+
 distro.util = {
 	pad: function(input, length, char){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(char || '0') + input : input); },
 	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); }
 };
 distro.SERVER = "/api/",
+distro.TITLE = "DISTRO",
 distro.global = new Backbone.Model({}),
 distro.pyramidHead = function(message, retryback, giveupback){
 	var composedMessage = distro.loc.str('global.pyramidHead.pre') + '\n' + message;
@@ -246,8 +259,12 @@ Hollerback.prototype.fail = function(){
 
 distro.lightbox = new (function(){
 	function Lightbox(){
+		var self = this;
 		this.$lightbox = $('#lightbox');
 		this.$contentWrapper = $('#lightboxWrapper');
+		this.$contentWrapper.delegate('.close.button', 'click', function(){
+			self.hide();
+		});
 	}
 	Lightbox.prototype.show = function(content){
 		var self = this;
@@ -258,6 +275,8 @@ distro.lightbox = new (function(){
 			self.content = content;
 			self.$contentWrapper.html($content);
 			content.show($content, self);
+			Backbone.history.saveLocation('/' + content.name);
+			document.title = content.longName ? (content.longName + ' - ' + distro.TITLE) : distro.TITLE;
 			next();
 		}).fadeIn(200);
 		this.$lightbox.fadeIn(200);
@@ -269,6 +288,8 @@ distro.lightbox = new (function(){
 			this.$contentWrapper.fadeOut(200, function(){
 				self.hideContent();
 			});
+			Backbone.history.saveLocation('');
+			document.title = distro.TITLE;
 		}
 	}
 	Lightbox.prototype.hideContent = function(){
@@ -286,9 +307,6 @@ distro.lightbox = new (function(){
 	distro.global.bind('change:user', function(model, user){
 		if (user) {
 			distro.lightbox.hide('login');
-			if (window.location.hash === '#/login') {
-				Backbone.history.saveLocation('');
-			}
 		}
 	});
 })();
@@ -424,9 +442,9 @@ distro.LandingPage = distro.Model.extend({
 distro.loadLandingPage = function(name, callback){
 	(new distro.LandingPage({name: name})).fetch({
 		success: function(model){
-			Backbone.history.saveLocation('/' + model.attributes.name);
 			distro.lightbox.show({
-				name: 'landingpage',
+				name: model.name,
+				longName: model.get('fullname'),
 				show: function($content){
 					$content.attr('id', 'landingBox');
 					$content.stencil(["%form", {},
@@ -461,9 +479,6 @@ distro.loadLandingPage = function(name, callback){
 							]
 						]
 					], model.attributes);
-					$('.close').bind('click', function(){
-						window.location.hash = '';
-					});
 				}
 			});
 			callback(model);
@@ -499,12 +514,13 @@ distro.Router = Backbone.Controller.extend({
 	},
 	find: function(){
 		distro.lightbox.show({
-			name: "findNetworks",
+			name: "find",
+			longName: "Find a network",
 			show: function($content){
-				var $close, $field, $text, $placeholder;
+				var $field, $text, $placeholder;
 				$content.attr('id', 'networkSearch');
 				$content.haml([
-					['%span.close.button', {$:{$:function(){ $close = this; }}}, 'x'],
+					['%span.close.button', 'x'],
 					['.search',
 						['%span.field', {$:{$:function(){ $field = this; }}}, '^',
 							['%span.text', { contenteditable: 'plaintext-only', $:{$:function(){ $text = this; }}}],
@@ -512,9 +528,6 @@ distro.Router = Backbone.Controller.extend({
 						'^' ]
 					]
 				]);
-				$close.click(function(){
-					window.location.hash = '';
-				});
 				$field.click(function(e){
 					if (e.target != $text[0]) {
 						$text.focus();
@@ -543,10 +556,7 @@ distro.Router = Backbone.Controller.extend({
 						return false;
 					}
 				})
-			}//,
-			// hide: function(){
-			// 	alert("BYE");
-			// }
+			}
 		});
 	},
 	login: function(){
@@ -556,6 +566,7 @@ distro.Router = Backbone.Controller.extend({
 		}
 		distro.lightbox.show({
 			name: 'login',
+			longName: 'Login',
 			show: function($content){
 				var $form, $emailField, $passwordField, $registerCheckbox, $submitButton, submitStatus = new Backbone.Model({submitting:false});
 				$content.attr('id', 'loginRegisterBox');
