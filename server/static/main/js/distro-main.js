@@ -271,6 +271,11 @@ distro.lightbox = new (function(){
 		this.$contentWrapper.delegate('.close.button', 'click', function(){
 			self.hide();
 		});
+		$(document).bind('keyup', function(e){
+			if(e.keyCode == 27){
+				self.hide();
+			}
+		});
 	}
 	Lightbox.prototype.show = function(content){
 		var self = this;
