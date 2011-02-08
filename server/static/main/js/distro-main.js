@@ -69,7 +69,7 @@ distro.request = function(path, data, hollerback){
 	})
 };
 distro.library = {
-	networks: new (Backbone.Collection.extend({
+	subscriptions: new (Backbone.Collection.extend({
 		comparator: function(model){
 			return model.attributes.name;
 		}
@@ -92,33 +92,33 @@ distro.library = {
 	refresh: function(){
 		distro.request('library', null, new Hollerback({
 			success: function(data){
-				this.networks.refresh(data.networks || []);
+				this.subscriptions.refresh(data.subscriptions || []);
 				this.tracks.refresh(data.tracks || []);
 			}
 		}, this));
 	}
 };
-distro.library.networkListView = new (Backbone.View.extend({
-	el: $('#networksTable>tbody')[0],
+distro.library.subscriptionListView = new (Backbone.View.extend({
+	el: $('#subscriptionsTable>tbody')[0],
 	initialize: function() {
 		_.bindAll(this, 'add', 'render');
 		this.$el = $(this.el);
 		this.$foot = this.$el.children('.filler:first');
 		this.collection.bind('refresh', this.render);
 	},
-	add: function(network){
-		this.$foot.before((new distro.library.NetworkView({ model: network })).el);
+	add: function(subscription){
+		this.$foot.before((new distro.library.SubscriptionView({ model: subscription })).el);
 	},
 	render: function(){
 		this.$el.empty().append(this.$foot);
 		this.collection.each(this.add);
 	}
-}))({ collection: distro.library.networks });
+}))({ collection: distro.library.subscriptions });
 
-distro.library.NetworkView = Backbone.View.extend({
+distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.network', { key: 'id' }, ['.networkControls', ['.delete', 'X'], ['.mute', 'M'], ['.solo', 'S']]]
+		['.subscription', { key: 'id' }, ['.subscriptionControls', ['.delete', 'X'], ['.mute', 'M'], ['.solo', 'S']]]
 	],
 	events: {
 		"click .delete": "delete",
@@ -663,7 +663,7 @@ distro.init(function(){
 	distro.request('ping', null, new Hollerback({}));
 
 	$('#logOut').click(function(){
-		distro.library.networks.refresh([]);
+		distro.library.subscriptions.refresh([]);
 		distro.library.tracks.refresh([]);
 		distro.request('logout', {}, new Hollerback({}));
 	});

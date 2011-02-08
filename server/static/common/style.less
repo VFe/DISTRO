@@ -3,7 +3,7 @@
 @topBarHeight: 3em;
 @bottomBarHeight: 3em;
 @content-padding: 2em;
-@networkPaneWidth: 25em;
+@subscriptionPaneWidth: 25em;
 
 @brightBlue: #28aeed;
 @helloGreen: #6CB830;
@@ -178,17 +178,17 @@ tr.filler>td{
 	right: 0;
 	bottom: @bottomBarHeight;
 	left: 0;
-	padding-left: @networkPaneWidth;
+	padding-left: @subscriptionPaneWidth;
 	position: fixed;
 }
-#networks{
+#subscriptions{
 	height: 100%;
 	left: 0;
 	position: absolute;
 	top: 0;
-	width: @networkPaneWidth;
+	width: @subscriptionPaneWidth;
 }
-#networksDividier{
+#subscriptionsDividier{
 	float: right;
 	width: 1em;
 	height: 100%;
@@ -393,7 +393,7 @@ table{
 	cursor: pointer;
 	.button;
 }
-#musicTableBodyContainer td, #networksTable td{
+#musicTableBodyContainer td, #subscriptionsTable td{
 	padding: 0 0.5em;
 	line-height: 2em;
 	height: 2em;
@@ -407,7 +407,7 @@ table{
 #musicTableHead th:not(:last-child),#musicTableBody td:not(:last-child){
 	border-right: 1px solid rgba(50, 50, 50, 0.3);
 }
-#musicTableHead th, #networks th{
+#musicTableHead th, #subscriptions th{
 	background-color: rgb(225, 225, 225);
 	.commonGradient;
 	text-align: left;
@@ -418,21 +418,21 @@ table{
 	padding: 0 0 0 0.8em;
 	text-transform: uppercase;
 }
-#musicTableBodyContainer, #networksTableBodyContainer{
+#musicTableBodyContainer, #subscriptionsTableBodyContainer{
 	height: 100%;
 	overflow-y: auto;
 }
-#musicTableBodyContainer table, #networksTable{
+#musicTableBodyContainer table, #subscriptionsTable{
 	width: 100%;
 	height: 100%;
 }
-#networksTable{
+#subscriptionsTable{
 	table-layout: fixed;
 }
-#networksTable{
+#subscriptionsTable{
 	.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.2), 2em);
 }
-#networksTable div.network{
+#subscriptionsTable div.subscription{
 	width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -440,7 +440,7 @@ table{
 	position: relative;
 	white-space: nowrap;
 	.border-box;
-	.networkControls{
+	.subscriptionControls{
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -481,28 +481,28 @@ table{
 	}
 	&:hover{
 		background: rgba(220, 220, 220, 0.6);
-		.networkControls div{
+		.subscriptionControls div{
 			display: block;
 		}
 	}
 	&.muted{
-		&:not(:hover) .networkControls div.mute{
+		&:not(:hover) .subscriptionControls div.mute{
 			display: block;
 			color: #F88017;
 			background: none;
 		}
-		&:hover .networkControls div.mute{
+		&:hover .subscriptionControls div.mute{
 			background-color: #FF6929;
 			.box-shadow(0px 0px 0.7em #FF6929);
 		}
 	}
 	&.soloed{
-		&:not(:hover) .networkControls div.solo{
+		&:not(:hover) .subscriptionControls div.solo{
 			display: block;
 			color: #87AFC7;
 			background: none;
 		}
-		&:hover .networkControls div.solo{
+		&:hover .subscriptionControls div.solo{
 			background-color: #93C7E6;
 			.box-shadow(0px 0px 0.7em #95D6FC);
 		}

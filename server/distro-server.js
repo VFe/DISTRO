@@ -112,7 +112,7 @@ global.db.open(function(err, db){
 									for (var id in networkMap){
 										networkNames.push({id: networkMap[id]});
 									}
-									successback({tracks: tracks, networks: networkNames});
+									successback({tracks: tracks, subscriptions: networkNames});
 								}
 							});
 						}
