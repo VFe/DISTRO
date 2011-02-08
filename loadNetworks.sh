@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMPORT_CSV=`mktemp -t distro-import`
+IMPORT_CSV=`mktemp -t distro_import.XXXXXXXXXX`
 
 if [[ -z $AUTH_TOKEN ]]; then
 	echo "I require additional AUTH_TOKEN"
