@@ -440,8 +440,13 @@ distro.player = new (function(){
 
 distro.LandingPage = Backbone.Model.extend({
 	initialize: function(opts){
-		this.name = opts.name;
 		this.url = 'networks/' + opts.name;
+	},
+	set: function(attrs){
+		if (Backbone.Model.prototype.set.apply(this, arguments)) {
+			if (attrs && 'name' in attrs) this.name = this.attributes.name;
+		}
+		return this;
 	}
 });
 
