@@ -461,7 +461,7 @@ distro.loadLandingPage = function(name, callback){
 									],
 									["#location", {key: "location", template:[
 										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "streetAddress"}],
-										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0.25em; margin-left: 0em;"}, { key: "citystate"}, {key:"zip"}],
+										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0.25em; margin-left: 0em;"}, { key: "citystate"}, " ", {key:"zip"}],
 										{key:"country", conditional: ["%p",{style:"margin-top:0px;"}, { key: "country"}]}
 									]}, 
 									{key:"map", conditional: ["%a#mapLink", {target:"_blank", href:{key:"map"}}, "MAP"]}]
