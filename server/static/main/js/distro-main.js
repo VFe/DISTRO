@@ -276,6 +276,14 @@ distro.lightbox = new (function(){
 				self.hide();
 			}
 		});
+
+		$(document).bind('keyup', function(e){
+			if(e.keyCode == 107 || e.keyCode == 187){
+				if(document.location.hash == ""){
+					document.location.hash = "/find";
+				}
+			}
+		});
 	}
 	Lightbox.prototype.show = function(content){
 		var self = this;
