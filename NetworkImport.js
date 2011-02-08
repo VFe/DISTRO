@@ -76,10 +76,10 @@ importDB.open(function(err, db) {
 											var canonicalURL = property.replace(urlLeaderRegExp, "http://$1"),
 												parsed = url.parse(canonicalURL), path;
 											if (!parsed || !parsed.host || !parsed.pathname) {
-												throw new Error('Failed to parse '+key+' : '+property+' / '+canonicalURL+' as a URL');
+												throw new Error('Failed to parse '+key+' : '+property+' as a URL');
 											}
 											if (parsed.host !== mapping.host) {
-												throw new Error('Unexpected hostname on '+key+' : '+property+' / '+canonicalURL);
+												throw new Error('Unexpected hostname on '+key+' : '+property);
 											}
 											if (mapping.hashable && parsed.pathname === '/' && parsed.hash) {
 												path = parsed.hash.substring((parsed.hash.indexOf('#!') === 0) ? 2 : 1);
