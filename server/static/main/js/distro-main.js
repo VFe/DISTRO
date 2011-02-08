@@ -68,21 +68,27 @@ distro.request = function(path, data, hollerback){
 		}
 	})
 };
-distro.Model = Backbone.Model.extend({
-	sync: function(method, model, success, error){
-		if (!(model && model.url)) throw new Error("A 'url' property or function must be specified");
-		if (method !== 'read') {
-			throw new Error("distro.Model can only read");
-		}
-		distro.request((_.isFunction(model.url) ? model.url() : model.url), null, new Hollerback({
-			success: success,
-			failure: error
-		}));
-	}
-});
 distro.library = {
-	networks: new Backbone.Collection,
-	tracks: new Backbone.Collection,
+	networks: new (Backbone.Collection.extend({
+		comparator: function(model){
+			return model.attributes.name;
+		}
+	})),
+	tracks: new (Backbone.Collection.extend({
+		model: Backbone.Model.extend({
+			validate: function(attributes){
+				if (!(attributes.release instanceof Date)) {
+					attributes.release = new Date(attributes.release);
+				}
+			},
+			initialize: function(){
+				this.validate(this.attributes);
+			}
+		}),
+		comparator: function(model){
+			return +model.attributes.release;
+		}
+	})),
 	refresh: function(){
 		distro.request('library', null, new Hollerback({
 			success: function(data){
@@ -432,11 +438,11 @@ distro.player = new (function(){
 	return Player;
 }())();
 
-distro.LandingPage = distro.Model.extend({
+distro.LandingPage = Backbone.Model.extend({
 	initialize: function(opts){
 		this.name = opts.name;
 		this.url = 'networks/' + opts.name;
-	},
+	}
 });
 
 distro.loadLandingPage = function(name, callback){
