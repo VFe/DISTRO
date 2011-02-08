@@ -483,7 +483,7 @@ distro.loadLandingPage = function(name, callback){
 							],
 							[".rightContent",
 								{ key: 'presence', conditional: [".presence",
-									["%ul.presence", { key: 'presence', children: [
+									["%ul.presence", {key: "email", conditional: ["%li.email", ["%a", {target:"_blank"}]]}, { key: 'presence', children: [
 										['%li', { 'class': { key: 'name' } }, ['%a', { target:"_blank", href: { key: 'url' } }]]
 									] } ]
 								] },
