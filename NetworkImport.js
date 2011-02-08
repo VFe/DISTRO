@@ -22,7 +22,7 @@ var urlLeaderRegExp = /^(?:https?:\/\/)?(?:www.)?(.*)$/i,
 		"ZIP": {newName:"zip"},
 		"PHOTO_BY": {newName:"photoCred"},
 		"CAL_MAIN": {newName:"calendar"},
-		"CAL_GOOG": {newName:"calendarGoogle", host:"www.google.com", qs:true},
+		"CAL_GOOG": {newName:"calendarGoogle", host:"google.com", qs:true},
 		"GOOGLE_MAP": {newName:"map"},
 		// begin urlPathList
 		"LINKEDIN": {newName:'linkedin', object:'presence', host:"linkedin.com"},
