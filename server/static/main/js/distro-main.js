@@ -467,7 +467,7 @@ distro.loadLandingPage = function(name, callback){
 									{key:"map", conditional: ["%a#mapLink", {target:"_blank", href:{key:"map"}}, "MAP"]}]
 								],
 								["%span#artist",{style:"font-size:36px;"},
-									["%p",{style:"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { key: "fullname"}]
+									["%p",{style:"margin-top: 0.17em; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { key: "fullname"}]
 								]
 							],
 							[".rightContent",
