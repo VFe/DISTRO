@@ -1,9 +1,9 @@
 Backbone.sync = function(method, model, success, error){
 	if (!(model && model.url)) throw new Error("A 'url' property or function must be specified");
-	if (method !== 'read') {
-		throw new Error("distro.Model can only read");
-	}
-	distro.request((_.isFunction(model.url) ? model.url() : model.url), null, new Hollerback({
+	var httpMethod = { 'create': 'POST', 'update': 'PUT', 'delete': 'DELETE', 'read'  : 'GET' }[method],
+	    data = (method === 'create' || method === 'update') ? JSON.stringify(model.toJSON()) : null;
+	
+	distro.request((_.isFunction(model.url) ? model.url() : model.url), httpMethod, data, new Hollerback({
 		success: success,
 		failure: error
 	}));
@@ -29,12 +29,12 @@ distro.pyramidHead = function(message, retryback, giveupback){
 		alert(composedMessage);
 	}
 };
-distro.request = function(path, data, hollerback){
+distro.request = function(path, method, data, hollerback){
 	var responseData = null;
 	$.ajax({
 		url: (distro.SERVER + path),
 		data: (data ? JSON.stringify(data) : null),
-		type: (data ? 'POST' : 'GET'),
+		type: method,
 		contentType: (data ? 'application/json' : undefined),
 		success: function(responseDataInternal, status, xhr){
 			responseData = responseDataInternal;
@@ -45,7 +45,7 @@ distro.request = function(path, data, hollerback){
 				responseData = $.parseJSON(xhr.responseText);
 			} catch(e) {
 				distro.pyramidHead(distro.loc.str('global.serverError'), function(){
-					distro.request(path, data, hollerback);
+					distro.request(path, method, data, hollerback);
 				}, function(){
 					hollerback.fail(responseData, status, xhr);
 				});
@@ -53,7 +53,7 @@ distro.request = function(path, data, hollerback){
 			}
 			if (xhr.status === 500) {
 				distro.pyramidHead(distro.loc.str('global.serverError'), function(){
-					distro.request(path, data, hollerback);
+					distro.request(path, method, data, hollerback);
 				}, function(){
 					hollerback.fail(responseData, status, xhr);
 				});
@@ -90,7 +90,7 @@ distro.library = {
 		}
 	})),
 	refresh: function(){
-		distro.request('library', null, new Hollerback({
+		distro.request('library', 'GET', null, new Hollerback({
 			success: function(data){
 				this.subscriptions.refresh(data.subscriptions || []);
 				this.tracks.refresh(data.tracks || []);
@@ -632,7 +632,7 @@ distro.Router = Backbone.Controller.extend({
 						alert(distro.loc.str('registration.errors.noCredentials'));
 					} else {
 						submitStatus.set({submitting: true});
-						distro.request(register ? 'register' : 'login', {email: email, password: password}, new Hollerback({
+						distro.request(register ? 'register' : 'login', 'POST', {email: email, password: password}, new Hollerback({
 							failure: function(data){
 								if (data && data.errorMessage) {
 									alert(distro.loc.str(data.errorMessage) || data.errorMessage);
@@ -660,12 +660,12 @@ distro.init(function(){
 	
 	distro.loc.replacePlaceholders();
 	
-	distro.request('ping', null, new Hollerback({}));
+	distro.request('ping', 'GET', null, new Hollerback({}));
 
 	$('#logOut').click(function(){
 		distro.library.subscriptions.refresh([]);
 		distro.library.tracks.refresh([]);
-		distro.request('logout', {}, new Hollerback({}));
+		distro.request('logout', 'GET', {}, new Hollerback({}));
 	});
 
 	// Miscellaneous UI
