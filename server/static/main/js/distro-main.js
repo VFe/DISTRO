@@ -460,7 +460,8 @@ distro.loadLandingPage = function(name, callback){
 										["%a",{target:"_blank", href:{ key: "photoCredURL"}, style:"text-decoration:none;"}, { key: "photoCred"}]
 									],
 									["#location", {key: "location", template:[
-										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "citystate"}],
+										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "streetAddress"}],
+										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0.25em; margin-left: 0em;"}, { key: "citystate"}],
 										{key:"country", conditional: ["%p",{style:"margin-top:0px;"}, { key: "country"}]}
 									]}, 
 									{key:"map", conditional: ["%a#mapLink", {target:"_blank", href:{key:"map"}}, "MAP"]}]
