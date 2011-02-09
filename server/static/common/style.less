@@ -773,16 +773,18 @@ table{
 	line-height: 2em;
 	position: absolute;
 	width: 100%;
-	border: 1px solid white;
+	border: 1px solid @helloGreen;
 	.border-radius(0.3em);
 	font-size: 1.5em;
 	line-height: 3em;
 	text-align: center;
-	cursor: default;
+	cursor: pointer;
 	.button;
 }
-#landingBox.subscribeButton:not(.disabled){
-	cursor: pointer;
+#landingBox .subscribeButton.disabled{
+	cursor: default;
+	border-color: #333;
+	color: #555;
 }
 #landingBox .subscribeButton .label {
 	background-color: #3a3a3c;
