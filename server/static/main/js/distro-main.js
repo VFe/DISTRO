@@ -276,6 +276,7 @@ Hollerback.prototype.fail = function(){
 		if (user) {
 			$accountName.text(user);
 			$account.addClass('loggedIn');
+			distro.library.refresh();
 		} else {
 			$account.removeClass('loggedIn');
 		}
