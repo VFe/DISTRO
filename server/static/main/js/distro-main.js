@@ -95,7 +95,7 @@ distro.library = {
 			return +model.attributes.release;
 		}
 	})),
-	refresh: function(success){
+	refresh: function(complete){
 		if (this.justUpdated) {
 			return;
 		} else {
@@ -109,10 +109,8 @@ distro.library = {
 			success: function(data){
 				this.subscriptions.refresh(data.subscriptions || []);
 				this.tracks.refresh(data.tracks || []);
-				if (success) {
-					success();
-				}
-			}
+			},
+			complete: complete
 		}, this));
 	}
 };
