@@ -1,7 +1,7 @@
 Backbone.sync = function(method, model, success, error){
 	if (!(model && model.url)) throw new Error("A 'url' property or function must be specified");
 	var httpMethod = { 'create': 'POST', 'update': 'PUT', 'delete': 'DELETE', 'read'  : 'GET' }[method],
-	    data = (method === 'create' || method === 'update') ? JSON.stringify(model.toJSON()) : null;
+	    data = (method === 'create' || method === 'update') ? model.toJSON() : null;
 	
 	distro.request((_.isFunction(model.url) ? model.url() : model.url), httpMethod, data, new Hollerback({
 		success: success,
