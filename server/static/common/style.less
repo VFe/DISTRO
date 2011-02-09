@@ -778,8 +778,11 @@ table{
 	font-size: 1.5em;
 	line-height: 3em;
 	text-align: center;
-	cursor: pointer;
+	cursor: default;
 	.button;
+}
+#landingBox.subscribeButton:not(.disabled){
+	cursor: pointer;
 }
 #landingBox .subscribeButton .label {
 	background-color: #3a3a3c;

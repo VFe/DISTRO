@@ -89,37 +89,55 @@ global.db.open(function(err, db){
 			}));
 			app.get('/library', distro.request.handleRequest(true, function(session, req, res, successback, errback){
 				if (session.user.subscriptions && session.user.subscriptions.length) {
-					global.tracks.tracksForSubscriptions(session.user.subscriptions, function(err, tracks){
+					global.users.subscriptions(session.user, function(err, subscriptions){
 						if (err) {
 							errback(err);
 						} else {
-							var subscribedNetworks = {};
-							session.user.subscriptions.forEach(function(subscription) {
-								subscribedNetworks[subscription.network.toHexString()] = subscription.network;
-							});
-							subscribedNetworkIds = [];
-							for (var id in subscribedNetworks) {
-								subscribedNetworkIds.push(subscribedNetworks[id]);
-							}
-							global.networks.batchNetworkNameFromId(subscribedNetworkIds, function(err, networkMap){
+							global.users.tracks(session.user, function(err, tracks){
 								if (err) {
 									errback(err);
 								} else {
-									var networkNames = [];
-									tracks.forEach(function(track){
-										track.network = networkMap[track.network.toHexString()] || '';
-									});
-									for (var id in networkMap){
-										networkNames.push({id: networkMap[id]});
-									}
-									successback({tracks: tracks, subscriptions: networkNames});
+									successback({tracks: tracks, subscriptions: subscriptions});
 								}
 							});
 						}
 					});
 				} else {
-					successback({library:[]});
+					successback({tracks: [], subscriptions: []});
 				}
+			}));
+			app.get('/library/tracks', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+				if (session.user.subscriptions && session.user.subscriptions.length) {
+					global.users.tracks(session.user, function(err, tracks){
+						if (err) {
+							errback(err);
+						} else {
+							successback(tracks);
+						}
+					});
+				} else {
+					successback({tracks: [], subscriptions: []});
+				}
+			}));
+			app.post('/library/subscriptions', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+				if (!req.body || !req.body.name) {
+					errback(new distro.error.ClientError("networks.errors.noNetwork"));
+					return;
+				}
+				global.networks.findNetworkByName(req.body.name, {}, function(err, doc){
+					if (err) {
+						errback(err);
+					} else if (doc) {
+						global.users.subscribeToNetwork(session.user, doc._id, function(err){
+							if (err) {
+								errback(err);
+							}
+							successback({ id: doc.name });
+						});
+					} else {
+						errback(new distro.error.ClientError("networks.errors.noNetwork"));
+					}
+				});
 			}));
 			app.get('/search/:search', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				global.networks.search(req.params.search, function(err, returnData){

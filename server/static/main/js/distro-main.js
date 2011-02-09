@@ -70,11 +70,17 @@ distro.request = function(path, method, data, hollerback){
 };
 distro.library = {
 	subscriptions: new (Backbone.Collection.extend({
+		url: 'library/subscriptions',
+		model: Backbone.Model,
 		comparator: function(model){
 			return model.attributes.name;
+		},
+		isSubscribed: function(networkName){
+			return this.any(function(subscription){ return subscription.id === networkName });
 		}
 	})),
 	tracks: new (Backbone.Collection.extend({
+		url: 'library/tracks',
 		model: Backbone.Model.extend({
 			validate: function(attributes){
 				if (!(attributes.release instanceof Date)) {
@@ -104,6 +110,7 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 		_.bindAll(this, 'add', 'render');
 		this.$el = $(this.el);
 		this.$foot = this.$el.children('.filler:first');
+		this.collection.bind('add', this.add);
 		this.collection.bind('refresh', this.render);
 	},
 	add: function(subscription){
@@ -151,6 +158,9 @@ distro.library.trackListView = new (Backbone.View.extend({
 		this.$el = $(this.el);
 		this.$foot = this.$el.children('.filler:first');
 		this.collection.bind('refresh', this.render);
+		distro.library.subscriptions.bind('add', function(){
+			distro.library.tracks.fetch();
+		});
 	},
 	add: function(network){
 		this.$foot.before((new distro.library.TrackView({ model: network, parent: this })).el);
@@ -470,6 +480,8 @@ distro.loadLandingPage = function(name, callback){
 				name: model.name,
 				longName: model.get('fullname'),
 				show: function($content){
+					var $subscribeButton,
+					    subscribed = distro.library.subscriptions.isSubscribed(model.name);
 					$content.attr('id', 'landingBox');
 					$content.stencil(["%form", {},
 						[".lightboxHeader",
@@ -502,10 +514,13 @@ distro.loadLandingPage = function(name, callback){
 								] },
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {key: "calendarGoogle", conditional: ["%iframe#calFrame", {frameborder: "0", src: {key:"calendarGoogle", handler: function(){ return "http://google.com/"+this+"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000";}}}]}],
-								[".subscribeButton", { type: "button" }, [".label"], "^", { key: 'name' }, "^"]
+								[".subscribeButton", { 'class': { key:'', handler: function(){ alert(subscribed); return subscribed ? 'disabled' : '' } }, type: "button", $:{$:function(){ $subscribeButton = this }}}, [".label"], "^", { key: 'name' }, "^"]
 							]
 						]
 					], model.attributes);
+					$subscribeButton.click(function(){
+						distro.library.subscriptions.create({name:model.name});
+					});
 				}
 			});
 			callback(model);

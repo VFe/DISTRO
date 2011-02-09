@@ -63,3 +63,66 @@ Users.prototype.registerUser = function(email, password, callback){
 		}
 	});
 };
+Users.prototype.subscribeToNetwork = function(user, networkID, callback){
+	var now = new Date;
+	if (user.subscriptions) {
+		var i, subscription;
+		for (i = user.subscriptions.length - 1; i >= 0; i--){
+			subscription = user.subscriptions[i];
+			if (networkID.toString() === subscription.network.toString() && (!subscription.end || subscription.end > now)) {
+				callback(null);
+				return;
+			}
+		}
+	}
+	this.collection.update({ _id: user._id }, { $push: { subscriptions: { network: networkID, start: now } } }, function(err, doc){
+		callback(err);
+	});
+};
+Users.prototype.subscriptions = function(user, callback){
+	var subscribedNetworkIdMap = {};
+	user.subscriptions.forEach(function(subscription) {
+		subscribedNetworkIdMap[subscription.network.toHexString()] = subscription.network;
+	});
+	subscribedNetworkIds = [];
+	for (var id in subscribedNetworkIdMap) {
+		subscribedNetworkIds.push(subscribedNetworkIdMap[id]);
+	}
+	global.networks.batchNetworkNameFromId(subscribedNetworkIds, function(err, networkMap){
+		if (err) {
+			callback(err, null);
+		} else {
+			var subscriptions = [];
+			for (var id in networkMap){
+				subscriptions.push({id: networkMap[id]});
+			}
+			callback(null, subscriptions);
+		}
+	});
+}
+Users.prototype.tracks = function(user, callback){
+	global.tracks.tracksForSubscriptions(user.subscriptions, function(err, tracks){
+		if (err) {
+			callback(err, null);
+		} else {
+			var trackNetworkIdMap = {};
+			tracks.forEach(function(track) {
+				trackNetworkIdMap[track.network.toHexString()] = track.network;
+			});
+			trackNetworkIds = [];
+			for (var id in trackNetworkIdMap) {
+				trackNetworkIds.push(trackNetworkIdMap[id]);
+			}
+			global.networks.batchNetworkNameFromId(trackNetworkIds, function(err, networkMap){
+				if (err) {
+					callback(err, null);
+				} else {
+					tracks.forEach(function(track){
+						track.network = networkMap[track.network.toHexString()] || '';
+					});
+					callback(null, tracks);
+				}
+			});
+		}
+	});
+}
