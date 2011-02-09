@@ -29,7 +29,11 @@ Networks.prototype.batchNetworkNameFromId = function(ids, callback){
 
 Networks.prototype.findNetworkByName = function(name, options, callback){
 	name = name.toLowerCase();
-	this.collection.findOne({"lname":name}, { fields: { _id: (options._id === false ? 0 : 1), lname: 0, lfullname: 0 } }, function(err, doc){
+	var exclusions = { lname: 0, lfullname: 0 };
+	if (options._id === false) {
+		exclusions._id = 0;
+	}
+	this.collection.findOne({"lname":name}, { fields: exclusions }, function(err, doc){
 		if(err) {
 			callback(err, null);
 		} else {
