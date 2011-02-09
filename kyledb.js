@@ -1,11 +1,12 @@
 var http = require('http'),
 	exec = require('child_process').exec,
 	fs = require('fs'),
-	auth = fs.readFileSync("./auth.txt", encoding = 'utf8');
+	auth = fs.readFileSync("./auth.txt", encoding = 'utf8'),
+	util = require('util');
 
 http.createServer(function (req, res) {
 	res.writeHead(200, {'Content-Type': 'text/plain'});
-	exec("bash loadNetworks.sh", [], {cwd:"/", env:auth}, 
+	exec("bash loadNetworks.sh", {cwd:"/", env:{AUTH_TOKEN:auth}}, 
 	 function(error, stdout, stdin){
 		res.write("STDOUT: "+stdout);
 		if(error){
