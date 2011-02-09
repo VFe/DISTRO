@@ -95,11 +95,23 @@ distro.library = {
 			return +model.attributes.release;
 		}
 	})),
-	refresh: function(){
+	refresh: function(success){
+		if (this.justUpdated) {
+			return;
+		} else {
+			this.justUpdated = true;
+			self = this;
+			setTimeout(function(){
+				self.justUpdated = false;
+			}, 0);
+		}
 		distro.request('library', 'GET', null, new Hollerback({
 			success: function(data){
 				this.subscriptions.refresh(data.subscriptions || []);
 				this.tracks.refresh(data.tracks || []);
+				if (success) {
+					success();
+				}
 			}
 		}, this));
 	}
@@ -266,7 +278,6 @@ Hollerback.prototype.fail = function(){
 		if (user) {
 			$accountName.text(user);
 			$account.addClass('loggedIn');
-			distro.library.refresh();
 		} else {
 			$account.removeClass('loggedIn');
 		}
@@ -514,12 +525,19 @@ distro.loadLandingPage = function(name, callback){
 								] },
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {key: "calendarGoogle", conditional: ["%iframe#calFrame", {frameborder: "0", src: {key:"calendarGoogle", handler: function(){ return "http://google.com/"+this+"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000";}}}]}],
-								[".subscribeButton", { 'class': { key:'', handler: function(){ alert(subscribed); return subscribed ? 'disabled' : '' } }, type: "button", $:{$:function(){ $subscribeButton = this }}}, [".label"], "^", { key: 'name' }, "^"]
+								[".subscribeButton", { 'class': { key:'', handler: function(){ return subscribed ? 'disabled' : '' } }, type: "button", $:{$:function(){ $subscribeButton = this }}}, [".label"], "^", { key: 'name' }, "^"]
 							]
 						]
 					], model.attributes);
 					$subscribeButton.click(function(){
-						distro.library.subscriptions.create({name:model.name});
+						if (!subscribed) {
+							distro.library.subscriptions.create({name:model.name}, {
+								success: function(){
+									subscribed = true;
+									$subscribeButton.addClass('disabled');
+								}
+							});
+						}
 					});
 				}
 			});
@@ -675,8 +693,6 @@ distro.init(function(){
 	
 	distro.loc.replacePlaceholders();
 	
-	distro.request('ping', 'GET', null, new Hollerback({}));
-
 	$('#logOut').click(function(){
 		distro.library.subscriptions.refresh([]);
 		distro.library.tracks.refresh([]);
@@ -689,5 +705,7 @@ distro.init(function(){
 	});
 	
 	distro.router = new distro.Router();
-	Backbone.history.start();
+	distro.library.refresh(function(){
+		Backbone.history.start();
+	});
 });

@@ -84,9 +84,6 @@ global.db.open(function(err, db){
 					errback(new distro.error.ClientError("registration.errors.noCredentials"));
 				}
 			}));
-			app.get('/ping', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-				successback();
-			}));
 			app.get('/library', distro.request.handleRequest(true, function(session, req, res, successback, errback){
 				if (session.user.subscriptions && session.user.subscriptions.length) {
 					global.users.subscriptions(session.user, function(err, subscriptions){
