@@ -42,7 +42,7 @@ global.db.open(function(err, db){
 								if(err){
 									errback(err);
 								} else {
-									successback({userName:user.email});
+									successback(null, {userName:user.email});
 								}
 							});	
 						} else {
@@ -59,7 +59,7 @@ global.db.open(function(err, db){
 					if (err) {
 						errback(err);
 					} else {
-						successback({userName:null});
+						successback(null, {userName:null});
 					}
 				});
 			}));
@@ -75,7 +75,7 @@ global.db.open(function(err, db){
 								if(err){
 									errback(err);
 								} else {
-									successback({userName: body.email});
+									successback(null, {userName: body.email});
 								}
 							});
 						}

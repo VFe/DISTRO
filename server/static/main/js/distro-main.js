@@ -38,7 +38,7 @@ distro.request = function(path, method, data, hollerback){
 		contentType: (data ? 'application/json' : undefined),
 		success: function(responseDataInternal, status, xhr){
 			responseData = responseDataInternal;
-			hollerback.succeed(responseData, status, xhr);
+			hollerback.succeed(responseData.data, status, xhr);
 		},
 		error: function(xhr, status, error){
 			try{

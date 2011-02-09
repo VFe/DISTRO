@@ -13,8 +13,11 @@ function endResponse(res, status, headers, body){
 exports.handleRequest = function(requireAuthentication, callback){
 	return function(req, res) {
 		var responseContent = {};
-		function successback(response){
-			connect.utils.merge(responseContent, response);
+		function successback(data, topData){
+			if (data) {
+				responseContent.data = data;
+			}
+			connect.utils.merge(responseContent, topData);
 			endResponse(res, 200, {}, responseContent)
 		}
 		function errback(err){
