@@ -665,7 +665,7 @@ distro.init(function(){
 	$('#logOut').click(function(){
 		distro.library.subscriptions.refresh([]);
 		distro.library.tracks.refresh([]);
-		distro.request('logout', 'GET', {}, new Hollerback({}));
+		distro.request('logout', 'POST', null, new Hollerback({}));
 	});
 
 	// Miscellaneous UI
