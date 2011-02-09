@@ -11,7 +11,7 @@ http.createServer(function (req, res) {
 		if(error){
 			res.write("Error: "+error);
 		}
-		res.end("done"+auth);
+		res.end("done");
 		console.log("Wrote some shit I hope");
 	});
 //	script.stdout.on('data', function(data){
@@ -22,4 +22,4 @@ http.createServer(function (req, res) {
 //		res.end("Exited with code: "+code, encoding='utf8');
 //	});
 }).listen(8118, "127.0.0.1");
-
+console.log("Running on port 8118");
