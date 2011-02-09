@@ -6,8 +6,8 @@ var http = require('http'),
 
 http.createServer(function (req, res) {
 	res.writeHead(200, {'Content-Type': 'text/plain'});
-	exec("bash loadNetworks.sh", {cwd:"/", env:{AUTH_TOKEN:auth}}, 
-	 function(error, stdout, stdin){
+	exec("bash loadNetworks.sh", {cwd:__dirname, env:{AUTH_TOKEN:auth}}, 
+	function(error, stdout, stdin){
 		res.write("STDOUT: "+stdout);
 		if(error){
 			res.write("Error: "+error);
