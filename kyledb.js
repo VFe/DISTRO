@@ -1,7 +1,7 @@
 var http = require('http'),
 	exec = require('child_process').exec,
 	fs = require('fs'),
-	auth = fs.readFileSync("auth.txt", encoding = 'utf8');
+	auth = fs.readFileSync("./auth.txt", encoding = 'utf8');
 
 http.createServer(function (req, res) {
 	res.writeHead(200, {'Content-Type': 'text/plain'});
