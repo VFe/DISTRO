@@ -356,6 +356,7 @@ distro.player = new (function(){
 		// SoundManager initialization
 		soundManager.debugMode = false;
 		soundManager.url = '/soundmanager/';
+		soundManager.flashVersion = 9;
 		soundManager.useFlashBlock = true;
 		soundManager.useHTML5Audio = true;
 		soundManager.onload = _.bind(function() {
