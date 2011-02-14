@@ -291,11 +291,16 @@ distro.lightbox = new (function(){
 		this.$contentWrapper.delegate('.close.button', 'click', function(){
 			self.hide();
 		});
-		$(document).bind('keyup', function(e){
+		$(document).keyup(function(e){
 			if(e.keyCode == 27){
 				self.hide();
+				return false;
 			}
 		});
+		this.$lightbox.click(function(e){
+			self.hide();
+			return false;
+		})
 
 		$(document).bind('keyup', function(e){
 			if(e.keyCode == 107 || e.keyCode == 187){
