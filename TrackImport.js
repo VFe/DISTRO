@@ -1,4 +1,4 @@
-var Do = require('Do'),
+var Do = require('do'),
     mongoDB = require('mongodb'),
 	util = require('util'),
 	url = require('url');
