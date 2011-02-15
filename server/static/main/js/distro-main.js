@@ -527,8 +527,8 @@ distro.loadLandingPage = function(name, callback){
 									["%ul.presence", {$test: {$key: "email"}, $if:["%li.email", ["%a", {target:"_blank"}]]}, { $key: 'presence', $children: [
 										['%li', { 'class': { $key: 'name' } }, ['%a', { target:"_blank", href: { $key: 'url' } }]]
 									] }],
-									["%ul.emailList", {$key: "email", $children: ["%li", {class: {$key:"."}}, 
-										["%a", {href: {$join: ["mailto://",{$key:""}]}}, {$key:""}]]}]
+									["%ul.emailList", {style:"display:none;"}, {$key: "email", $children: ["%li", {class: {$key:"."}}, 
+										["%a", {href: {$join: ["mailto:",{$key:""}]}, title:{$key:""}}, {$key:"."}]]}]
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$key:"calendarGoogle", $handler: function(){ return "http://google.com/"+this+"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000";}}}]}],
@@ -546,6 +546,7 @@ distro.loadLandingPage = function(name, callback){
 							});
 						}
 					});
+					$('.email').click(function(){$('.emailList').toggle()});
 				}
 			});
 			callback(model);
