@@ -524,14 +524,16 @@ distro.loadLandingPage = function(name, callback){
 							],
 							[".rightContent",
 								{$test: {$or: [{$key: 'presence'}, {$key:'email'}]}, $if: [".presence",
-									["%ul.presence", {$test: {$key: "email"}, $if:["%li.email", ["%a", {target:"_blank"}]]}, { $key: 'presence', $children: [
+									["%ul.presence", {$test: {$key: "email"}, $if:["%li.email", ["%a", {target:"_blank"}],
+										["%ul.emailList", {style:"display:none; position: absolute; padding: 0 .5em; background-color: white; list-style:none;"}, {$key: "email", $children: 
+											["%li", {class: {$key:"."}, style:"margin: 0px 1em;"}, 
+												["%a", {href: {$join: ["mailto:",{$key:""}]}, title:{$key:""}}, {$key:"."}]]}]]}, { $key: 'presence', $children: [
 										['%li', { 'class': { $key: 'name' } }, ['%a', { target:"_blank", href: { $key: 'url' } }]]
 									] }],
-									["%ul.emailList", {style:"display:none;"}, {$key: "email", $children: ["%li", {class: {$key:"."}}, 
-										["%a", {href: {$join: ["mailto:",{$key:""}]}, title:{$key:""}}, {$key:"."}]]}]
+									
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
-								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$key:"calendarGoogle", $handler: function(){ return "http://google.com/"+this+"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000";}}}]}],
+								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
 								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : '' } }, type: "button", $:{$:function(){ $subscribeButton = this }}}, [".label"], "^", { $key: 'name' }, "^"]
 							]
 						]
