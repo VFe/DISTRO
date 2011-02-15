@@ -376,7 +376,7 @@ distro.player = new (function(){
 		    totalTime   = document.getElementById('totalTime').firstChild,
 			slider = new distro.Slider($('#scrubber'), function(position, actuated){
 				if (player.current) {
-					player.current.setPosition(position * player.current.duration);
+					player.current.setPosition(position * (player.loaded ? player.current.duration : player.current.durationEstimate));
 				}
 			});
 	
@@ -402,8 +402,14 @@ distro.player = new (function(){
 		}
 		function onwhileplaying(){
 			currentTime.data = distro.util.formatTime(Math.floor(this.position/1000));
-			totalTime.data = distro.util.formatTime(Math.floor(this.duration/1000));
-			slider.setPosition(this.position/this.duration);
+			updateSlider();
+		}
+		function onwhileloading(){
+			totalTime.data = distro.util.formatTime(Math.floor(this.durationEstimate/1000));
+			updateSlider();
+		}
+		function updateSlider(){
+			slider.setPosition(player.current.position/(player.loaded ? player.current.duration : player.current.durationEstimate));
 		}
 		this.play = function(track){
 			if (!soundManager.ok()) {
@@ -414,6 +420,7 @@ distro.player = new (function(){
 				this.stop();
 			}
 			if (track && track.attributes.network && track.attributes.filename) {
+				this.loaded = false;
 				this.current = soundManager.createSound({
 					id: "track",
 					url: "//distro-music.s3.amazonaws.com/" + track.get('network') + "/" + track.get('filename') + ".mp3",
@@ -422,7 +429,18 @@ distro.player = new (function(){
 					onpause: onpause,
 					onstop: onstop,
 					onfinish: onfinish,
-					whileplaying: onwhileplaying
+					whileplaying: onwhileplaying,
+					whileloading: onwhileloading,
+					onload: function(success){
+						if (success) {
+							this.loaded = true;
+							totalTime.data = distro.util.formatTime(Math.floor(this.duration/1000));
+							updateSlider();
+						} else {
+							alert(distro.loc.str('player.errors.loadFail'));
+							player.stop();
+						}
+					}
 				}).play();
 				distro.library.trackListView.setPlaying(track);
 			}

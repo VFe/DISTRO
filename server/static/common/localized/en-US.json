@@ -36,5 +36,10 @@
 	},
 	"findNetworks": {
 		"placeholder": "Search for a network"
+	},
+	"player": {
+		"errors": {
+			"loadFail": "Oh, bother! It looks like there was a problem loading this track. Please try again, and let us know if this error keeps happening."
+		}
 	}
 }
