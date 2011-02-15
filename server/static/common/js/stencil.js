@@ -9,7 +9,7 @@
 			if ('$join' in template) {
 				return stencil(template.$join, data).join(template.$separator || '');
 			} else if ('$or' in template) {
-				template = stencil(template, data);
+				template = stencil(template.$or, data);
 				for(var i = 0, l = template.length; i < l; i++){
 					if (template[i]) {
 						return template[i];
