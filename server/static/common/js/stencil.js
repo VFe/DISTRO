@@ -27,7 +27,16 @@
 			} else if ('$template' in template) {
 				return [stencil(template.$template, ('$key' in template) ? data[template.$key] : data)];
 			} else if ('$children' in template) {
-				return $.map(template.$key === "" ? data : data[template.$key], function(item){
+				data = template.$key ? data[template.$key] : data;
+				if ($.isPlainObject(data)) {
+					var key, childTemplate = template.$children;
+					template = [];
+					for (key in data) {
+						template.push(stencil(childTemplate, data[key], key));
+					}
+					return template;
+				}
+				return $.map(data, function(item){
 					return [stencil(template.$children, item)];
 				});
 			} else if ('$key' in template) {
