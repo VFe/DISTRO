@@ -135,7 +135,7 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', { key: 'id' }, ['.subscriptionControls', ['.delete', 'X'], ['.mute', 'M'], ['.solo', 'S']]]
+		['.subscription', { $key: 'id' }, ['.subscriptionControls', ['.delete', 'X'], ['.mute', 'M'], ['.solo', 'S']]]
 	],
 	events: {
 		"click .delete": "delete",
@@ -195,7 +195,7 @@ distro.library.trackListView = new (Backbone.View.extend({
 
 distro.library.TrackView = Backbone.View.extend({
 	tagName: 'tr',
-	template: [['%td', { key: 'name' }], ['%td'], ['%td'], ['%td', { key: 'network' }]],
+	template: [['%td', { $key: 'name' }], ['%td'], ['%td'], ['%td', { $key: 'network' }]],
 	events: {
 		"dblclick": "play"
 	},
@@ -502,35 +502,35 @@ distro.loadLandingPage = function(name, callback){
 					$content.stencil(["%form", {},
 						[".lightboxHeader",
 							["%span.close.button", {}, "x"],
-							["%h1","^", { key: 'name' }, "^"]
+							["%h1","^", { $key: 'name' }, "^"]
 						],
 						[".contentBox",
 							[".content.leftContent",
-								["%img.photo",{src: {key: 'name', handler: function(){ return "http://distro-images.s3.amazonaws.com/"+this+".jpg" }}, width:"500", height:"335"}],
+								["%img.photo",{src: {$join: ["http://distro-images.s3.amazonaws.com/",{$key:"name"},".jpg"]}, width:"500", height:"335"}],
 								["%span.caption",{style:"color: rgb(119, 119, 119);"},
-									{key:"photoCred", conditional: ["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
-										["%a",{key:"photoCredURL", conditional: {target:"_blank", href:{ key: "photoCredURL"}, style:"text-decoration:none;"}}, { key: "photoCred"}]
+									{$test: {$key:"photoCred"}, $if:["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
+										["%a",{$key:"photoCredURL", $test: {target:"_blank", href:{ $key: "photoCredURL"}, style:"text-decoration:none;"}}, { $key: "photoCred"}]
 									]},
-									["#location", {key: "location", template:[
-										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { key: "streetAddress"}],
-										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0.25em; margin-left: 0em;"}, { key: "citystate"}, " ", {key:"zip"}],
-										{key:"country", conditional: ["%p",{style:"margin-top:0px;"}, { key: "country"}]}
+									["#location", {$key: "location", $template:[
+										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { $key: "streetAddress"}],
+										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0.25em; margin-left: 0em;"}, { $key: "citystate"}, " ", {$key:"zip"}],
+										{$test: {$key:"country"}, $if:["%p",{style:"margin-top:0px;"}, { $key: "country"}]}
 									]}, 
-									{key:"map", conditional: ["%a#mapLink", {target:"_blank", href:{key:"map"}}, "MAP"]}]
+									{$test: {$key:"map"}, $if:["%a#mapLink", {target:"_blank", href:{$key:"map"}}, "MAP"]}]
 								],
 								["%span#artist",{style:"font-size:36px;"},
-									["%p",{style:"margin-top: 0.17em; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { key: "fullname"}]
+									["%p",{style:"margin-top: 0.17em; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"}, { $key: "fullname"}]
 								]
 							],
 							[".rightContent",
-								{ key: 'presence', conditional: [".presence",
-									["%ul.presence", {key: "email", conditional: ["%li.email", ["%a", {target:"_blank"}]]}, { key: 'presence', children: [
-										['%li', { 'class': { key: 'name' } }, ['%a', { target:"_blank", href: { key: 'url' } }]]
+								{$test: {$or: [{$key: 'presence'}, {$key:'email'}]}, $if: [".presence",
+									["%ul.presence", {$test: {$key: "email"}, $if:["%li.email", ["%a", {target:"_blank"}]]}, { $key: 'presence', $children: [
+										['%li', { 'class': { $key: 'name' } }, ['%a', { target:"_blank", href: { $key: 'url' } }]]
 									] } ]
 								] },
 								["%div", {style:"height: 1em; background-color: #212121;"}],
-								[".content", {key: "calendarGoogle", conditional: ["%iframe#calFrame", {frameborder: "0", src: {key:"calendarGoogle", handler: function(){ return "http://google.com/"+this+"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000";}}}]}],
-								[".subscribeButton", { 'class': { key:'', handler: function(){ return subscribed ? 'disabled' : '' } }, type: "button", $:{$:function(){ $subscribeButton = this }}}, [".label"], "^", { key: 'name' }, "^"]
+								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$key:"calendarGoogle", $handler: function(){ return "http://google.com/"+this+"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000";}}}]}],
+								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : '' } }, type: "button", $:{$:function(){ $subscribeButton = this }}}, [".label"], "^", { $key: 'name' }, "^"]
 							]
 						]
 					], model.attributes);
