@@ -120,56 +120,6 @@ Do.chain(
 					util.error('['+name+'] '+err.message+", not imported");
 					process.nextTick(nextRecord);
 				});
-				
-				
-				
-				// for (key in doc){
-				// 	var mapping = keys[key], property = doc[key], out = '';
-				// 	try{
-				// 		//util.debug(key + " " + doc[key]);
-				// 		if (!(mapping = keys[key])) {
-				// 			throw new Error('Unknown key: '+key+' : '+property);
-				// 		}
-				// 		if (mapping.host) { // If this key a URL
-				// 			var canonicalURL = property.replace(urlLeaderRegExp, "http://$1"),
-				// 				parsed = url.parse(canonicalURL), path;
-				// 			if (!parsed || !parsed.host || !parsed.pathname) {
-				// 				throw new Error('Failed to parse '+key+' : '+property+' as a URL');
-				// 			}
-				// 			if (parsed.host !== mapping.host) {
-				// 				throw new Error('Unexpected hostname on '+key+' : '+property);
-				// 			}
-				// 			if (mapping.hashable && parsed.pathname === '/' && parsed.hash) {
-				// 				path = parsed.hash.substring((parsed.hash.indexOf('#!') === 0) ? 2 : 1);
-				// 			} else {
-				// 				path = parsed.pathname;
-				// 			}
-				// 			out += path.replace(leadingSlashRegExp, '$1');
-				// 			if (mapping.qs && parsed.search) {
-				// 				out += parsed.search;
-				// 			}
-				// 		} else {
-				// 			out = property.toString();
-				// 		}
-				// 		if (mapping.regexp) {
-				// 			var match = out.match(mapping.regexp);
-				// 			if (match && match.length === 2) {
-				// 				out = match[1];
-				// 			} else {
-				// 				throw new Error('Didn\'t match regexp '+key+' : '+util.inspect(property));
-				// 			}
-				// 		}
-				// 		(mapping.object ? record[mapping.object] : record)[mapping.newName] = out;
-				// 	}catch(e){
-				// 		util.error('['+doc.NETWORK_NAME+'] '+e.message+"\n");
-				// 	}
-				// }
-				// record.lname = record.name.toLowerCase();
-				// record.lfullname = record.fullname.toLowerCase();
-				// exportColl.update({"name":record.name}, {$set: record}, {upsert:true}, function(err){
-				// 	if(err) util.log(new Error(err));
-				// 	process.nextTick(nextRecord);
-				// });
 			});
 		}());
 	});
