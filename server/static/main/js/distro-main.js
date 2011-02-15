@@ -601,6 +601,7 @@ distro.Router = Backbone.Controller.extend({
 		});
 	},
 	find: function(){
+		var $keypress;
 		distro.lightbox.show({
 			name: "find",
 			longName: "Find a network",
@@ -632,7 +633,7 @@ distro.Router = Backbone.Controller.extend({
 					}
 					$field.removeClass('focus');
 				});
-				$text.keydown(function(e){
+				$text.keypress(function(e){
 					var search;
 					if (e.keyCode === 13){
 						if ((search = $text.text())) {
@@ -644,6 +645,17 @@ distro.Router = Backbone.Controller.extend({
 						return false;
 					}
 				})
+				$(window.document).keypress(function(event){
+					$text.focus(); 
+					$keypress = event;
+					if(event.target !== $text[0]){
+						$text.trigger(event);
+					}
+					console.log("focus on");
+				});
+			},
+			hide: function(){
+				$(window.document).unbind($keypress);
 			}
 		});
 	},
