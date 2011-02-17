@@ -603,7 +603,7 @@ distro.Router = Backbone.Controller.extend({
 	find: function(){
 		(function ($) {
 		   var original = $.fn.val;
-		   $.fn.val = function() { console.log('accessed');
+		   $.fn.val = function() {
 			  if ($(this).is('[contenteditable=plaintext-only]')) {
 				 return $.fn.text.apply(this, arguments);
 			  };
@@ -660,7 +660,6 @@ distro.Router = Backbone.Controller.extend({
 					if(event.target !== $text[0]){
 						$text.trigger(event);
 					}
-					console.log("focus on");
 				});
 				$('.text').autocomplete({source: function(request, response){
 					distro.request('search/'+request.term, 'GET', null, new Hollerback({
