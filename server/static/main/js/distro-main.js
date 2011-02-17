@@ -601,6 +601,15 @@ distro.Router = Backbone.Controller.extend({
 		});
 	},
 	find: function(){
+		(function ($) {
+		   var original = $.fn.val;
+		   $.fn.val = function() { console.log('accessed');
+			  if ($(this).is('[contenteditable=plaintext-only]')) {
+				 return $.fn.text.apply(this, arguments);
+			  };
+			  return original.apply(this, arguments);
+		   };
+		})(jQuery);
 		var $keypress;
 		distro.lightbox.show({
 			name: "find",
@@ -653,6 +662,11 @@ distro.Router = Backbone.Controller.extend({
 					}
 					console.log("focus on");
 				});
+				$('.text').autocomplete({source: function(request, response){
+					distro.request('search/'+request.term, 'GET', null, new Hollerback({
+						success: function(data){ console.log(data); response(data)}
+					}));
+				}})
 			},
 			hide: function(){
 				$(window.document).unbind($keypress);

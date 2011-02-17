@@ -49,7 +49,16 @@ Networks.prototype.search = function(name, callback){
 		if(err){
 			callback(err, null);
 		} else{
-			cursor.toArray(callback);
+			cursor.toArray(function(err, cursorArray){
+				cursorArray.forEach(function(data){
+					data.value = data.name; 
+					data.label = data.fullname;
+					delete data.name;
+					delete data.fullname;
+				});
+				console.log(cursorArray);
+				callback(null, cursorArray);
+			});
 		}
 	});
 };
