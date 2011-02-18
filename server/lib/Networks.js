@@ -56,7 +56,6 @@ Networks.prototype.search = function(name, callback){
 					delete data.name;
 					delete data.fullname;
 				});
-				console.log(cursorArray);
 				callback(null, cursorArray);
 			});
 		}
