@@ -527,7 +527,7 @@ distro.loadLandingPage = function(name, callback){
 								["%img.photo",{src: {$join: ["http://distro-images.s3.amazonaws.com/",{$key:"name"},".jpg"]}, width:"500", height:"335"}],
 								["%span.caption",{style:"color: rgb(119, 119, 119);"},
 									{$test: {$key:"photoCred"}, $if:["%p", {style:"margin-top:0px; margin-right: 0.25em; margin-bottom: 0px; margin-left:0px; text-align: right; float:right;"}, "Photo by ",
-										["%a",{$key:"photoCredURL", $test: {target:"_blank", href:{ $key: "photoCredURL"}, style:"text-decoration:none;"}}, { $key: "photoCred"}]
+										["%a", {$test:{$key:"photoCredURL"}, $if:{target:"_blank", href:{$key: "photoCredURL"}}, style:"text-decoration:none;"}, { $key: "photoCred"}]
 									]},
 									["#location", {$key: "location", $template:[
 										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { $key: "streetAddress"}],
