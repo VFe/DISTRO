@@ -686,7 +686,7 @@ distro.Router = Backbone.Controller.extend({
 				});
 				$('.text').autocomplete({source: function(request, response){
 					distro.request('search/'+request.term, 'GET', null, new Hollerback({
-						success: function(data){ console.log(data); response(data)}
+						success: function(data){response(data)}
 					}));
 				}})
 			},
@@ -791,6 +791,8 @@ distro.init(function(){
 			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)] : distro.library.trackListView.relativeSelection(-1));
 		} else if(e.keyCode == 40){
 			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[0] : distro.library.trackListView.relativeSelection(1));
+		} else if(e.keyCode == 32 || e.keyCode == 13){
+			distro.player.play(distro.library.trackListView.relativeSelection(0));
 		}
 	});	
 });
