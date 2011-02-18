@@ -189,6 +189,7 @@ distro.library.trackListView = new (Backbone.View.extend({
 		this.playingTrack = track;
 	},
 	setSelected: function(track){
+		this.prevSelect = this.selectedTrack;
 		if(this.selectedTrack){
 			this.selectedTrack.view.setSelected(false);
 		}
@@ -199,6 +200,9 @@ distro.library.trackListView = new (Backbone.View.extend({
 	},
 	relativeTrack: function(shift){
 		return this.playingTrack && this.collection.models[this.collection.indexOf(this.playingTrack) + shift];
+	},
+	relativeSelection: function(shift){
+		return this.selectedTrack && this.collection.models[this.collection.indexOf(this.selectedTrack) + shift];
 	}
 }))({ collection: distro.library.tracks });
 
@@ -230,6 +234,9 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	select: function(){
 		distro.library.trackListView.setSelected(this.model);
+	},
+	moveSelection: function(){
+		this.setSelected(distro.library.trackListView.relativeSelection(1));
 	}
 });
 
@@ -777,4 +784,13 @@ distro.init(function(){
 	distro.library.refresh(function(){
 		Backbone.history.start();
 	});
+	$(document).keydown(function(e){
+		//up 38 down 40
+		var emptySelection = !distro.library.trackListView.selectedTrack;
+		if(e.keyCode == 38){
+			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)] : distro.library.trackListView.relativeSelection(-1));
+		} else if(e.keyCode == 40){
+			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[0] : distro.library.trackListView.relativeSelection(1));
+		}
+	});	
 });
