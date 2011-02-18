@@ -188,6 +188,15 @@ distro.library.trackListView = new (Backbone.View.extend({
 		}
 		this.playingTrack = track;
 	},
+	setSelected: function(track){
+		if(this.selectedTrack){
+			this.selectedTrack.view.setSelected(false);
+		}
+		if(track) {
+			track.view.setSelected(true);
+		}
+		this.selectedTrack = track;
+	},
 	relativeTrack: function(shift){
 		return this.playingTrack && this.collection.models[this.collection.indexOf(this.playingTrack) + shift];
 	}
@@ -197,7 +206,8 @@ distro.library.TrackView = Backbone.View.extend({
 	tagName: 'tr',
 	template: [['%td', { $key: 'name' }], ['%td'], ['%td'], ['%td', { $key: 'network' }]],
 	events: {
-		"dblclick": "play"
+		"dblclick": "play",
+		"click": "select"
 	},
 	initialize: function() {
 		_.bindAll(this, 'render', 'setPlaying', 'play');
@@ -214,6 +224,12 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	play: function(){
 		distro.player.play(this.model);
+	},
+	setSelected: function(selected){
+		this.$el[selected ? 'addClass' : 'removeClass']('selected');
+	},
+	select: function(){
+		distro.library.trackListView.setSelected(this.model);
 	}
 });
 
