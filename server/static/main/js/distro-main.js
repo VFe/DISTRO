@@ -785,7 +785,7 @@ distro.init(function(){
 		Backbone.history.start();
 	});
 	$(document).keydown(function(e){
-		//up 38 down 40
+		//{up:38, down:40, left:37, right:39}
 		var emptySelection = !distro.library.trackListView.selectedTrack;
 		if(e.keyCode == 38){
 			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)] : distro.library.trackListView.relativeSelection(-1));
@@ -797,6 +797,18 @@ distro.init(function(){
 			} else{
 				distro.player.play(distro.library.trackListView.relativeSelection(0));
 			}
+		} else if(e.keyCode == 37){
+			if (distro.player.current) {
+				if (distro.player.current.position > 1000) {
+					distro.player.current.setPosition(0);
+				} else {
+					distro.player.previous();
+				}
+			}
+		} else if(e.keyCode == 39){
+			if (distro.player.current) {
+				distro.player.next();
+			}	
 		}
 	});	
 });
