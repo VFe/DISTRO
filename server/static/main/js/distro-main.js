@@ -567,7 +567,7 @@ distro.loadLandingPage = function(name, callback){
 								{$test: {$or: [{$key: 'presence'}, {$key:'email'}]}, $if: [".presence",
 									["%ul.presence", {$test: {$key: "email"}, $if:["%li.email", ["%a", {target:"_blank"}],
 										["%ul.emailList", {style:"display:none; position: absolute; padding: 0 .5em; background-color: white; list-style:none;"}, {$key: "email", $children: 
-											["%li", {class: {$key:"."}, style:"margin: 0px 1em;"}, 
+											["%li", {'class': {$key:"."}, style:"margin: 0px 1em;"}, 
 												["%a", {href: {$join: ["mailto:",{$key:""}]}, title:{$key:""}}, {$key:"."}]]}]]}, { $key: 'presence', $children: [
 										['%li', { 'class': { $key: 'name' } }, ['%a', { target:"_blank", href: { $key: 'url' } }]]
 									] }],
