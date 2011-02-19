@@ -792,7 +792,11 @@ distro.init(function(){
 		} else if(e.keyCode == 40){
 			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[0] : distro.library.trackListView.relativeSelection(1));
 		} else if(e.keyCode == 32 || e.keyCode == 13){
-			distro.player.play(distro.library.trackListView.relativeSelection(0));
+			if(distro.library.trackListView.relativeSelection(0) && distro.library.trackListView.relativeSelection(0) == distro.library.trackListView.playingTrack){
+				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
+			} else{
+				distro.player.play(distro.library.trackListView.relativeSelection(0));
+			}
 		}
 	});	
 });
