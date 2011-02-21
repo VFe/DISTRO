@@ -1,26 +1,46 @@
-# f4adf54d636433d0881ff4b86e9049a587597855 #
+# ef733e23d9fbd548aacb27825e08478fb30f4962
 
-Good stuff. I know the you're not finished with band landing pages, just keep this in mind for later:
+- **[bad bug]** Line 658: `$keypress` is only defined once a key has been pressed.
 
-- Try distro.lightbox instead of modifying $('#lightbox') directly. It's not much now, but will be needed later and I want to give its API a workout. API looks like this right now (`hide` is optional):
+# 73b178bd674bd2f1e2b93c1084e2f0361fefa33e
 
-      distro.lightbox.show({
-      	show: function(lightbox){
-      		/* set up */
-      		lightbox.$lightbox.haml(/* … */);
-      	},
-      	hide: function(lightbox){
-      		/* clean up */
-      	}
-      });
+- **[bug]** Lines 52-61: No error handling
+- **[suggestion]** Lines 52-61: `[].map` is more appropriate:
 
-# a2edcee156c4c47e69da8c947bfb2da7880dd044 #
+        cursor.toArray(function(err, cursorArray){
+        	callback(null, cursorArray.map(function(item){
+        		return({ label: item.fullname, value: item.name });
+        	}));
+        });
 
-- You should use distro.request instead of $.get; it has error handling (like 500s) and state handling (like session expiration)
+- **[bug]** Lines 604-612: `$.fn.val` gets another layer of wrapping every time the `find` route is accessed.
 
+# 243733d3b31fc400545619544aebe3a5eae8ec61
 
-# f4b533bc74c0f99ff46e0f099d41e6920c553e6f #
+- **[bug]** no escaping of text made into regexp… let's talk about this
 
-- I think classes work better than ids for presence; they can be scoped to the presence ul.
-- When this thing is closer to working, try using stencil to iterate through presence and only render the ones in the doc
-- distro.lightbox handles fade in.
+# 805b5cc33e01f0c3a78af1f79e831091fd5dd28d
+
+- Styling should be done in style sheet
+
+# bb2fd4b0ce10613c4d96f593fe18fefbeb66b5db
+
+- Doesn't behave like it should. Selection should stop at the ends, not deselect and wrap around. You should be able to deselect by clicking on empty space (i.e. the filler row) or by meta-clicking the selected row.
+
+# d519196d6bc499f3ed7317a0de1de2cc8c3a67a0
+
+- Line 192: stillborn code
+- Lines 237-239: stillborn code
+- [suggestion] I had something like this in the demo. You'll notice that the `musicTableBodyContainer` has a tabindex, and the selection CSS "greys out" the selection when it isn't focused. So, maybe try binding to the `musicTableBodyContainer` instead of the document. That way arrow keys will "just work" as far as not working when a lightbox is visible. Let's talk about it, there may be cases where this solution isn't ideal.
+- Selecting (with the keyboard) a row that's out of view should scroll the table to bring it in view
+- [bug] Lines 787-795: up/down arrow handlers don't `preventDefault` on the event, so if the table has a scollbar, they will scroll it up and down (as is the browser's default behavior) *and* change the selection
+
+# fb703052301fe4619a5517175d8223974af7d4b0 / a61e307ed23002192a6010c230ba6acd0d4096b5
+
+- Pressing the space bar should play/pause the current track, not switch to a different track. When the selected track === the current track, pressing enter should play it from the beginning (or do nothing, maybe), not pause it (see iTunes).
+
+# cf5d7673b4bf4f0e8057fc33baa1dc3a22257955
+
+- Some hotkeys *should* keep working when we're in a lightbox. (Talk to me about this, not high priority, obv.)
+
+Everything else looks OK. Great work!
