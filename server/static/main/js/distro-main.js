@@ -787,6 +787,8 @@ distro.init(function(){
 	$(document).keydown(function(e){
 		//{up:38, down:40, left:37, right:39}
 		var emptySelection = !distro.library.trackListView.selectedTrack;
+		if (distro.lightbox.content) { return; } //Don't handle hotkeys if we're in a lightbox.
+
 		if(e.keyCode == 38){
 			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)] : distro.library.trackListView.relativeSelection(-1));
 		} else if(e.keyCode == 40){
