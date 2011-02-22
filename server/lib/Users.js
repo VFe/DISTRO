@@ -110,7 +110,7 @@ Users.prototype.tracks = function(user, callback){
 					track.artistNetwork = networkProxies.create(track.artistNetwork);
 				}
 				if (track.performance && track.performance.venue) {
-					track.performance.venue.artistNetwork = networkProxies.create(track.performance.venue);
+					track.performance.venue = networkProxies.create(track.performance.venue);
 				}
 			});
 			networkProxies.resolve(function(err){
