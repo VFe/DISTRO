@@ -456,7 +456,7 @@ distro.player = new (function(){
 				this.loaded = false;
 				this.current = soundManager.createSound({
 					id: "track",
-					url: "//distro-music.s3.amazonaws.com/" + track.get('network') + "/" + track.get('filename') + ".mp3",
+					url: "//distro-music.s3.amazonaws.com/" + track.get('network').name + "/" + track.get('filename') + ".mp3",
 					onplay: onplay,
 					onresume: onplay,
 					onpause: onpause,
