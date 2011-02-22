@@ -672,7 +672,7 @@ distro.Router = Backbone.Controller.extend({
 			  return original.apply(this, arguments);
 		   };
 		})(jQuery);
-		var $keypress;
+		var keypressHandler;
 		distro.lightbox.show({
 			name: "find",
 			longName: "Find a network",
@@ -716,9 +716,8 @@ distro.Router = Backbone.Controller.extend({
 						return false;
 					}
 				})
-				$(window.document).keypress(function(event){
+				$(window.document).keypress(keypressHandler = function(event){
 					$text.focus(); 
-					$keypress = event;
 					if(event.target !== $text[0]){
 						$text.trigger(event);
 					}
@@ -730,7 +729,7 @@ distro.Router = Backbone.Controller.extend({
 				}})
 			},
 			hide: function(){
-				$(window.document).unbind($keypress);
+				$(window.document).unbind('keypress', keypressHandler);
 			}
 		});
 	},
