@@ -76,7 +76,7 @@ distro.library = {
 			return model.attributes.name;
 		},
 		isSubscribed: function(networkName){
-			return this.any(function(subscription){ return subscription.id === networkName });
+			return this.any(function(subscription){ return subscription.attributes.name === networkName });
 		}
 	})),
 	tracks: new (Backbone.Collection.extend({
@@ -135,7 +135,7 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', { $key: 'id' }, ['.subscriptionControls', ['.delete', 'X'], ['.mute', 'M'], ['.solo', 'S']]]
+		['.subscription', ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.delete', 'X']]]
 	],
 	events: {
 		"click .delete": "delete",
@@ -591,7 +591,7 @@ distro.loadLandingPage = function(name, callback){
 					], model.attributes);
 					$subscribeButton.click(function(){
 						if (!subscribed) {
-							distro.library.subscriptions.create({name:model.name}, {
+							distro.library.subscriptions.create({ name:model.name, fullname: model.get('fullname') }, {
 								success: function(){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');

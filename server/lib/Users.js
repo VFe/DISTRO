@@ -82,9 +82,13 @@ Users.prototype.subscribeToNetwork = function(user, networkID, callback){
 	});
 };
 Users.prototype.subscriptions = function(user, callback){
-	var networkProxies = new Networks.ProxySet, subscriptions;
+	var networkProxies = new Networks.ProxySet, subscriptionNetworks = {};
 	user.subscriptions.forEach(function(subscription) {
-		networkProxies.create(subscription.network);
+		var idString = subscription.network.toHexString();
+		if ( ! (idString in subscriptionNetworks)) {
+			networkProxies.create(subscription.network);
+			subscriptionNetworks[idString] = true;
+		}
 	});
 	networkProxies.resolve(function(err){
 		if (err) {

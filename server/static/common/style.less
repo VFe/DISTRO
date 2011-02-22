@@ -374,10 +374,6 @@ table{
 }
 #musicTableBody{
 	height: 100%;
-	a {
-		text-decoration: none;
-		color: #028;
-	}
 }
 #musicTableBody tr.playing{
 	font-weight: bold;
@@ -397,6 +393,11 @@ table{
 	cursor: default;
 	.button;
 }
+#musicTableBody a, #subscriptionsTable a {
+	text-decoration: none;
+	color: #028;
+}
+
 #musicTableBodyContainer td, #subscriptionsTable td{
 	padding: 0 0.5em;
 	line-height: 2em;
@@ -440,7 +441,7 @@ table{
 	width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	padding: 0 4em 0 2.5em;
+	padding: 0 0 0 2.5em;
 	position: relative;
 	white-space: nowrap;
 	.border-box;
