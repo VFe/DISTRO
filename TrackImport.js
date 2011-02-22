@@ -1,4 +1,4 @@
-var Do = require('do'),
+var Do = require('Do'),
     mongoDB = require('mongodb'),
 	util = require('util'),
 	url = require('url');
@@ -32,7 +32,11 @@ Do.chain(
 	var importColl = collections[0], exportColl = collections[1], networksColl = collections[2];
 	
 	function makeDate(datestring){ return function(cb){
-		cb(new Date(datestring));
+		if(datestring){
+			cb(new Date(datestring));
+		} else {
+			cb(null);
+		}
 	}}
 	function resolveNetwork(name){ return function(callback, errback) {
 		networksColl.findOne({ name: name }, { fields: { _id : 1 } }, function(err, network){ if (err) { errback(err) } else {
@@ -48,7 +52,7 @@ Do.chain(
 			"Timestamp": {newName:"timestamp", handler: makeDate},
 			"ARTIST NETWORK": {newName:"artistNetwork", handler: resolveNetwork},
 			"ARTIST NAME": {newName:"artist"},
-			"PERFORMANCE DATE": {newName:"date", object:"performance"},
+			"PERFORMANCE DATE": {newName:"date", object:"performance", handler: makeDate},
 			"SONG NAME": {newName:"name", required: true},
 			"NETWORK BROADCASTING": {newName:"network", handler: resolveNetwork},
 			"BROADCAST DATE": {newName: "release", handler: makeDate},
