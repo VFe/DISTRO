@@ -424,7 +424,6 @@ table{
 	text-transform: uppercase;
 }
 #musicTableBodyContainer, #subscriptionsTableBodyContainer{
-	height: 100%;
 	overflow-y: auto;
 }
 #musicTableBodyContainer table, #subscriptionsTable{
@@ -433,6 +432,10 @@ table{
 }
 #subscriptionsTable{
 	table-layout: fixed;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: @subscriptionPaneWidth - 1em;
 }
 #subscriptionsTable{
 	.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.2), 2em);
