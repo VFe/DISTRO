@@ -1,6 +1,8 @@
 var CollectionManager = require('./lib/CollectionManager'),
     crypto = require('crypto'),
-    error = require('./error');
+    error = require('./error'),
+    Networks = require('./Networks')
+;
 
 function Users(){ require('./init').add(this); }
 module.exports = Users;
@@ -80,23 +82,15 @@ Users.prototype.subscribeToNetwork = function(user, networkID, callback){
 	});
 };
 Users.prototype.subscriptions = function(user, callback){
-	var subscribedNetworkIdMap = {};
+	var networkProxies = new Networks.ProxySet, subscriptions;
 	user.subscriptions.forEach(function(subscription) {
-		subscribedNetworkIdMap[subscription.network.toHexString()] = subscription.network;
+		networkProxies.create(subscription.network);
 	});
-	subscribedNetworkIds = [];
-	for (var id in subscribedNetworkIdMap) {
-		subscribedNetworkIds.push(subscribedNetworkIdMap[id]);
-	}
-	global.networks.batchNetworkNameFromId(subscribedNetworkIds, function(err, networkMap){
+	networkProxies.resolve(function(err){
 		if (err) {
 			callback(err, null);
 		} else {
-			var subscriptions = [];
-			for (var id in networkMap){
-				subscriptions.push({id: networkMap[id]});
-			}
-			callback(null, subscriptions);
+			callback(null, networkProxies.proxies);
 		}
 	});
 }
@@ -105,33 +99,20 @@ Users.prototype.tracks = function(user, callback){
 		if (err) {
 			callback(err, null);
 		} else {
-			var trackNetworkIdMap = {};
+			var networkProxies = new Networks.ProxySet;
 			tracks.forEach(function(track) {
-				trackNetworkIdMap[track.network.toHexString()] = track.network;
+				track.network = networkProxies.create(track.network);
 				if (track.artistNetwork) {
-					trackNetworkIdMap[track.artistNetwork.toHexString()] = track.artistNetwork;
+					track.artistNetwork = networkProxies.create(track.artistNetwork);
 				}
 				if (track.performance && track.performance.venue) {
-					trackNetworkIdMap[track.performance.venue.toHexString()] = track.performance.venue;
+					track.performance.venue.artistNetwork = networkProxies.create(track.performance.venue);
 				}
 			});
-			trackNetworkIds = [];
-			for (var id in trackNetworkIdMap) {
-				trackNetworkIds.push(trackNetworkIdMap[id]);
-			}
-			global.networks.batchNetworkNameFromId(trackNetworkIds, function(err, networkMap){
+			networkProxies.resolve(function(err){
 				if (err) {
 					callback(err, null);
 				} else {
-					tracks.forEach(function(track){
-						track.network = networkMap[track.network.toHexString()] || '';
-						if (track.artistNetwork) {
-							track.artistNetwork = networkMap[track.artistNetwork.toHexString()] || '';
-						}
-						if (track.performance && track.performance.venue) {
-							track.performance.venue = networkMap[track.performance.venue.toHexString()] || '';
-						}
-					});
 					callback(null, tracks);
 				}
 			});

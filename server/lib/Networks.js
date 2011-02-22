@@ -7,13 +7,13 @@ Networks.prototype.constructor = Networks;
 Networks.collectionName = 'networks';
 
 Networks.prototype.batchNetworkNameFromId = function(ids, callback){
-	this.collection.find({ _id: { $in: ids } }, function(err, cursor){
+	this.collection.find({ _id: { $in: ids } }, { fields: { name: 1, fullname: 1 } }, function(err, cursor){
 		var networks = {};
 		cursor.each(function(err, network){
 			if (err) {
 				callback(err, null);
 			} else if (network) {
-				networks[network._id.toHexString()] = network.name;
+				networks[network._id.toHexString()] = { name: network.name, fullname: network.fullname };
 			} else {
 				callback(null, networks);
 			}
@@ -77,3 +77,51 @@ Networks.PRESENCE = [
 	{ name: "facebook", prefix: "http://www.facebook.com/" },
 	{ name: "bandcamp", prefix: "http://", suffix:".bandcamp.com/" }
 ];
+
+// Abstract away resolving network names and full names for output
+Networks.Proxy = function(id){
+	this.id = id;
+}
+
+Networks.Proxy.prototype.toJSON = function(){
+	var obj = {};
+	if (this.name) { obj.name = this.name; }
+	if (this.fullname) { obj.fullname = this.fullname; }
+	return obj;
+}
+
+Networks.ProxySet = function(){
+	this.proxies = [];
+}
+
+Networks.ProxySet.prototype.push = function(proxy){
+	this.proxies.push(proxy);
+}
+Networks.ProxySet.prototype.create = function(id){
+	var proxy = new Networks.Proxy(id);
+	this.push(proxy);
+	return proxy;
+}
+Networks.ProxySet.prototype.resolve = function(callback){
+	var self = this, networkIdMap = {}, networkIds = [];
+	this.proxies.forEach(function(proxy) {
+		networkIdMap[proxy.id.toHexString()] = proxy.id;
+	});
+	for (var id in networkIdMap) {
+		networkIds.push(networkIdMap[id]);
+	}
+	global.networks.batchNetworkNameFromId(networkIds, function(err, networkMap){
+		if (err) {
+			callback(err, null);
+		} else {
+			self.proxies.forEach(function(proxy){
+				var networkDeets = networkMap[proxy.id.toHexString()];
+				if (networkDeets) {
+					proxy.name = networkDeets.name;
+					proxy.fullname = networkDeets.fullname;
+				}
+			});
+			callback(null, self);
+		}
+	});
+}
