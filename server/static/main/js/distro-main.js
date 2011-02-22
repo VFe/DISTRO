@@ -233,7 +233,10 @@ distro.library.TrackView = Backbone.View.extend({
 				return 'someday';
 			}
 		} }], $separator: ' ' } },
-			['.eventDetails']
+			['.eventDetails', ['.perfDate', {$key:'date', $handler:function(data){return (data.toLocaleDateString() + '\n' + data.toLocaleTimeString())}}], ['.perfVenue', {$key:'venue', $template:[
+				['%a', {href: {$join:['#/', {$key:'name'}]}, title:{$key:'fullname'}}, '^', {$key:'name'}, '^ '],
+				['%span.cityState', {$key:'citystate'}]
+			]}]]
 		]] }, $else: ['%td'] },
 		['%td', ['%a', { href: { $join: ['#/', { $key: 'network', $template: { $key: 'name' } }] } }, { $key: 'network', $template: { $key: 'fullname' } }]]
 	],
