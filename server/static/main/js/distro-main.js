@@ -216,6 +216,9 @@ distro.library.TrackView = Backbone.View.extend({
 			return Math.floor(time / 60) + ':' + (seconds < 10 ? '0' : '') + seconds;
 		} }],
 		['%td', { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }] }, $else: { $key: 'artist' } }],
+		{ $test: { $key: 'performance' }, $if: ['%td', { 'class': 'event' }, ['%div', { class: 'event' },
+			['.eventDetails']
+		]], $else: ['%td'] },
 		['%td', ['%a', { href: { $join: ['#/', { $key: 'network', $template: { $key: 'name' } }] } }, { $key: 'network', $template: { $key: 'fullname' } }]]
 	],
 	events: {

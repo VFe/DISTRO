@@ -385,6 +385,33 @@ table{
 	background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #3e6a97), color-stop(0.5, rgba(0, 0, 0, 0)));
 	background-image: -moz-linear-gradient(45deg, #3e6a97 50%, rgba(0, 0, 0, 0) 50%);
 }
+#musicTableBody td.event{
+	overflow: visible;
+	padding: 0;
+}
+#musicTableBody td.event div.event{
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	background-image: url('http://distro-static.s3.amazonaws.com/music_library/black.png');
+	background-position: center;
+	background-repeat: no-repeat;
+}
+#musicTableBody td.event div.event:not(:hover) .eventDetails{
+	display: none;
+}
+#musicTableBody td.event div.event:hover{
+	background-color: #222;
+}
+#musicTableBody td.event div.event div.eventDetails{
+	position: absolute;
+	right: 100%;
+	background: #222;
+	color: white;
+	.border-radius(0.5em 0 0 0.5em);
+	padding: 0.5em;
+}
 #musicTableBodyContainer:focus tr.selected{
 	background-color: #2576EE;
 	color: white;
