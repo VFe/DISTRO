@@ -44,13 +44,9 @@ Networks.prototype.search = function(name, callback){
 			callback(err, null);
 		} else{
 			cursor.toArray(function(err, cursorArray){
-				cursorArray.forEach(function(data){
-					data.value = data.name; 
-					data.label = data.fullname;
-					delete data.name;
-					delete data.fullname;
-				});
-				callback(null, cursorArray);
+				callback(null, cursorArray.map(function(data){
+					return {value: data.name, label: data.fullname};
+				}));
 			});
 		}
 	});
