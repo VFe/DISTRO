@@ -208,7 +208,16 @@ distro.library.trackListView = new (Backbone.View.extend({
 
 distro.library.TrackView = Backbone.View.extend({
 	tagName: 'tr',
-	template: [['%td', { $key: 'name' }], ['%td'], ['%td'], ['%td', { $key: 'network' }]],
+	template: [
+		['%td', { $key: 'name' }],
+		['%td', { $key: 'time', $handler: function(time){
+			if (!time) { return ''; }
+			var seconds = time % 60;
+			return Math.floor(time / 60) + ':' + (seconds < 10 ? '0' : '') + seconds;
+		} }],
+		['%td', { $test: { $key: 'artistNetwork' }, $if: ['%a', { href: { $join: ['#/', { $key: 'artistNetwork' }] } }, { $key: 'artistNetwork' }], $else: { $key: 'artist' } }],
+		['%td', ['%a', { href: { $join: ['#/', { $key: 'artistNetwork' }] } }, { $key: 'network' }]]
+	],
 	events: {
 		"dblclick": "play",
 		"click": "select"
@@ -232,7 +241,8 @@ distro.library.TrackView = Backbone.View.extend({
 	setSelected: function(selected){
 		this.$el[selected ? 'addClass' : 'removeClass']('selected');
 	},
-	select: function(){
+	select: function(e){
+		if (e.target.tagName === 'A') { return; }
 		distro.library.trackListView.setSelected(this.model);
 	},
 	moveSelection: function(){

@@ -374,6 +374,10 @@ table{
 }
 #musicTableBody{
 	height: 100%;
+	a {
+		text-decoration: none;
+		color: #028;
+	}
 }
 #musicTableBody tr.playing{
 	font-weight: bold;
@@ -390,7 +394,7 @@ table{
 	color: white;
 }
 #musicTableBody tr:not(.filler){
-	cursor: pointer;
+	cursor: default;
 	.button;
 }
 #musicTableBodyContainer td, #subscriptionsTable td{

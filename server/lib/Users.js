@@ -108,6 +108,12 @@ Users.prototype.tracks = function(user, callback){
 			var trackNetworkIdMap = {};
 			tracks.forEach(function(track) {
 				trackNetworkIdMap[track.network.toHexString()] = track.network;
+				if (track.artistNetwork) {
+					trackNetworkIdMap[track.artistNetwork.toHexString()] = track.artistNetwork;
+				}
+				if (track.performance && track.performance.venue) {
+					trackNetworkIdMap[track.performance.venue.toHexString()] = track.performance.venue;
+				}
 			});
 			trackNetworkIds = [];
 			for (var id in trackNetworkIdMap) {
@@ -119,6 +125,12 @@ Users.prototype.tracks = function(user, callback){
 				} else {
 					tracks.forEach(function(track){
 						track.network = networkMap[track.network.toHexString()] || '';
+						if (track.artistNetwork) {
+							track.artistNetwork = networkMap[track.artistNetwork.toHexString()] || '';
+						}
+						if (track.performance && track.performance.venue) {
+							track.performance.venue = networkMap[track.performance.venue.toHexString()] || '';
+						}
 					});
 					callback(null, tracks);
 				}

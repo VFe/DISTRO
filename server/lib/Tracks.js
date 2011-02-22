@@ -49,7 +49,7 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 			// TODO: Invalid subscription, log an error
 		}
 	});
-	this.collection.find({ $or: trackSearches }, { fields: { _id: 0, name: 1, release: 1, network: 1, filename: 1 } }, function(err, cursor){
+	this.collection.find({ $or: trackSearches }, { fields: { _id: 0, name: 1, release: 1, network: 1, filename: 1, artist: 1, artistNetwork: 1, performance: 1, time: 1 } }, function(err, cursor){
 		if (err) {
 			callback(err, null);
 		} else {
