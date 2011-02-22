@@ -86,6 +86,9 @@ distro.library = {
 				if (!(attributes.release instanceof Date)) {
 					attributes.release = new Date(attributes.release);
 				}
+				if (attributes.performance && attributes.performance.date && !(attributes.performance.date instanceof Date)) {
+					attributes.performance.date = new Date(attributes.performance.date);
+				}
 			},
 			initialize: function(){
 				this.validate(this.attributes);
@@ -216,9 +219,22 @@ distro.library.TrackView = Backbone.View.extend({
 			return Math.floor(time / 60) + ':' + (seconds < 10 ? '0' : '') + seconds;
 		} }],
 		['%td', { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }] }, $else: { $key: 'artist' } }],
-		{ $test: { $key: 'performance' }, $if: ['%td', { 'class': 'event' }, ['%div', { class: 'event' },
+		{ $test: { $key: 'performance' }, $if: { $key: 'performance', $template: ['%td', { 'class': 'event' }, ['%div', { 'class': { $join: ['event', { $key: 'date', $handler: function(date){
+			var diff = date - (new Date);
+			if (diff < 0) {
+				return '';
+			} else if (diff < 86400000) { // 24h
+				return 'soonest';
+			} else if (diff < 172800000) { // 48h
+				return 'sooner';
+			} else if (diff < 604800000) { // 1w
+				return 'soon';
+			} else {
+				return 'someday';
+			}
+		} }], $separator: ' ' } },
 			['.eventDetails']
-		]], $else: ['%td'] },
+		]] }, $else: ['%td'] },
 		['%td', ['%a', { href: { $join: ['#/', { $key: 'network', $template: { $key: 'name' } }] } }, { $key: 'network', $template: { $key: 'fullname' } }]]
 	],
 	events: {
