@@ -663,15 +663,6 @@ distro.Router = Backbone.Controller.extend({
 		});
 	},
 	find: function(){
-		(function ($) {
-		   var original = $.fn.val;
-		   $.fn.val = function() {
-			  if ($(this).is('[contenteditable=plaintext-only]')) {
-				 return $.fn.text.apply(this, arguments);
-			  };
-			  return original.apply(this, arguments);
-		   };
-		})(jQuery);
 		var keypressHandler;
 		distro.lightbox.show({
 			name: "find",
@@ -851,4 +842,14 @@ distro.init(function(){
 			}	
 		}
 	});	
+	(function ($) {
+		var original = $.fn.val;
+		$.fn.val = function() {
+			if ($(this).is('[contenteditable=plaintext-only]')) {
+				return $.fn.text.apply(this, arguments);
+			};
+			return original.apply(this, arguments);
+		};
+	})(jQuery);
+
 });
