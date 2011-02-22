@@ -6,26 +6,20 @@ Networks.prototype = new CollectionManager();
 Networks.prototype.constructor = Networks;
 Networks.collectionName = 'networks';
 
-Networks.prototype.batchNetworkNameFromId = function(ids, callback){
-	this.collection.find({ _id: { $in: ids } }, { fields: { name: 1, fullname: 1 } }, function(err, cursor){
+Networks.prototype.batchNetworkFromId = function(ids, callback){
+	this.collection.find({ _id: { $in: ids } }, function(err, cursor){
 		var networks = {};
 		cursor.each(function(err, network){
 			if (err) {
 				callback(err, null);
 			} else if (network) {
-				networks[network._id.toHexString()] = { name: network.name, fullname: network.fullname };
+				networks[network._id.toHexString()] = network;
 			} else {
 				callback(null, networks);
 			}
 		});
 	});
 };
-
-// Networks.prototype.networkNameFromId = function(id, callback){
-// 	this.batchNetworkNameFromId([id], function(err, networks){
-// 		callback(err, (networks ? networks[0] : networks));
-// 	});
-// }
 
 Networks.prototype.findNetworkByName = function(name, options, callback){
 	name = name.toLowerCase();
@@ -79,15 +73,46 @@ Networks.PRESENCE = [
 ];
 
 // Abstract away resolving network names and full names for output
-Networks.Proxy = function(id){
+
+function resolve(path){
+	var context = this;
+	if (!path) { return this; }
+	if (!(path instanceof Array)) { path = path.split('.'); }
+	while ((context = context[path.shift()]) != null && path.length);
+	return context;
+}
+Networks.Proxy = function(id, key){
 	this.id = id;
+	this.data = null;
+	this.key = key || ['name', 'fullname'];
 }
 
 Networks.Proxy.prototype.toJSON = function(){
-	var obj = {};
-	if (this.name) { obj.name = this.name; }
-	if (this.fullname) { obj.fullname = this.fullname; }
-	return obj;
+	return this.data;
+}
+
+Networks.Proxy.prototype.resolve = function(networkDetails){
+	if (networkDetails) {
+		var self = this;
+		function set(key){
+			if (key.constructor === Object) {
+				self.data[key.name] = resolve.call(networkDetails, key.key);
+			} else {
+				self.data[key] = resolve.call(networkDetails, key);
+			}
+		}
+		if (this.key instanceof Array) {
+			this.data = {};
+			this.key.forEach(function(key){
+				if (key === 'location.citystate') {
+					console.log(networkDetails);
+				}
+				set(key);
+			});
+		} else {
+			set(this.key);
+		}
+	}
 }
 
 Networks.ProxySet = function(){
@@ -97,8 +122,8 @@ Networks.ProxySet = function(){
 Networks.ProxySet.prototype.push = function(proxy){
 	this.proxies.push(proxy);
 }
-Networks.ProxySet.prototype.create = function(id){
-	var proxy = new Networks.Proxy(id);
+Networks.ProxySet.prototype.create = function(id, key){
+	var proxy = new Networks.Proxy(id, key);
 	this.push(proxy);
 	return proxy;
 }
@@ -110,16 +135,12 @@ Networks.ProxySet.prototype.resolve = function(callback){
 	for (var id in networkIdMap) {
 		networkIds.push(networkIdMap[id]);
 	}
-	global.networks.batchNetworkNameFromId(networkIds, function(err, networkMap){
+	global.networks.batchNetworkFromId(networkIds, function(err, networkMap){
 		if (err) {
 			callback(err, null);
 		} else {
 			self.proxies.forEach(function(proxy){
-				var networkDeets = networkMap[proxy.id.toHexString()];
-				if (networkDeets) {
-					proxy.name = networkDeets.name;
-					proxy.fullname = networkDeets.fullname;
-				}
+				proxy.resolve(networkMap[proxy.id.toHexString()]);
 			});
 			callback(null, self);
 		}
