@@ -219,7 +219,8 @@ distro.library.TrackView = Backbone.View.extend({
 			return Math.floor(time / 60) + ':' + (seconds < 10 ? '0' : '') + seconds;
 		} }],
 		['%td', { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }] }, $else: { $key: 'artist' } }],
-		{ $test: { $key: 'performance' }, $if: { $key: 'performance', $template: ['%td', { 'class': 'event' }, ['%div', { 'class': { $join: ['event', { $key: 'date', $handler: function(date){
+		{ $test: { $key: 'performance' }, $if: { $test: { $handler: function(track){ return track.performance.date > new Date; } }, $if:
+		{ $key: 'performance', $template: ['%td', { 'class': 'event' }, ['%div', { 'class': { $join: ['event', { $key: 'date', $handler: function(date){
 			var diff = date - (new Date);
 			if (diff < 0) {
 				return '';
@@ -244,8 +245,8 @@ distro.library.TrackView = Backbone.View.extend({
 					['%span.cityState', {$key:'citystate'}]
 				]}]
 			]
-		]] }, $else: ['%td'] },
-		['%td', ['%a', { href: { $join: ['#/', { $key: 'network', $template: { $key: 'name' } }] } }, { $key: 'network', $template: { $key: 'fullname' } }]]
+		]] }, $else: ['%td'] }, $else: ['%td'] },
+		['%td', { $key: 'network', $template: ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'network', $template: { $key: 'fullname' } }]}]
 	],
 	events: {
 		"dblclick": "play",
