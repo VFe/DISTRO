@@ -559,7 +559,7 @@ distro.player = new (function(){
 
 distro.LandingPage = Backbone.Model.extend({
 	initialize: function(opts){
-		this.url = 'networks/' + opts.name;
+		this.url = 'networks/' + encodeURIComponent(opts.name);
 	},
 	set: function(attrs){
 		if (Backbone.Model.prototype.set.apply(this, arguments)) {
@@ -714,7 +714,7 @@ distro.Router = Backbone.Controller.extend({
 					}
 				});
 				$('.text').autocomplete({source: function(request, response){
-					distro.request('search/'+request.term, 'GET', null, new Hollerback({
+					distro.request('search/'+encodeURIComponent(request.term), 'GET', null, new Hollerback({
 						success: function(data){response(data)}
 					}));
 				}})
