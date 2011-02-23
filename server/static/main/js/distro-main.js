@@ -246,7 +246,7 @@ distro.library.TrackView = Backbone.View.extend({
 				]}]
 			]
 		]] }, $else: ['%td'] }, $else: ['%td'] },
-		['%td', { $key: 'network', $template: ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'network', $template: { $key: 'fullname' } }]}]
+		['%td', { $key: 'network', $template: ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]}]
 	],
 	events: {
 		"dblclick": "play",
