@@ -37,6 +37,7 @@ Networks.prototype.findNetworkByName = function(name, options, callback){
 };
 
 Networks.prototype.search = function(name, callback){
+	name = name.replace(/([\^$\\.*+?()[\]{}|])/g, '\\$1');
 	var searchRegex = new RegExp('^' + name.toLowerCase() + '|\\b' + name.toLowerCase(), 'i'),
 		returnData = [];
 	this.collection.find({$or:[{"lfullname":searchRegex},{"lname":searchRegex}]}, { name:1, fullname: 1}, function(err, cursor){
