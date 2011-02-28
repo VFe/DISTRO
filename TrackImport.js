@@ -62,7 +62,7 @@ Do.chain(
 			"IS THIS SONG ON DECK?": {newName: "onDeck", handler: function(onDeck){ return function(cb){ cb((onDeck == "YES") ? [{ start: new Date(0) }] : null) }}},
 			"PERFORMANCE VENUE (VENUE NAME)": {newName: "venue", object: "performance"},
 			"FILENAME": {newName: "filename", required: true},
-			"TIME": {newName: "time", handler: function(timeString){return function(cb){
+			"TIME (LENGTH)": {newName: "time", handler: function(timeString){return function(cb){
 				var split = timeString.split(':');
 				if (split.length = 2) {
 					cb((parseInt(split[0], 10) * 60) + parseInt(split[1], 10));
