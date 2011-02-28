@@ -60,10 +60,10 @@ Sessions.prototype.getRequestSession = function(req, res, callback){
 	}
 };
 Sessions.prototype.endSession = function(sessionID, res, callback){
-	this.collection.remove(sessionID, function(err){
+	attachCookieToResponse("", {expires:new Date(0)}, res); //Destroy Cookie
+	this.collection.remove({ session: sessionID }, function(err){
 		callback(err);
 	});
-	attachCookieToResponse("", {expires:new Date(0)}, res); //Destroy Cookie
 };
 Sessions.prototype.startSessionForUserID = function (userID, extendedSession, req, res, callback){
 	if (!userID) { callback(new Error("startSessionForUserID: null userID")); };
