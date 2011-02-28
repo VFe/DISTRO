@@ -69,7 +69,8 @@ Do.chain(
 				} else {
 					cb(null);
 				}
-			}}} // ,
+			}}},
+			"EXTERNAL EVENT LINK": {newName: "extLink", object:"performance"}
 //			"NOTES": {newName: "notes", object: "performance"}
 	    };
 

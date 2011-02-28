@@ -243,7 +243,8 @@ distro.library.TrackView = Backbone.View.extend({
 				}], ['.perfVenue', {$key:'venue', $template:[
 					['%a', {href: {$join:['#/', {$key:'name'}]}, title:{$key:'fullname'}}, '^', {$key:'name'}, '^ '],
 					['%span.cityState', {$key:'citystate'}]
-				]}]
+				]}],
+				['%a.eventLink', {target:'_blank', href:{$key:extLink}}]
 			]
 		]] }, $else: ['%td'] }, $else: ['%td'] },
 		['%td', { $key: 'network', $template: ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]}]
