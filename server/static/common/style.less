@@ -8,6 +8,7 @@
 @brightBlue: #28aeed;
 @helloGreen: #6CB830;
 @subtleGreen: #ADE356;
+@lightBorder: #666;
 
 .border-radius ( @radius ) {
 	-webkit-border-radius: @radius;
@@ -188,12 +189,6 @@ tr.filler>td{
 	top: 0;
 	width: @subscriptionPaneWidth;
 }
-#subscriptionsDividier{
-	float: right;
-	width: 1em;
-	height: 100%;
-	.commonGradientVertical;
-}
 #transport{
 	list-style: none;
 	padding: 0;
@@ -364,7 +359,7 @@ table{
 	border-spacing: 0;
 	border-collapse: collapse;
 }
-#musicTableHead, #musicTableBody{
+#musicTableHead, #subscriptionsTableHead, #musicTableBody, #subscriptionsTableBody{
 	.border-box;
 	width:100%;
 	table-layout: fixed;
@@ -446,7 +441,12 @@ table{
 }
 #musicTableBody a, #subscriptionsTable a {
 	text-decoration: none;
+}
+#musicTableBody a {
 	color: #3B698A;
+}
+#subscriptionsTable a {
+	color: inherit;
 }
 
 #musicTableBodyContainer td, #subscriptionsTable td{
@@ -460,8 +460,11 @@ table{
 #musicTableHead th, #musicTableBody td{
 	padding: 0 0.5em;
 }
-#musicTableHead th:not(:last-child),#musicTableBody td:not(:last-child){
+#musicTableBody td:not(:last-child){
 	border-right: 1px solid rgba(50, 50, 50, 0.3);
+}
+#musicTableHead th {
+	border-left: 1px solid @lightBorder;
 }
 #musicTableHead th, #subscriptions th{
 	background-color: rgb(225, 225, 225);
@@ -470,12 +473,24 @@ table{
 	color: #888;
 	font-weight: 200;
 	font-size: 0.8em;
-	line-height: 2.5em;
+	line-height: 3em;
+	height: 3em;
 	padding: 0 0 0 0.8em;
 	text-transform: uppercase;
 }
 #musicTableBodyContainer, #subscriptionsTableBodyContainer{
 	overflow-y: auto;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	top: 0;
+	position: absolute;
+}
+#musicTableBodyContainer{
+	top: 2.4em;
+}
+#subscriptionsTableBodyContainer{
+	top: 2.4em; /*plus some later*/
 }
 #musicTableBodyContainer table, #subscriptionsTable{
 	width: 100%;
@@ -483,16 +498,21 @@ table{
 }
 #subscriptionsTable{
 	table-layout: fixed;
-	position: absolute;
 	top: 0;
 	bottom: 0;
-	width: @subscriptionPaneWidth - 1em;
 }
 #subscriptionsTable{
-	.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.2), 2em);
+	/*.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.2), 2em);*/
+	/*.backgroundGradientVertical(#333, #222);*/
+	background-image: -webkit-gradient(linear, left top, right top, from(#373737), color-stop(0.8, #373737), to(#222));
+	background-image: -moz-linear-gradient(left, #333, #222);
+}
+#subscriptionsTable tr:not(.filler) {
+	border-bottom: 1px solid @lightBorder;
 }
 #subscriptionsTable div.subscription{
-	width: 100%;
+	margin: 0 -0.5em;
+	color: #EEE;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	padding: 0 0 0 2.5em;
@@ -512,7 +532,6 @@ table{
 			height: 1.5em;
 			text-align: center;
 			position: absolute;
-			color: white;
 			.border-radius(0.4em);
 			cursor: pointer;
 			&.delete{
@@ -539,7 +558,7 @@ table{
 		}
 	}
 	&:hover{
-		background: rgba(220, 220, 220, 0.6);
+		background: rgba(220, 220, 220, 0.2);
 		.subscriptionControls div{
 			display: block;
 		}
@@ -568,13 +587,6 @@ table{
 	}
 }
 
-#musicTableBodyContainer{
-	bottom: 0;
-	right: 0;
-	left: 0;
-	top: 2em;
-	position: absolute;
-}
 #lightbox{
 	background: rgba(0, 0, 0, 0.7);
 	height: 100%;

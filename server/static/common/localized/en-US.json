@@ -11,6 +11,7 @@
 		"logOut": "Log out"
 	},
 	"library": {
+		"networks": "Network list",
 		"name": "Name",
 		"receivedFrom": "Received from",
 		"time": "Time",
