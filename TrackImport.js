@@ -116,7 +116,7 @@ Do.chain(
 						util.error('['+name+'] Extra keys found in document: '+extraKeys.join(', '));
 					}
 					exportColl.update({"filename":out.filename, network:out.network}, {$set: out}, {upsert:true}, function(err){
-						if(err) util.log(new Error(err));
+						if(err) util.log(err);
 						counter++;
 						process.nextTick(nextRecord);
 					});
