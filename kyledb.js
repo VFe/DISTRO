@@ -8,12 +8,16 @@ var http = require('http'),
 http.createServer(function (req, res) {
 	res.writeHead(200, {'Content-Type': 'text/plain'});
 	exec("bash loadNetworks.sh", {cwd:__dirname, env:{AUTH_TOKEN:auth, DISTRO_AUTH_TOKEN:distroAuth}}, 
-	function(error, stdout, stdin){
+	function(error, stdout, stderr){
 		res.write("STDOUT: "+stdout);
+		res.write('STDERR: '+stderr);
 		if(error){
 			res.write("Error: "+error);
+			console.log('Error: '+error);
 		}
 		res.end("done");
+		console.log('STDOUT: '+stdout);
+		console.log('STDERR: '+stderr);
 		console.log("Wrote some shit I hope");
 	});
 //	script.stdout.on('data', function(data){
