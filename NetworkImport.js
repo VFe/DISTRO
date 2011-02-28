@@ -60,7 +60,7 @@ importDB.open(function(err, db) {
 					(function nextRecord(){
 						cursor.nextObject(function(err, doc){
 							if(doc != null){
-								var record = { presence: {}, email: {}, location: {}, timestamp: new Date(doc.Timestamp) },
+								var record = { timestamp: new Date(doc.Timestamp) },
 								    key, mapping;
 								delete doc.Timestamp;
 								delete doc._id;
@@ -101,7 +101,7 @@ importDB.open(function(err, db) {
 												throw new Error('Didn\'t match regexp '+key+' : '+util.inspect(property));
 											}
 										}
-										(mapping.object ? record[mapping.object] : record)[mapping.newName] = out;
+										(mapping.object ? (record[mapping.object] || (record[mapping.object] = {})) : record)[mapping.newName] = out;
 									}catch(e){
 										util.error('['+doc.NETWORK_NAME+'] '+e.message+"\n");
 									}
