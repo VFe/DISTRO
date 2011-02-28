@@ -56,7 +56,7 @@ importDB.open(function(err, db) {
 		exportDB.collection('networks', function(err, exportColl){
 			db.collection('import', function(err, coll){
 				coll.find(function(err, cursor){
-					var counter = 1;
+					var counter = 1, networkIDs = [];
 					(function nextRecord(){
 						cursor.nextObject(function(err, doc){
 							if(doc != null){
@@ -108,16 +108,32 @@ importDB.open(function(err, db) {
 								}
 								record.lname = record.name.toLowerCase();
 								record.lfullname = record.fullname.toLowerCase();
-								exportColl.update({"name":record.name}, record, {upsert:true}, function(err){
+								// exportColl.findAndModify({"filename":out.filename, network:out.network}, [], out, { upsert: true, 'new': true}, function(err, doc){
+								exportColl.findAndModify({"name":record.name}, [], record, { upsert: true, 'new': true }, function(err, doc){
+									networkIDs.push(doc._id);
 									if(err) util.log(new Error(err));
 									process.nextTick(nextRecord);
 								});
 							}
 							else{
-								if(err) util.log(new Error(err));
-								//util.debug(util.inspect(exportColl.find()));
-								db.close();
-								exportDB.close();
+								if(err) util.log(err);
+								exportColl.find({ _id: { $nin: networkIDs } }, { fields: { name: 1 } }, function(err, cursor){
+									var goneNetworks = {}, haveGoneNetworks = false;
+									cursor.each(function(err, doc){
+										if (err) util.log(err);
+										else if (doc) {
+											goneNetworks[doc._id.toHexString()] = doc.name;
+											haveGoneNetworks = true;
+										} else {
+											if (haveGoneNetworks) {
+												util.log("Gone networks, remove them at will:\n" + JSON.stringify(goneNetworks, null, '\t'));
+											}
+											// All done
+											db.close();
+											exportDB.close();
+										}
+									});
+								});
 							}
 						});
 					}());

@@ -75,13 +75,28 @@ Do.chain(
 
 	
 	importColl.find(function(err, cursor){
-		var counter = 1;
+		var counter = 1, trackIDs = [];
 		(function nextRecord(){
 			cursor.nextObject(function(err, doc){
 				if (!doc) {
 					if(err) util.log(err);
-					importDB.close();
-					exportDB.close();
+					exportColl.find({ _id: { $nin: trackIDs } }, { fields: { name: 1 } }, function(err, cursor){
+						var goneTracks = {}, haveGoneTracks = false;
+						cursor.each(function(err, doc){
+							if (err) util.log(err);
+							else if (doc) {
+								goneTracks[doc._id.toHexString()] = doc.name;
+								haveGoneTracks = true;
+							} else {
+								if (haveGoneTracks) {
+									util.log("Gone tracks, remove them at will:\n" + JSON.stringify(goneTracks, null, '\t'));
+								}
+								// All done
+								importDB.close();
+								exportDB.close();
+							}
+						});
+					});
 					return;
 				}
 				var out = {}, key, name = doc['SONG NAME'];
@@ -115,7 +130,8 @@ Do.chain(
 					if (extraKeys.length) {
 						util.error('['+name+'] Extra keys found in document: '+extraKeys.join(', '));
 					}
-					exportColl.update({"filename":out.filename, network:out.network}, out, {upsert:true}, function(err){
+					exportColl.findAndModify({"filename":out.filename, network:out.network}, [], out, { upsert: true, 'new': true}, function(err, doc){
+						trackIDs.push(doc._id);
 						if(err) util.log(err);
 						counter++;
 						process.nextTick(nextRecord);
