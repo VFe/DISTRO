@@ -27,7 +27,7 @@ var urlLeaderRegExp = /^(?:https?:\/\/)?(?:www.)?(.*)$/i,
 		// begin urlPathList
 		"LINKEDIN": {newName:'linkedin', object:'presence', host:"linkedin.com"},
 		"ITUNES": {newName: 'itunes', object:'presence', host: "itunes.apple.com"},
-		"BANDCAMP": {newName: 'bandcamp', object:'presence', regexp: /(?:https?:\/\/)?([^.]+).bandcamp.com\/?/i},
+		"BANDCAMP": {newName: 'bandcamp', object:'presence', regexp: /(?:https?:\/\/)?(.*)\/?/i},
 		"FLICKR_STREAM": {newName: 'flickr', object:'presence', host:"flickr.com"},
 		"BLOG": {newName: 'blog', object:"presence"},
 		"YOUTUBE": {newName:'youtube', object:"presence", host:"youtube.com"},
