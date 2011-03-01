@@ -628,6 +628,7 @@ distro.loadLandingPage = function(name, callback){
 					], model.attributes);
 					$subscribeButton.click(function(){
 						if (!subscribed) {
+							mpq.push(['track', 'subcribe', {'name': model.name, 'fullname': model.get('fullname')}]);
 							distro.library.subscriptions.create({ name:model.name, fullname: model.get('fullname') }, {
 								success: function(){
 									subscribed = true;
