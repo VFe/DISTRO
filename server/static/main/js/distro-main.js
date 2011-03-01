@@ -245,7 +245,7 @@ distro.library.TrackView = Backbone.View.extend({
 					['%span.cityState', {$key:'citystate'}]
 				]}],
 			],
-			['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]
+			{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 		]] }, $else: ['%td'] }, $else: ['%td'] },
 		['%td', { $key: 'network', $template: ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]}]
 	],
