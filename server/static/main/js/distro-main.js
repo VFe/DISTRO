@@ -681,8 +681,8 @@ distro.Router = Backbone.Controller.extend({
 				$content.haml([
 					['%span.close.button', 'x'],
 					['.search',
-						['%span.field', {$:{$:function(){ $field = this; }}}, '^',
-							['%span.text', { contenteditable: 'plaintext-only', $:{$:function(){ $text = this; }}}],
+						['.field', {$:{$:function(){ $field = this; }}}, '^',
+							['%span.text', { contenteditable: 'true', $:{$:function(){ $text = this; }}}],
 							['%span.placeholder', {$:{$:function(){ $placeholder = this; }}}, distro.loc.str('findNetworks.placeholder')],
 						'^' ]
 					]
@@ -853,7 +853,7 @@ distro.init(function(){
 	(function ($) {
 		var original = $.fn.val;
 		$.fn.val = function() {
-			if ($(this).is('[contenteditable=plaintext-only]')) {
+			if ($(this).is('[contenteditable]')) {
 				return $.fn.text.apply(this, arguments);
 			};
 			return original.apply(this, arguments);
