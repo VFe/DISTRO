@@ -8,7 +8,8 @@
 	},
 	"chrome": {
 		"logIn": "Log in",
-		"logOut": "Log out"
+		"logOut": "Log out",
+		"findNetwork": "Find network"
 	},
 	"library": {
 		"networks": "Network list",
