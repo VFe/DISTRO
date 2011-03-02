@@ -6,7 +6,8 @@ var util = require('util'),
 	url = require('url'),
 	_ = require('underscore.js'),
 	connect = require('connect'),
-	distro = require('./lib');
+	distro = require('./lib'),
+	port = process.env.PRODUCTION ? 8085 : 3000;
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 global.users = new distro.Users();
@@ -177,7 +178,7 @@ global.db.open(function(err, db){
 			});
 		}))
 		/*.use('/', connect.router())*/
-		.listen(3000);
-		util.log('Alive on port 3000');
+		.listen(port);
+		util.log('Alive on port '+port);
 	});
 });
