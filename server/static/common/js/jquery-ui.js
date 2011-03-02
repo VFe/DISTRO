@@ -842,8 +842,8 @@ $.widget( "ui.autocomplete", {
 		delay: 300,
 		minLength: 1,
 		position: {
-			my: "left top",
-			at: "left bottom",
+			my: "center top",
+			at: "center bottom",
 			collision: "none"
 		},
 		source: null
