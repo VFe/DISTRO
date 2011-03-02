@@ -620,7 +620,7 @@ distro.loadLandingPage = function(name, callback){
 							return;
 						}
 						if (!subscribed) {
-							mpq.push(['track', 'subscribe', {'name': model.name, 'fullname': model.get('fullname'), 'user': $('#accountName').text()}]);
+							mpq.push(['track', 'subscribe', {'name': model.name, 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
 							distro.library.subscriptions.create({ name:model.name, fullname: model.get('fullname') }, {
 								success: function(){
 									subscribed = true;
