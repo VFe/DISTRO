@@ -643,6 +643,52 @@ distro.loadLandingPage = function(name, callback){
 	});
 }
 
+distro.AboutPage = Backbone.Model.extend({
+	initialize: function(opts){
+		this.url = 'about/' + encodeURIComponent(opts.name) + '.json';
+	},
+	set: function(attrs){
+		if (Backbone.Model.prototype.set.apply(this, arguments)) {
+			if (attrs && 'name' in attrs) this.name = this.attributes.name;
+		}
+		return this;
+	}
+});
+
+distro.loadAboutPage = function(name){
+	(new distro.AboutPage({name: name})).fetch({
+		success: function(model){
+			distro.lightbox.show({
+				show: $content.stencil(["%form", {},
+					[".lightboxHeader",
+						["%span.close.button", {}, "x"],
+						["%h1","^", { $key: 'name' }, "^"]
+					],
+					[".contentBox",
+						[".content.leftContent",
+							["%img.photo",{src: "http://distro-static.s3.amazonaws.com/TRDD/TRDD.jpg", width:"510px", height:"450px"}]
+						],
+						[".rightContent",
+							[".navBlocks",
+								["%ul.navBlocks",
+									{ $key: 'navBlocks', $children: [
+										['%li', { 'class': { $key: 'name' }, 'title': {$key: 'name'}}, ['%a', { target:"_blank", href: { $key: 'url' } }]]
+									]}
+								]
+							],
+							["%div", {style:"height: 1em; background-color: #212121;"}],
+							[".content", {$test: {$key: 'navBlocks'}, $if: [{$key: 'content'}] }]
+						]
+					]
+				], model.attributes)
+			});
+		},
+		error: function(){
+			alert('There Was a Problem Loading The Page');
+		}
+	});
+};
+
 distro.Router = Backbone.Controller.extend({
 	routes: {
 		"": "blank",
