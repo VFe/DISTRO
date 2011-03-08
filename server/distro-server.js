@@ -170,8 +170,8 @@ global.db.open(function(err, db){
 				});
 			}));
 			app.get('/about/:name', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				var name = '';
-				if((name = req.params.name.toLowerCase()) == 'faq.json'){
+				var name = req.params.name.toLowerCase();
+				// if(!!(name = req.params.name.toLowerCase()).match(/.*\.json$/)){
 					successback({
 						'name': name,
 						'navBlocks': [
@@ -182,9 +182,9 @@ global.db.open(function(err, db){
 							{'name': 'Jobs', 'url': 'jobs'}
 						]
 					});
-				} else {
-					errback(null, null);
-				}
+				// } else {
+				//     successback(null, null);
+				// }
 			}));
 		}))
 		.use('/', connect.router(function(app){
