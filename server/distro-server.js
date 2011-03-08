@@ -169,6 +169,23 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
+			app.get('/about/:name', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				var name = '';
+				if((name = req.params.name.toLowerCase()) == 'faq.json'){
+					successback({
+						'name': name,
+						'navBlocks': [
+							{'name': 'FAQ', 'url': 'faq', 'content': 'This is the FAQ Content'},
+							{'name': 'About', 'url': 'about'},
+							{'name': 'Contact', 'url': 'contact'},
+							{'name': 'Invest', 'url': 'invest'},
+							{'name': 'Jobs', 'url': 'jobs'}
+						]
+					});
+				} else {
+					errback(null, null);
+				}
+			}));
 		}))
 		.use('/', connect.router(function(app){
 			app.get('/:network', function(req, res){
