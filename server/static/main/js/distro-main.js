@@ -237,7 +237,8 @@ distro.library.TrackView = Backbone.View.extend({
 	],
 	events: {
 		"dblclick": "play",
-		"click": "select"
+		"click": "select",
+		"mousedown": "blockEvent"
 	},
 	initialize: function() {
 		_.bindAll(this, 'render', 'setPlaying', 'play');
@@ -264,7 +265,8 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	moveSelection: function(){
 		this.setSelected(distro.library.trackListView.relativeSelection(1));
-	}
+	},
+	blockEvent: function(e){ e.preventDefault(); }
 });
 
 distro.Slider = function (element, callback){
