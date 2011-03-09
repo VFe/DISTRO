@@ -103,9 +103,10 @@ Users.prototype.tracks = function(user, callback){
 		if (err) {
 			callback(err, null);
 		} else {
-			var networkProxies = new Networks.ProxySet;
+			var networkProxies = new Networks.ProxySet,
+				subscriptionNetworks = user.subscriptions.map(function(subscription){ return subscription.network.id });
 			tracks.forEach(function(track) {
-				track.network = networkProxies.create(track.network instanceof Array ? track.network[0] : track.network);
+				track.network = track.network.filter(function(network){ return subscriptionNetworks.indexOf(network.id) != -1; }).map(function(network){ return networkProxies.create(network); });
 				if (track.artistNetwork) {
 					track.artistNetwork = networkProxies.create(track.artistNetwork);
 				}

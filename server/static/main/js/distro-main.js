@@ -233,7 +233,7 @@ distro.library.TrackView = Backbone.View.extend({
 			],
 			{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 		]] }, $else: ['%td'] }, $else: ['%td'] },
-		['%td', { $key: 'network', $template: ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]}]
+		['%td', ['%ul.inlineList', { $key: 'network', $children: ['%li', ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]]}]]
 	],
 	events: {
 		"dblclick": "play",

@@ -54,7 +54,9 @@ Do.chain(
 			"ARTIST NAME": {newName:"artist"},
 			"PERFORMANCE DATE": {newName:"date", object:"performance", handler: makeDate},
 			"SONG NAME": {newName:"name", required: true},
-			"NETWORK BROADCASTING": {newName:"network", handler: resolveNetwork},
+			"NETWORK BROADCASTING": {newName:"network", handler: function(networkList){
+				return Do.map(networkList.split(',').map(function(str){ return str.trim(); }), resolveNetwork);
+			}},
 			"BROADCAST DATE": {newName: "release", handler: makeDate},
 			"PERFORMANCE VENUE (NETWORK)": {newName:"venue", object: "performance", handler: resolveNetwork},
 			"PERFORMANCE VENUE (CITY/STATE)": {newName: "venueCity", object: "performance"},
@@ -131,7 +133,7 @@ Do.chain(
 					if (extraKeys.length) {
 						util.error('['+name+'] Extra keys found in document: '+extraKeys.join(', '));
 					}
-					exportColl.findAndModify({"filename":out.filename, network:out.network}, [], out, { upsert: true, 'new': true}, function(err, doc){
+					exportColl.findAndModify({"filename":out.filename, network:{ $in: out.network }}, [], out, { upsert: true, 'new': true}, function(err, doc){
 						trackIDs.push(doc._id);
 						if(err) util.log(err);
 						counter++;
