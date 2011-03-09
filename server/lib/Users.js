@@ -105,7 +105,7 @@ Users.prototype.tracks = function(user, callback){
 		} else {
 			var networkProxies = new Networks.ProxySet;
 			tracks.forEach(function(track) {
-				track.network = networkProxies.create(track.network);
+				track.network = networkProxies.create(track.network instanceof Array ? track.network[0] : track.network);
 				if (track.artistNetwork) {
 					track.artistNetwork = networkProxies.create(track.artistNetwork);
 				}
