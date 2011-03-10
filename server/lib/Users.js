@@ -106,6 +106,7 @@ Users.prototype.tracks = function(user, callback){
 			var networkProxies = new Networks.ProxySet,
 				subscriptionNetworks = user.subscriptions.map(function(subscription){ return subscription.network.id });
 			tracks.forEach(function(track) {
+				track.networkWithFile = networkProxies.create(track.network[0]);
 				track.network = track.network.filter(function(network){ return subscriptionNetworks.indexOf(network.id) != -1; }).map(function(network){ return networkProxies.create(network); });
 				if (track.artistNetwork) {
 					track.artistNetwork = networkProxies.create(track.artistNetwork);
