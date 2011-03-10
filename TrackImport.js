@@ -102,7 +102,7 @@ Do.chain(
 					});
 					return;
 				}
-				var out = {}, key, name = doc['SONG NAME'];
+				var out = {}, key, name = doc['SONG NAME'], alreadyFailed = false;
 				
 				delete doc._id;
 				
@@ -140,8 +140,11 @@ Do.chain(
 						process.nextTick(nextRecord);
 					});
 				}, function(err){
-					util.error('['+name+'] '+err.message+", not imported");
-					process.nextTick(nextRecord);
+					if (!alreadyFailed) {
+						alreadyFailed = true;
+						util.error('['+name+'] '+err.message+", not imported");
+						process.nextTick(nextRecord);
+					}
 				});
 			});
 		}());
