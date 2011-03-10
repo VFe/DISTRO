@@ -18,13 +18,13 @@
 		distro.init.callees.forEach(function(callee){
 			callee.init(ownCallback);
 		});
-	}
+	};
 	distro.init.add = function(callee){
 		if (distro.init.ran) {
 			throw new Error("distro.init already called");
 		}
 		distro.init.callees.push(callee);
-	}
+	};
 	distro.init.callees = [];
 	distro.init.ran = false;
 	distro.loc = {

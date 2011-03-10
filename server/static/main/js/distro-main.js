@@ -1,5 +1,5 @@
 Backbone.sync = function(method, model, success, error){
-	if (!(model && model.url)) throw new Error("A 'url' property or function must be specified");
+	if (!(model && model.url)) { throw new Error("A 'url' property or function must be specified"); }
 	var httpMethod = { 'create': 'POST', 'update': 'PUT', 'delete': 'DELETE', 'read'  : 'GET' }[method],
 	    data = (method === 'create' || method === 'update') ? model.toJSON() : null;
 	
@@ -7,16 +7,16 @@ Backbone.sync = function(method, model, success, error){
 		success: success,
 		failure: error
 	}));
-}
+};
 
 
 distro.util = {
 	pad: function(input, length, char){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(char || '0') + input : input); },
 	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); }
 };
-distro.SERVER = "/api/",
-distro.TITLE = "DISTRO",
-distro.global = new Backbone.Model({}),
+distro.SERVER = "/api/";
+distro.TITLE = "DISTRO";
+distro.global = new Backbone.Model({});
 distro.pyramidHead = function(message, retryback, giveupback){
 	var composedMessage = distro.loc.str('global.pyramidHead.pre') + '\n' + message;
 	if (retryback) {
@@ -66,7 +66,7 @@ distro.request = function(path, method, data, hollerback){
 				distro.global.set({user: responseData.userName});
 			}
 		}
-	})
+	});
 };
 distro.library = {
 	subscriptions: new (Backbone.Collection.extend({
@@ -76,7 +76,7 @@ distro.library = {
 			return model.attributes.name;
 		},
 		isSubscribed: function(networkName){
-			return this.any(function(subscription){ return subscription.attributes.name === networkName });
+			return this.any(function(subscription){ return subscription.attributes.name === networkName; });
 		}
 	})),
 	tracks: new (Backbone.Collection.extend({
@@ -223,8 +223,8 @@ distro.library.TrackView = Backbone.View.extend({
 			['.eventDetails', 
 				['.perfDate', {$key:'date', $handler:
 					function(data){
-						if(!data) { return null }
-						return (data.toLocaleDateString() + '\n' + data.toLocaleTimeString())
+						if(!data) { return null; }
+						return (data.toLocaleDateString() + '\n' + data.toLocaleTimeString());
 					}
 				}], ['.perfVenue', {$key:'venue', $template:[
 					['%a', {href: {$join:['#/', {$key:'name'}]}, title:{$key:'fullname'}}, '^', {$key:'name'}, '^ '],
@@ -284,13 +284,13 @@ distro.Slider = function (element, callback){
 		if (actuated === true) {
 			callback.call(this, this.position);
 		}
-	}
+	};
 	this.enable = function(){
 		$slider.addClass('enabled');
-	}
+	};
 	this.disable = function(){
 		$slider.removeClass('enabled');
-	}
+	};
 	$slider.mousedown(function(e){
 		if (!$slider.hasClass('enabled')) { return false; }
 		var $document = $(document), left = $backing.offset().left, width = $channel.width();
@@ -304,7 +304,7 @@ distro.Slider = function (element, callback){
 		move(e);
 		return false;
 	});
-}
+};
 
 // Simple success/failure callback abstraction layer
 function Hollerback(callbacks, context){
@@ -382,7 +382,7 @@ distro.lightbox = new (function(){
 			next();
 		}).fadeIn(200);
 		this.$lightbox.fadeIn(200);
-	}
+	};
 	Lightbox.prototype.hide = function(name){
 		if (!name || (this.content && name === this.content.name)) {
 			var self = this;
@@ -393,14 +393,14 @@ distro.lightbox = new (function(){
 			Backbone.history.saveLocation('');
 			document.title = distro.TITLE;
 		}
-	}
+	};
 	Lightbox.prototype.hideContent = function(){
 		if (this.content) {
 			this.content.hide && this.content.hide(this);
 			this.content = null;
 		}
 		this.$contentWrapper.empty();
-	}
+	};
 	return Lightbox;
 }())();
 
@@ -531,7 +531,7 @@ distro.player = new (function(){
 				player.next();
 			}
 		});
-	};
+	}
 	Player.prototype.next = function(){
 		if (this.current) {
 			this.play(distro.library.trackListView.relativeTrack(1));
@@ -610,7 +610,7 @@ distro.loadLandingPage = function(name, callback){
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
-								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : '' } }, $:{$:function(){ $subscribeButton = this }}}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
+								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:{$:function(){ $subscribeButton = this }}}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
 							]
 						]
 					], model.attributes);
@@ -641,7 +641,7 @@ distro.loadLandingPage = function(name, callback){
 			callback(null);
 		}
 	});
-}
+};
 
 distro.AboutPage = Backbone.Model.extend({
 	initialize: function(opts){
@@ -656,6 +656,7 @@ distro.AboutPage = Backbone.Model.extend({
 });
 
 distro.loadAboutPage = function(name, callback){
+	if(typeof callback !== 'function') callback = function(){};
 	(new distro.AboutPage({name: name})).fetch({
 		success: function(model){
 			distro.lightbox.show({
@@ -683,7 +684,7 @@ distro.loadAboutPage = function(name, callback){
 								[".content", {$test: {$key: 'navBlocks'}, $if: ['%span', {$key: 'content'}] }]
 							]
 						]
-					], model.attributes)
+					], model.attributes);
 				}
 			});
 			callback(model);
@@ -773,7 +774,7 @@ distro.Router = Backbone.Controller.extend({
 						document.execCommand('InsertHTML', false, '_');
 						return false;
 					}
-				})
+				});
 				$(window.document).keypress(keypressHandler = function(event){
 					$text.focus(); 
 					if(event.target !== $text[0]){
@@ -914,7 +915,7 @@ distro.init(function(){
 		$.fn.val = function() {
 			if ($(this).is('[contenteditable]')) {
 				return $.fn.text.apply(this, arguments);
-			};
+			}
 			return original.apply(this, arguments);
 		};
 	})(jQuery);
