@@ -176,6 +176,11 @@ global.db.open(function(err, db){
 				res.writeHead(302, { Location: ("/#/" + encodeURIComponent(target)) });
 				res.end();
 			});
+			app.get('/about/:page', function(req, res){
+				var target = req.params && req.params.page || '';
+				res.writeHead('302', { Location: ('/#/about/' + encodeURIComponent(target)) });
+				res.end();
+			});
 		}))
 		/*.use('/', connect.router())*/
 		.listen(port);
