@@ -1,0 +1,17 @@
+{"navBlocks": [
+		{"name": "FAQ", "url": "about/faq"},
+		{"name": "About", "url": "about/about"},
+		{"name": "Contact", "url": "about/contact"},
+		{"name": "Invest", "url": "about/invest"},
+		{"name": "Jobs", "url": "about/jobs"}
+	],
+	"faq":{
+		"content":"This is the FAQ Content."
+	},
+	"about":{
+		"content":"This is the About Content."
+	},
+	"contact":{
+		"content":"This is the Contact Content."
+	}
+}

@@ -643,57 +643,49 @@ distro.loadLandingPage = function(name, callback){
 	});
 };
 
-distro.AboutPage = Backbone.Model.extend({
-	initialize: function(opts){
-		this.url = '../' + encodeURIComponent(opts.name) + '.json';
-	},
-	set: function(attrs){
-		if (Backbone.Model.prototype.set.apply(this, arguments)) {
-			if (attrs && 'name' in attrs) this.name = this.attributes.name;
-		}
-		return this;
-	}
-});
-
-distro.loadAboutPage = function(name, callback){
-	if(typeof callback !== 'function') callback = function(){};
-	(new distro.AboutPage({name: name})).fetch({
-		success: function(model){
-			distro.lightbox.show({
-				name: 'about/' + model.name,
-				content: model.get('content'),
-				show: function($content){
-					$content.stencil(["%form", {},
-						[".lightboxHeader",
-							["%span.close.button", {}, "x"],
-							["%h1","^", { $key: 'name' }, "^"]
-						],
-						[".contentBox",
-							[".content.leftContent",
-								["%img.photo",{src: "http://distro-static.s3.amazonaws.com/TRDD/TRDD.jpg", width:"510", height:"450"}]
-							],
-							[".rightContent",
-								[".presence",
-									["%ul.navBlocks",
-										{ $key: 'navBlocks', $children: [
-											['%li', { 'class': { $key: 'name' }, 'title': {$key: 'name'}}, ['%a', { target:"_blank", href: { $key: 'url' } }]]
-										]}
-									]
-								],
-								["%div", {style:"height: 1em; background-color: #212121;"}],
-								[".content", {$test: {$key: 'navBlocks'}, $if: ['%span', {$key: 'content'}] }]
+distro.loadAboutPage =function(pageName, data){
+	distro.lightbox.show({
+		name: 'about/' + pageName,
+		show: function($content){
+			$content.stencil(["%form", {},
+				[".lightboxHeader",
+					["%span.close.button", {}, "x"],
+					["%h1","^", pageName, "^"]
+				],
+				[".contentBox",
+					[".content.leftContent",
+						["%img.photo",{src: "http://distro-static.s3.amazonaws.com/TRDD/TRDD.jpg", width:"510", height:"450"}]
+					],
+					[".rightContent",
+						[".presence",
+							["%ul.navBlocks",
+								{ $key: 'navBlocks', $children: [
+									['%li', { 'class': { $key: 'name' }, 'title': {$key: 'name'}}, ['%a', { href: { $key: 'url' } }, 'TEST']]
+								]}
 							]
-						]
-					], model.attributes);
-				}
-			});
-			callback(model);
-		},
-		error: function(){
-			alert('There Was a Problem Loading The Page');
-			callback(null);
+						],
+						["%div", {style:"height: 1em; background-color: #212121;"}],
+						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $children: ['%span', {$key: 'content'}]} }]
+					]
+				]
+			], data);
 		}
 	});
+	
+};
+
+distro.AboutPage = function(name, callback){
+	if(typeof callback !== 'function') callback = function(){};
+	if(typeof distro.aboutData !== 'object'){
+		$.getJSON('/about.json', function(data){
+			distro.aboutData = data;
+			distro.loadAboutPage(name, distro.aboutData);
+			callback(data);
+		});
+	} else {
+		distro.loadAboutPage(name, distro.aboutData);
+		callback(distro.aboutData);
+	}
 };
 
 distro.Router = Backbone.Controller.extend({
@@ -721,12 +713,12 @@ distro.Router = Backbone.Controller.extend({
 	},
 	about: function(page){
 		if (!page) {
-			window.location.hash = '';
+			window.location.hash = '/about/about';
 			return;
 		}
-		distro.loadAboutPage(page, function(model){
+		distro.AboutPage(page, function(model){
 			if(!model) {
-				window.location.hash = '';
+				window.location.hash = '/about/about';
 			}
 		});
 	},
