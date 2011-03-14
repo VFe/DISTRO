@@ -647,6 +647,7 @@ distro.loadAboutPage =function(pageName, data){
 	distro.lightbox.show({
 		name: 'about/' + pageName,
 		show: function($content){
+			$content.attr('id', 'landingBox');
 			$content.stencil(["%form", {},
 				[".lightboxHeader",
 					["%span.close.button", {}, "x"],
@@ -657,15 +658,13 @@ distro.loadAboutPage =function(pageName, data){
 						["%img.photo",{src: "http://distro-static.s3.amazonaws.com/TRDD/TRDD.jpg", width:"510", height:"450"}]
 					],
 					[".rightContent",
-						[".presence",
-							["%ul.navBlocks",
-								{ $key: 'navBlocks', $children: [
-									['%li', { 'class': { $key: 'name' }, 'title': {$key: 'name'}}, ['%a', { href: { $key: 'url' } }, 'TEST']]
-								]}
-							]
+						["%ul.aboutIcons",
+							{ $key: 'navBlocks', $children: [
+								['%li', { 'class': { $key: 'name' }, 'title': {$key: 'name'}}, ['%a', { href: { $key: 'url' } }]]
+							]}
 						],
 						["%div", {style:"height: 1em; background-color: #212121;"}],
-						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $children: ['%span', {$key: 'content'}]} }]
+						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%span', {$key: 'content'}]} }]
 					]
 				]
 			], data);

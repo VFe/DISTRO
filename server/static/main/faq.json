@@ -1,7 +1,0 @@
-{'navBlocks': [
-	{'name': 'FAQ', 'url': 'faq', 'content': 'This is the FAQ Content'},
-	{'name': 'About', 'url': 'about'},
-	{'name': 'Contact', 'url': 'contact'},
-	{'name': 'Invest', 'url': 'invest'},
-	{'name': 'Jobs', 'url': 'jobs'}
-]}

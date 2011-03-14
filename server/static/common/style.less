@@ -723,6 +723,55 @@ table{
 	margin-top: 2em;
 	//overflow-y: auto;
 }
+
+ul.aboutIcons{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	a {
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+	}
+	>li {
+		display: inline-block;
+		width: 3em;
+		height: 3em;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+	li.about {
+		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/ABOUT.png');
+		&:hover {
+			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/ABOUT_HOVER.png');
+		}
+	}
+	li.faq {
+		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/FAQ.png');
+		&:hover {
+			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/FAQ_HOVER.png');
+		}
+	}
+	li.jobs {
+		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/JOBS.png');
+		&:hover {
+			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/JOBS_HOVER.png');
+		}
+	}
+	li.invest {
+		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/INVEST.png');
+		&:hover {
+			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/INVEST_HOVER.png');
+		}
+	}
+	li.contact {
+		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/CONTACT.png');
+		&:hover {
+			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/CONTACT_HOVER.png');
+		}
+	}
+}
+
 #landingBox ul.presence{
 	list-style: none;
 	margin: 0;
