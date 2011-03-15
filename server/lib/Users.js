@@ -1,8 +1,8 @@
 var CollectionManager = require('./lib/CollectionManager'),
     crypto = require('crypto'),
     error = require('./error'),
-    Networks = require('./Networks')
-;
+    Networks = require('./Networks'),
+    BSON = require('mongodb').BSONNative;
 
 function Users(){ require('./init').add(this); }
 module.exports = Users;
@@ -55,7 +55,12 @@ Users.prototype.registerUser = function(email, password, callback){
 		} else if (exists){
 			callback(new error.ClientError("registration.errors.existingUser"), null);
 		} else {
-			self.collection.insert({"email":email, "hash":hash(password, salt), "salt":salt}, function(err, doc){
+			self.collection.insert({
+			    email: email,
+			    hash: hash(password, salt),
+			    salt: salt,
+			    subscriptions: [ { network: BSON.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ]
+			}, function(err, doc){
 				if (doc && doc[0] && doc[0]._id) {
 					callback(err, doc[0]._id);
 				} else {
