@@ -647,7 +647,7 @@ distro.loadAboutPage =function(pageName, data){
 	distro.lightbox.show({
 		name: 'about/' + pageName,
 		show: function($content){
-			$content.attr('id', 'landingBox');
+			$content.attr('id', 'aboutBox');
 			$content.stencil(["%form", {},
 				[".lightboxHeader",
 					["%span.close.button", {}, "x"],
@@ -663,8 +663,7 @@ distro.loadAboutPage =function(pageName, data){
 								['%li', { 'class': { $key: 'name' }, 'title': {$key: 'name'}}, ['%a', { href: { $key: 'url' } }]]
 							]}
 						],
-						["%div", {style:"height: 1em; background-color: #212121;"}],
-						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%span', {$key: 'content', $handler: function(data){ return $(data); }}]} }]
+						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%div', {$key: 'content', $handler: function(data){ return $(data); }}]} }]
 					]
 				]
 			], data);

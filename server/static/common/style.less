@@ -693,6 +693,9 @@ table{
 #landingBox{
 	width: 65em;
 }
+#aboutBox{
+	width: 69.5em;
+}
 .leftContent{					//begin removed #landingBox selector
 	width: 500px;
 	max-height: 90em;
@@ -723,11 +726,31 @@ table{
 	margin-top: 2em;
 	//overflow-y: auto;
 }								//end removed #landingBox selector
-
+#aboutBox .rightContent .content{
+	overflow-y: auto;
+	padding-left: 1em;
+	max-height: 32em;
+	margin-top: 0px;
+}
+#aboutBox .contentBox{
+	height: 38.5em;
+}
+#aboutBox .rightContent{
+	width: 26em;
+}
+#aboutBox .photo{
+	margin-bottom: 0px;
+}
+#aboutBox .leftContent{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+}
 ul.aboutIcons{
 	list-style: none;
 	margin: 0;
-	padding: 0;
+	padding: 0.5em 0 0.5em 0.333em;
+	background: #212121;
 	a {
 		display: inline-block;
 		width: 100%;
@@ -739,7 +762,7 @@ ul.aboutIcons{
 		height: 4em;
 		background-repeat: no-repeat;
 		background-position: center;
-		margin: 0 0.2em;
+		margin: 0 0.5em;
 	}
 	li.About {
 		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/ABOUT.png');
@@ -748,14 +771,14 @@ ul.aboutIcons{
 		}
 	}
 	li.FAQ {
-		margin: 0 .2em 0 0;
+		margin: 0 .5em 0 0;
 		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/FAQ.png');
 		&:hover {
 			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/FAQ_HOVER.png');
 		}
 	}
 	li.Jobs {
-		margin: 0 0 0 0.2em;
+		margin: 0 0 0 0.5em;
 		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/JOBS.png');
 		&:hover {
 			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/JOBS_HOVER.png');
