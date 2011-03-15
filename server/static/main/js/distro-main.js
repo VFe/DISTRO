@@ -610,7 +610,7 @@ distro.loadLandingPage = function(name, callback){
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
-								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : '' } }, type: "button", $:{$:function(){ $subscribeButton = this }}}, [".label"], "^", { $key: 'name' }, "^"]
+								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : '' } }, $:{$:function(){ $subscribeButton = this }}}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
 							]
 						]
 					], model.attributes);
