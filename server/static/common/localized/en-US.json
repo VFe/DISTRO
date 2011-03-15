@@ -9,7 +9,14 @@
 	"chrome": {
 		"logIn": "Log in",
 		"logOut": "Log out",
-		"findNetwork": "Find network"
+		"findNetwork": "Find network",
+		"about": {
+			"faq": "FAQ",
+			"about": "About",
+			"contact": "Contact",
+			"invest": "Invest",
+			"jobs": "Jobs"
+		}
 	},
 	"library": {
 		"networks": "Network list",
