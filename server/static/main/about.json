@@ -6,7 +6,7 @@
 		{"name": "Jobs", "url": "#/about/jobs"}
 	],
 	"faq":{
-		"content":"This is the FAQ Content."
+		"content": "<dl>\n  <dt>What is DISTRO?</dt>\n  <dd>DISTRO is a subscription-based music distribution platform. Holler.</dd>\n  <dt>How can I get my own landing page?</dt>\n  <dd>E-Mail <a href=\"mailto:kyle@distro.fm\">kyle@distro.fm</a> to set up your own landing page. Make sure to specify what you want your ^networkname^ to be.   We should have it up and running shortly after you message.</dd>\n  <dt>How can I make changes to my landing page / How can I upload a song? How do I tag a song with a concert date?</dt>\n  <dd>For right now, just send us an e-mail, and we’ll be happy to make any changes/updates!  <a href=\"mailto:hello@distro.fm\">hello@distro.fm</a></dd>\n  <dt>Why do I have to e-mail someone, why can’t I just do it myself?</dt>\n  <dd>We just launched our site, and we’re gathering feedback and implementing new site functionality based on that feedback. Please be patient with us, and thanks for being our first generation of users!  Feedback is always welcome: hello@distro.fm</dd>\n  <dt>I subscribed to a page and I don’t seem to be getting any music from them?</dt>\n  <dd>Chances are, that network hasn’t been ‘claimed’ yet.  We’re on it.</dd>\n  <dt>Looks dtke there’s a landing page for my band/venue... How can I start broadcasting music?</dt>\n  <dd>It’s easy!  Just send us an e-mail (hello@distro.fm) to claim your network, and then you can begin broadcasting music and promoting shows.</dd>\n  <dt>What networks are dtve on DISTRO?</dt>\n  <dd>You can see a list of live networks here.</dd>\n</dl>\n"
 	},
 	"about":{
 		"content":"This is the About Content."

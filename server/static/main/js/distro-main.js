@@ -664,7 +664,7 @@ distro.loadAboutPage =function(pageName, data){
 							]}
 						],
 						["%div", {style:"height: 1em; background-color: #212121;"}],
-						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%span', {$key: 'content'}]} }]
+						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%span', {$key: 'content', $handler: function(data){ return $(data); }}]} }]
 					]
 				]
 			], data);
