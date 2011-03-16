@@ -693,6 +693,7 @@ distro.Router = Backbone.Controller.extend({
 		"/login": "login",
 		"/about/:page": "about",
 		"/:network": "network",
+		"/*target": "fourOhFour",
 		"*target": "bounce"
 	},
 	blank: function(){
@@ -843,6 +844,9 @@ distro.Router = Backbone.Controller.extend({
 				});
 			}
 		});
+	},
+	fourOhFour: function(target){
+		alert("This page couldn't be found.");
 	},
 	bounce: function(target){
 		if (target) {
