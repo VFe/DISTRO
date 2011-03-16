@@ -694,7 +694,7 @@ table{
 	width: 65em;
 }
 #aboutBox{
-	width: 69.5em;
+	width: 73em;
 }
 .leftContent{					//begin removed #landingBox selector
 	width: 500px;
@@ -731,12 +731,38 @@ table{
 	padding-left: 1em;
 	max-height: 32em;
 	margin-top: 0px;
+	dt{
+		font-weight: 500;
+		color: #EEE;
+	}
+	dd{
+		margin: 0 0 1em 0;
+	}
+	a{
+		color: RGB(64, 193, 178);
+	}
+}
+.contact{
+	dt,dd{
+		margin: 0;
+	}
+	dt{
+		margin-bottom: 0.5em;
+		float: left;
+		clear: right;
+	}
+	dd{
+		color: #888;
+		margin-bottom: 1em;
+		float: right;
+		width: 17em;
+	}	
 }
 #aboutBox .contentBox{
 	height: 38.5em;
 }
 #aboutBox .rightContent{
-	width: 26em;
+	width: 29em;
 }
 #aboutBox .photo{
 	margin-bottom: 0px;
@@ -746,10 +772,18 @@ table{
 	top: 0;
 	bottom: 0;
 }
+#aboutBox h1{
+	/* color: #E65450;*/
+	color: RGB(240, 67, 80);
+	font-weight: normal;
+	font-size: 1.5em;
+	margin-top: 0px;
+}
 ul.aboutIcons{
 	list-style: none;
 	margin: 0;
-	padding: 0.5em 0 0.5em 0.333em;
+	padding: 0.7em 0;
+	text-align: center;
 	background: #212121;
 	a {
 		display: inline-block;
@@ -758,11 +792,11 @@ ul.aboutIcons{
 	}
 	>li {
 		display: inline-block;
-		width: 4em;
-		height: 4em;
+		width: 50px;
+		height: 50px;
 		background-repeat: no-repeat;
 		background-position: center;
-		margin: 0 0.5em;
+		margin: 0 0.7em;
 	}
 	li.About {
 		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/ABOUT.png');
@@ -771,14 +805,12 @@ ul.aboutIcons{
 		}
 	}
 	li.FAQ {
-		margin: 0 .5em 0 0;
 		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/FAQ.png');
 		&:hover {
 			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/FAQ_HOVER.png');
 		}
 	}
 	li.Jobs {
-		margin: 0 0 0 0.5em;
 		background-image: url('http://distro-static.s3.amazonaws.com/TRDD/JOBS.png');
 		&:hover {
 			background-image: url('http://distro-static.s3.amazonaws.com/TRDD/JOBS_HOVER.png');

@@ -663,7 +663,7 @@ distro.loadAboutPage =function(pageName, data){
 								['%li', { 'class': { $key: 'name' }, 'title': {$key: 'name'}}, ['%a', { href: { $key: 'url' } }]]
 							]}
 						],
-						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%div', {$key: 'content', $handler: function(data){ return $(data); }}]} }]
+						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%div', {$key: 'content', $handler: function(data){ return $('<div>').html(data).contents(); }}]} }]
 					]
 				]
 			], data);
