@@ -885,12 +885,15 @@ distro.init(function(){
 			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)] : distro.library.trackListView.relativeSelection(-1));
 		} else if(e.keyCode == 40){
 			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[0] : distro.library.trackListView.relativeSelection(1));
-		} else if(e.keyCode == 32 || e.keyCode == 13){
+		} else if(e.keyCode == 13){
 			if(distro.library.trackListView.relativeSelection(0) && distro.library.trackListView.relativeSelection(0) == distro.library.trackListView.playingTrack){
 				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
 			} else{
 				distro.player.play(distro.library.trackListView.relativeSelection(0));
 			}
+		} else if(distro.library.trackListView.relativeSelection(0) && e.keyCode == 32){
+			if(typeof distro.player.current == "undefined") distro.player.play(distro.library.trackListView.relativeSelection(0));
+			else distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
 		} else if(e.keyCode == 37){
 			if (distro.player.current) {
 				if (distro.player.current.position > 1000) {
