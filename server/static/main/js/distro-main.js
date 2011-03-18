@@ -646,12 +646,13 @@ distro.loadLandingPage = function(name, callback){
 distro.loadAboutPage =function(pageName, data){
 	distro.lightbox.show({
 		name: 'about/' + pageName,
+		longName: data && data[pageName] && data[pageName].title,
 		show: function($content){
 			$content.attr('id', 'aboutBox');
 			$content.stencil(["%form", {},
 				[".lightboxHeader",
 					["%span.close.button", {}, "x"],
-					["%h1","^", pageName, "^"]
+					["%h1", {$key: pageName, $template: {$key: 'title'}}]
 				],
 				[".contentBox",
 					[".content.leftContent",
@@ -663,7 +664,7 @@ distro.loadAboutPage =function(pageName, data){
 								['%li', { 'class': { $key: 'name' }, 'title': {$key: 'name'}}, ['%a', { href: { $key: 'url' } }]]
 							]}
 						],
-						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%div', {$key: 'content', $handler: function(data){ return $('<div>').html(data).contents(); }}]} }]
+						[".content", {$test: {$key: pageName}, $if: {$key: pageName, $template: ['%div', ['%h1', {$key: 'title'}], {$key: 'content', $handler: function(data){ return $('<div>').html(data).contents(); }}]} }]
 					]
 				]
 			], data);
