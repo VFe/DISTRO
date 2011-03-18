@@ -878,7 +878,9 @@ distro.init(function(){
 	});
 	$(document).keydown(function(e){
 		//{up:38, down:40, left:37, right:39}
-		var emptySelection = !distro.library.trackListView.selectedTrack;
+		var emptySelection = !distro.library.trackListView.selectedTrack,
+			firstTrack = distro.library.trackListView.collection.models[0],
+			selected;
 		if (distro.lightbox.content) { return; } //Don't handle hotkeys if we're in a lightbox.
 
 		if(e.keyCode == 38){
@@ -886,14 +888,19 @@ distro.init(function(){
 		} else if(e.keyCode == 40){
 			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[0] : distro.library.trackListView.relativeSelection(1));
 		} else if(e.keyCode == 13){
-			if(distro.library.trackListView.relativeSelection(0) && distro.library.trackListView.relativeSelection(0) == distro.library.trackListView.playingTrack){
-				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
+			if(selected = distro.library.trackListView.relativeSelection(0)){ 
+				distro.player.play(selected);
 			} else{
-				distro.player.play(distro.library.trackListView.relativeSelection(0));
+				distro.library.trackListView.setSelected(firstTrack);
+				distro.player.play(firstTrack);
 			}
 		} else if(distro.library.trackListView.relativeSelection(0) && e.keyCode == 32){
-			if(typeof distro.player.current == "undefined") distro.player.play(distro.library.trackListView.relativeSelection(0));
-			else distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
+			if(typeof distro.player.current == "undefined"){
+				distro.player.play(distro.library.trackListView.relativeSelection(0));
+			}
+			else {
+				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
+			}
 		} else if(e.keyCode == 37){
 			if (distro.player.current) {
 				if (distro.player.current.position > 1000) {
