@@ -905,7 +905,8 @@ distro.init(function(){
 				distro.player.play(selected);
 			}
 		}
-	});
+	})
+	.focus(); // Give initial focus to the music table 
 	$(document).keydown(function(e){
 		// { up:38, down:40, left:37, right:39, space:32, enter:13 }
 		var emptySelection = !distro.library.trackListView.selectedTrack,
