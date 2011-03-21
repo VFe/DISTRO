@@ -884,9 +884,25 @@ distro.init(function(){
 		if (distro.lightbox.content) { return; } //Don't handle hotkeys if we're in a lightbox.
 
 		if(e.keyCode == 38){
-			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)] : distro.library.trackListView.relativeSelection(-1));
+			if(emptySelection){
+				distro.library.trackListView.setSelected(distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)]);
+				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+				e.preventDefault();
+			} else {
+				distro.library.trackListView.setSelected(distro.library.trackListView.relativeSelection(-1));
+				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+				e.preventDefault();
+			}
 		} else if(e.keyCode == 40){
-			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[0] : distro.library.trackListView.relativeSelection(1));
+			if(emptySelection){
+				distro.library.trackListView.setSelected(distro.library.trackListView.collection.models[0]);
+				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+				e.preventDefault();
+			} else {
+				distro.library.trackListView.setSelected(distro.library.trackListView.relativeSelection(1));
+				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+				e.preventDefault();
+			}
 		} else if(e.keyCode == 13){
 			if(selected = distro.library.trackListView.relativeSelection(0)){ 
 				distro.player.play(selected);
@@ -924,6 +940,20 @@ distro.init(function(){
 			return original.apply(this, arguments);
 		};
 	})(jQuery);
+	
+	//credit: Abhijit Rao (http://stackoverflow.com/questions/1805808)
+	$.scrollIntoView = function(element, container) {
+		var containerTop = $(container).scrollTop(),
+			containerBottom = containerTop + $(container).height(), 
+			elemTop = element.offsetTop,
+			elemBottom = elemTop + $(element).height();
+		if (elemTop < containerTop) {
+			$(container).scrollTop(elemTop);
+		} else if (elemBottom > containerBottom) {
+			$(container).scrollTop(elemBottom - $(container).height());
+		}
+	}	
+
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
 	_gaq.push(['_setDomainName', '.distro.fm']);
