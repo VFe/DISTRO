@@ -237,8 +237,7 @@ distro.library.TrackView = Backbone.View.extend({
 	],
 	events: {
 		"dblclick": "play",
-		"click": "select",
-		"mousedown": "blockEvent"
+		"mousedown": "select"
 	},
 	initialize: function() {
 		_.bindAll(this, 'render', 'setPlaying', 'play');
@@ -261,12 +260,12 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	select: function(e){
 		if (e.target.tagName === 'A') { return; }
-		distro.library.trackListView.setSelected(this.model);
+		distro.library.trackListView.setSelected((e.metaKey && distro.library.trackListView.selectedTrack === this.model) ? null : this.model);
+		e.preventDefault();
 	},
 	moveSelection: function(){
 		this.setSelected(distro.library.trackListView.relativeSelection(1));
-	},
-	blockEvent: function(e){ e.preventDefault(); }
+	}
 });
 
 distro.Slider = function (element, callback){
@@ -876,47 +875,51 @@ distro.init(function(){
 	distro.library.refresh(function(){
 		Backbone.history.start();
 	});
-	$(document).keydown(function(e){
-		//{up:38, down:40, left:37, right:39}
+	
+	$('#musicTableBodyContainer')
+	.mousedown(function(){
+		this.focus();
+	})
+	.keydown(function(e){
 		var emptySelection = !distro.library.trackListView.selectedTrack,
 			firstTrack = distro.library.trackListView.collection.models[0],
 			selected;
-		if (distro.lightbox.content) { return; } //Don't handle hotkeys if we're in a lightbox.
-
-		if(e.keyCode == 38){
-			if(emptySelection){
-				distro.library.trackListView.setSelected(distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)]);
-				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
-				e.preventDefault();
-			} else {
-				distro.library.trackListView.setSelected(distro.library.trackListView.relativeSelection(-1));
-				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
-				e.preventDefault();
-			}
-		} else if(e.keyCode == 40){
-			if(emptySelection){
-				distro.library.trackListView.setSelected(distro.library.trackListView.collection.models[0]);
-				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
-				e.preventDefault();
-			} else {
-				distro.library.trackListView.setSelected(distro.library.trackListView.relativeSelection(1));
-				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
-				e.preventDefault();
-			}
-		} else if(e.keyCode == 13){
-			if(selected = distro.library.trackListView.relativeSelection(0)){ 
+		if(e.keyCode == 38){ // up arrow
+			distro.library.trackListView.setSelected(
+				emptySelection
+					? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)]
+					: distro.library.trackListView.relativeSelection(-1)
+			);
+			$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+			e.preventDefault();
+		} else if(e.keyCode == 40){ // down arrow
+			distro.library.trackListView.setSelected(
+				emptySelection
+					? distro.library.trackListView.collection.models[0]
+					: distro.library.trackListView.relativeSelection(1)
+			);
+			$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+			e.preventDefault();
+		} else if(e.keyCode == 13){ // enter
+			if ((selected = distro.library.trackListView.selectedTrack)){ 
 				distro.player.play(selected);
-			} else{
-				distro.library.trackListView.setSelected(firstTrack);
+			}
+		}
+	});
+	$(document).keydown(function(e){
+		// { up:38, down:40, left:37, right:39, space:32, enter:13 }
+		var emptySelection = !distro.library.trackListView.selectedTrack,
+			firstTrack = distro.library.trackListView.collection.models[0],
+			selected;
+		if ($(e.target).is('input, textarea, select, [contenteditable]')) { return; }
+
+		if(e.keyCode == 32){
+			if(distro.player.current){
+				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
+			} else {
 				distro.player.play(firstTrack);
 			}
-		} else if(distro.library.trackListView.relativeSelection(0) && e.keyCode == 32){
-			if(typeof distro.player.current == "undefined"){
-				distro.player.play(distro.library.trackListView.relativeSelection(0));
-			}
-			else {
-				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
-			}
+			e.preventDefault();
 		} else if(e.keyCode == 37){
 			if (distro.player.current) {
 				if (distro.player.current.position > 1000) {

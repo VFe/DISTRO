@@ -427,8 +427,12 @@ table{
 #musicTableBody tr.playing td:not(.event){
 	font-weight: bold;
 }
-#musicTableBody tr.selected{
+#musicTableBodyContainer tr.selected{
+	background-color: #ccc;
+}
+#musicTableBodyContainer:focus tr.selected{
 	background-color: #999;
+	color: white;
 }
 #musicTableBody td.new{
 	background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #3e6a97), color-stop(0.5, rgba(0, 0, 0, 0)));
@@ -484,14 +488,6 @@ table{
 #musicTableBody td.event span.cityState{
 	padding-left: 0.3em;
 	color: #999;
-}
-#musicTableBodyContainer:focus tr.selected{
-	background-color: #8D969E;
-	color: white;
-	a {
-		color: #84D1F0;
-		font-weight: 700;
-	}
 }
 #musicTableBody tr:not(.filler){
 	cursor: default;
