@@ -883,24 +883,20 @@ distro.init(function(){
 	.keydown(function(e){
 		var emptySelection = !distro.library.trackListView.selectedTrack,
 			firstTrack = distro.library.trackListView.collection.models[0],
-			selected;
-		if(e.keyCode == 38){ // up arrow
-			distro.library.trackListView.setSelected(
-				emptySelection
-					? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)]
-					: distro.library.trackListView.relativeSelection(-1)
-			);
-			if(distro.library.trackListView.selectedTrack){ 
-				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
-			}
-			e.preventDefault();
-		} else if(e.keyCode == 40){ // down arrow
-			distro.library.trackListView.setSelected(
-				emptySelection
+			selected,
+			newSelection;
+		if(e.keyCode == 38 || e.keyCode == 40){
+			if(e.keyCode == 38){ // up arrow
+				newSelection = emptySelection
+						? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)]
+						: distro.library.trackListView.relativeSelection(-1);
+			} else if(e.keyCode == 40){ // down arrow
+				newSelection = emptySelection
 					? distro.library.trackListView.collection.models[0]
-					: distro.library.trackListView.relativeSelection(1)
-			);
-			if(distro.library.trackListView.selectedTrack){ 
+					: distro.library.trackListView.relativeSelection(1);
+			}
+			if(newSelection){ 
+				distro.library.trackListView.setSelected(newSelection);
 				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
 			}
 			e.preventDefault();
