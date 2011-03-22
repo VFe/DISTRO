@@ -85,37 +85,31 @@ global.db.open(function(err, db){
 					errback(new distro.error.ClientError("registration.errors.noCredentials"));
 				}
 			}));
-			app.get('/library', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-				if (session.user.subscriptions && session.user.subscriptions.length) {
-					global.users.subscriptions(session.user, function(err, subscriptions){
-						if (err) {
-							errback(err);
-						} else {
-							global.users.tracks(session.user, function(err, tracks){
-								if (err) {
-									errback(err);
-								} else {
-									successback({tracks: tracks, subscriptions: subscriptions});
-								}
-							});
-						}
-					});
-				} else {
-					successback({tracks: [], subscriptions: []});
-				}
+			app.get('/library', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				var user = distro.Users.userOrGeneric(session && session.user);
+				global.users.subscriptions(user, function(err, subscriptions){
+					if (err) {
+						errback(err);
+					} else {
+						global.tracks.tracksForSubscriptions(user.subscriptions, function(err, tracks){
+							if (err) {
+								errback(err);
+							} else {
+								successback({tracks: tracks, subscriptions: subscriptions});
+							}
+						});
+					}
+				});
 			}));
-			app.get('/library/tracks', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-				if (session.user.subscriptions && session.user.subscriptions.length) {
-					global.users.tracks(session.user, function(err, tracks){
-						if (err) {
-							errback(err);
-						} else {
-							successback(tracks);
-						}
-					});
-				} else {
-					successback({tracks: [], subscriptions: []});
-				}
+			app.get('/library/tracks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				var user = distro.Users.userOrGeneric(session && session.user);
+				global.tracks.tracksForSubscriptions(user.subscriptions, function(err, tracks){
+					if (err) {
+						errback(err);
+					} else {
+						successback(tracks);
+					}
+				});
 			}));
 			app.post('/library/subscriptions', distro.request.handleRequest(true, function(session, req, res, successback, errback){
 				if (!req.body || !req.body.name) {

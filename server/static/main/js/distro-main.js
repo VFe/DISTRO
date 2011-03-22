@@ -29,7 +29,7 @@ distro.pyramidHead = function(message, retryback, giveupback){
 		alert(composedMessage);
 	}
 };
-distro.request = function(path, method, data, hollerback){
+distro.request = function(path, method, data, hollerback, noRefresh){
 	var responseData = null;
 	$.ajax({
 		url: (distro.SERVER + path),
@@ -63,7 +63,7 @@ distro.request = function(path, method, data, hollerback){
 		},
 		complete: function(){
 			if (responseData && 'userName' in responseData) {
-				distro.global.set({user: responseData.userName});
+				distro.global.set({user: responseData.userName}, { noRefresh: noRefresh });
 			}
 		}
 	});
@@ -98,23 +98,14 @@ distro.library = {
 			return +model.attributes.release;
 		}
 	})),
-	refresh: function(complete){
-		if (this.justUpdated) {
-			return;
-		} else {
-			this.justUpdated = true;
-			self = this;
-			setTimeout(function(){
-				self.justUpdated = false;
-			}, 0);
-		}
+	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
 			success: function(data){
 				this.subscriptions.refresh(data.subscriptions || []);
 				this.tracks.refresh(data.tracks || []);
 			},
 			complete: complete
-		}, this));
+		}, this), silent);
 	}
 };
 distro.library.subscriptionListView = new (Backbone.View.extend({
@@ -323,13 +314,15 @@ Hollerback.prototype.fail = function(){
 (function(){
 	var $account = $('#account'),
 	    $accountName = $('#accountName');
-	distro.global.bind('change:user', function(model, user){
+	distro.global.bind('change:user', function(model, user, options){
 		if (user) {
 			$accountName.text(user);
 			$account.addClass('loggedIn');
-			distro.library.refresh();
 		} else {
 			$account.removeClass('loggedIn');
+		}
+		if ( ! (options && options.noRefresh)) {
+			distro.library.refresh();
 		}
 	});
 })();
@@ -861,8 +854,6 @@ distro.init(function(){
 	distro.loc.replacePlaceholders();
 	
 	$('#logOut').click(function(){
-		distro.library.subscriptions.refresh([]);
-		distro.library.tracks.refresh([]);
 		distro.request('logout', 'POST', null, new Hollerback({}));
 	});
 
@@ -874,7 +865,7 @@ distro.init(function(){
 	distro.router = new distro.Router();
 	distro.library.refresh(function(){
 		Backbone.history.start();
-	});
+	}, true); // Don't refresh again if user is updated
 	
 	$('#musicTableBodyContainer')
 	.mousedown(function(){

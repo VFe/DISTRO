@@ -103,30 +103,11 @@ Users.prototype.subscriptions = function(user, callback){
 		}
 	});
 }
-Users.prototype.tracks = function(user, callback){
-	global.tracks.tracksForSubscriptions(user.subscriptions, function(err, tracks){
-		if (err) {
-			callback(err, null);
-		} else {
-			var networkProxies = new Networks.ProxySet,
-				subscriptionNetworks = user.subscriptions.map(function(subscription){ return subscription.network.id });
-			tracks.forEach(function(track) {
-				track.networkWithFile = networkProxies.create(track.network[0]);
-				track.network = track.network.filter(function(network){ return subscriptionNetworks.indexOf(network.id) != -1; }).map(function(network){ return networkProxies.create(network); });
-				if (track.artistNetwork) {
-					track.artistNetwork = networkProxies.create(track.artistNetwork);
-				}
-				if (track.performance && track.performance.venue) {
-					track.performance.venue = networkProxies.create(track.performance.venue, ['name', 'fullname', {name: 'citystate', key: 'location.citystate'}]);
-				}
-			});
-			networkProxies.resolve(function(err){
-				if (err) {
-					callback(err, null);
-				} else {
-					callback(null, tracks);
-				}
-			});
-		}
-	});
+Users.userOrGeneric = function(user){
+	// Non-logged-in users have a subscription to ^DISTRO^.
+	return (
+		user && user.subscriptions && user.subscriptions.length
+			? user
+			: { subscriptions: [ { network: BSON.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ] }
+	);
 }
