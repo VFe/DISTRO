@@ -99,11 +99,11 @@ distro.library = {
 		}
 	})),
 	refresh: function(complete){
+		var self = this;
 		if (this.justUpdated) {
 			return;
 		} else {
 			this.justUpdated = true;
-			self = this;
 			setTimeout(function(){
 				self.justUpdated = false;
 			}, 0);
