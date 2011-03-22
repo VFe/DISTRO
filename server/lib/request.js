@@ -37,23 +37,21 @@ exports.handleRequest = function(requireAuthentication, callback){
 			}
 			endResponse(res, status, {}, responseContent)
 		};
-		if (requireAuthentication){
-			global.sessions.getRequestSession(req, res, function(err, user, sessionID) {
-				if (err){
-					errback(err);
-					return;
-				} else if (user && user.email) {
-					responseContent.userName = user.email;
-					callback({user: user, session: sessionID}, req, res, successback, errback);
-				} else {
+		global.sessions.getRequestSession(req, res, function(err, user, sessionID) {
+			if (err){
+				errback(err);
+				return;
+			} else {
+				if (requireAuthentication && ! (user && user.email)) {
 					responseContent.userName = null;
 					responseContent.status = "unauthorized";
-					endResponse(res, 403, {}, responseContent)
+					endResponse(res, 403, {}, responseContent);
+				} else {
+					responseContent.userName = user && user.email;
+					callback(user ? {user: user, session: sessionID} : null, req, res, successback, errback);
 				}
-			});
-		} else {
-			callback(null, req, res, successback, errback);
-		}
+			}
+		});
 	};
 };
 exports.logToConsole = true;
