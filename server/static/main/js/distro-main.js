@@ -99,11 +99,11 @@ distro.library = {
 		}
 	})),
 	refresh: function(complete){
+		var self = this;
 		if (this.justUpdated) {
 			return;
 		} else {
 			this.justUpdated = true;
-			self = this;
 			setTimeout(function(){
 				self.justUpdated = false;
 			}, 0);
@@ -148,7 +148,7 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	render: function(){
 		$(this.el).stencil(this.template, this.model.toJSON());
-	},
+	}
 });
 distro.library.trackListView = new (Backbone.View.extend({
 	el: $('#musicTableBody>tbody')[0],
@@ -229,7 +229,7 @@ distro.library.TrackView = Backbone.View.extend({
 				}], ['.perfVenue', {$key:'venue', $template:[
 					['%a', {href: {$join:['#/', {$key:'name'}]}, title:{$key:'fullname'}}, '^', {$key:'name'}, '^ '],
 					['%span.cityState', {$key:'citystate'}]
-				]}],
+				]}]
 			],
 			{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 		]] }, $else: ['%td'] }, $else: ['%td'] },
@@ -605,8 +605,7 @@ distro.loadLandingPage = function(name, callback){
 											["%li", {'class': {$key:"."}, style:"margin: 0px 1em;"}, 
 												["%a", {href: {$join: ["mailto:",{$key:""}]}, title:{$key:""}}, {$key:"."}]]}]]}, { $key: 'presence', $children: [
 										['%li', { 'class': { $key: 'name' } }, ['%a', { target:"_blank", href: { $key: 'url' } }]]
-									] }],
-									
+									] }]
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
@@ -817,7 +816,7 @@ distro.Router = Backbone.Controller.extend({
 						['%button#submitButton', {$:{$:function(){
 							$submitButton = this;
 							submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
-						}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')],
+						}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')]
 					]
 				]);
 				$registerCheckbox.change(function(){
