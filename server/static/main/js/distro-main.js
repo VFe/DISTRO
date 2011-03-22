@@ -237,8 +237,7 @@ distro.library.TrackView = Backbone.View.extend({
 	],
 	events: {
 		"dblclick": "play",
-		"click": "select",
-		"mousedown": "blockEvent"
+		"mousedown": "select"
 	},
 	initialize: function() {
 		_.bindAll(this, 'render', 'setPlaying', 'play');
@@ -261,12 +260,12 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	select: function(e){
 		if (e.target.tagName === 'A') { return; }
-		distro.library.trackListView.setSelected(this.model);
+		distro.library.trackListView.setSelected((e.metaKey && distro.library.trackListView.selectedTrack === this.model) ? null : this.model);
+		e.preventDefault();
 	},
 	moveSelection: function(){
 		this.setSelected(distro.library.trackListView.relativeSelection(1));
-	},
-	blockEvent: function(e){ e.preventDefault(); }
+	}
 });
 
 distro.Slider = function (element, callback){
@@ -876,21 +875,52 @@ distro.init(function(){
 	distro.library.refresh(function(){
 		Backbone.history.start();
 	});
-	$(document).keydown(function(e){
-		//{up:38, down:40, left:37, right:39}
-		var emptySelection = !distro.library.trackListView.selectedTrack;
-		if (distro.lightbox.content) { return; } //Don't handle hotkeys if we're in a lightbox.
-
-		if(e.keyCode == 38){
-			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)] : distro.library.trackListView.relativeSelection(-1));
-		} else if(e.keyCode == 40){
-			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[0] : distro.library.trackListView.relativeSelection(1));
-		} else if(e.keyCode == 32 || e.keyCode == 13){
-			if(distro.library.trackListView.relativeSelection(0) && distro.library.trackListView.relativeSelection(0) == distro.library.trackListView.playingTrack){
-				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
-			} else{
-				distro.player.play(distro.library.trackListView.relativeSelection(0));
+	
+	$('#musicTableBodyContainer')
+	.mousedown(function(){
+		this.focus();
+	})
+	.keydown(function(e){
+		var emptySelection = !distro.library.trackListView.selectedTrack,
+			firstTrack = distro.library.trackListView.collection.models[0],
+			selected,
+			newSelection;
+		if(e.keyCode == 38 || e.keyCode == 40){
+			if(e.keyCode == 38){ // up arrow
+				newSelection = emptySelection
+						? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)]
+						: distro.library.trackListView.relativeSelection(-1);
+			} else if(e.keyCode == 40){ // down arrow
+				newSelection = emptySelection
+					? distro.library.trackListView.collection.models[0]
+					: distro.library.trackListView.relativeSelection(1);
 			}
+			if(newSelection){ 
+				distro.library.trackListView.setSelected(newSelection);
+				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+			}
+			e.preventDefault();
+		} else if(e.keyCode == 13){ // enter
+			if ((selected = distro.library.trackListView.selectedTrack)){ 
+				distro.player.play(selected);
+			}
+		}
+	})
+	.focus(); // Give initial focus to the music table 
+	$(document).keydown(function(e){
+		// { up:38, down:40, left:37, right:39, space:32, enter:13 }
+		var emptySelection = !distro.library.trackListView.selectedTrack,
+			firstTrack = distro.library.trackListView.collection.models[0],
+			selected;
+		if ($(e.target).is('input, textarea, select, [contenteditable]')) { return; }
+
+		if(e.keyCode == 32){
+			if(distro.player.current){
+				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
+			} else {
+				distro.player.play(firstTrack);
+			}
+			e.preventDefault();
 		} else if(e.keyCode == 37){
 			if (distro.player.current) {
 				if (distro.player.current.position > 1000) {
@@ -914,6 +944,20 @@ distro.init(function(){
 			return original.apply(this, arguments);
 		};
 	})(jQuery);
+	
+	//credit: Abhijit Rao (http://stackoverflow.com/questions/1805808)
+	$.scrollIntoView = function(element, container) {
+		var containerTop = $(container).scrollTop(),
+			containerBottom = containerTop + $(container).height(), 
+			elemTop = element.offsetTop,
+			elemBottom = elemTop + $(element).height();
+		if (elemTop < containerTop) {
+			$(container).scrollTop(elemTop);
+		} else if (elemBottom > containerBottom) {
+			$(container).scrollTop(elemBottom - $(container).height());
+		}
+	}	
+
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
 	_gaq.push(['_setDomainName', '.distro.fm']);
