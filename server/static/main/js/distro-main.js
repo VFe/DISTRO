@@ -330,6 +330,7 @@ Hollerback.prototype.fail = function(){
 distro.lightbox = new (function(){
 	function Lightbox(){
 		var self = this;
+		this.content = [];
 		this.$lightbox = $('#lightbox');
 		this.$contentWrapper = $('#lightboxWrapper');
 		this.$contentWrapper.delegate('.close.button', 'click', function(){
@@ -360,13 +361,25 @@ distro.lightbox = new (function(){
 			}
 		});
 	}
+	Lightbox.prototype.push = function(content){
+		this.content.push(content);
+		this.show();
+	};
 	Lightbox.prototype.show = function(content){
-		var self = this;
+		var self = this, old = this.content[this.content.length - 1];
+		if (content) {
+			this.content = [content];
+		} else {
+			if (old) {
+				content = old;
+			} else {
+				return;
+			}
+		}
 		this.$contentWrapper.fadeOut(200).queue(function(next){
 			var $content;
-			self.hideContent();
+			self.hideContent(old);
 			$content = $('<div>', { 'class': 'lightboxContent' });
-			self.content = content;
 			self.$contentWrapper.html($content);
 			content.show($content, self);
 			Backbone.history.saveLocation('/' + content.name);
@@ -376,20 +389,28 @@ distro.lightbox = new (function(){
 		this.$lightbox.fadeIn(200);
 	};
 	Lightbox.prototype.hide = function(name){
-		if (!name || (this.content && name === this.content.name)) {
-			var self = this;
-			this.$lightbox.fadeOut(200);
-			this.$contentWrapper.fadeOut(200, function(){
-				self.hideContent();
-			});
-			Backbone.history.saveLocation('');
-			document.title = distro.TITLE;
+		this.content.splice(0, this.content.length - 1);
+		this.pop(name);
+	}
+	Lightbox.prototype.pop = function(name){
+		var self = this, old;
+		if ((!name || (this.content.length && name === this.content[this.content.length - 1].name)) && (old = this.content.pop())) {
+			if (this.content.length) {
+				this.show();
+			} else {
+				this.$lightbox.fadeOut(200);
+				this.$contentWrapper.fadeOut(200, function(){
+					self.hideContent(old);
+				});
+				Backbone.history.saveLocation('');
+				document.title = distro.TITLE;
+			}
+			return old;
 		}
 	};
-	Lightbox.prototype.hideContent = function(){
-		if (this.content) {
-			this.content.hide && this.content.hide(this);
-			this.content = null;
+	Lightbox.prototype.hideContent = function(content){
+		if (content) {
+			content.hide && content.hide(this);
 		}
 		this.$contentWrapper.empty();
 	};
@@ -400,7 +421,7 @@ distro.lightbox = new (function(){
 (function(){
 	distro.global.bind('change:user', function(model, user){
 		if (user) {
-			distro.lightbox.hide('login');
+			distro.lightbox.pop('login');
 		}
 	});
 })();
@@ -564,7 +585,8 @@ distro.loadLandingPage = function(name, callback){
 				name: model.name,
 				longName: model.get('fullname'),
 				show: function($content){
-					var $subscribeButton,
+					var self = this,
+					    $subscribeButton,
 					    subscribed = distro.library.subscriptions.isSubscribed(model.name);
 					$content.attr('id', 'landingBox');
 					$content.stencil(["%form", {},
@@ -608,6 +630,7 @@ distro.loadLandingPage = function(name, callback){
 					$subscribeButton.click(function(){
 						if (!distro.global.get('user')) {
 							if (confirm('You need a free account to subscribe to networks on DISTRO.\n\nWould you like to log in or create one now?')) {
+								self.willSubscribe = true;
 								document.location.hash = '/login';
 							}
 							return;
@@ -618,11 +641,19 @@ distro.loadLandingPage = function(name, callback){
 								success: function(){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
+									distro.lightbox.pop();
 								}
 							});
 						}
 					});
 					$('.email').click(function(){$('.emailList').toggle()});
+					if (this.willSubscribe) { // If we're returning from logging in
+						if (distro.global.get('user')) {
+							setTimeout(function(){
+								$subscribeButton.click();
+							}, 800);
+						}
+					}
 				}
 			});
 			callback(model);
@@ -780,7 +811,7 @@ distro.Router = Backbone.Controller.extend({
 			window.location.hash = '';
 			return;
 		}
-		distro.lightbox.show({
+		distro.lightbox.push({
 			name: 'login',
 			longName: 'Login',
 			show: function($content){
