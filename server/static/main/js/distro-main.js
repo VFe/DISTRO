@@ -641,6 +641,7 @@ distro.loadLandingPage = function(name, callback){
 								success: function(){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
+									distro.lightbox.pop();
 								}
 							});
 						}
