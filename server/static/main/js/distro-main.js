@@ -29,7 +29,7 @@ distro.pyramidHead = function(message, retryback, giveupback){
 		alert(composedMessage);
 	}
 };
-distro.request = function(path, method, data, hollerback){
+distro.request = function(path, method, data, hollerback, noRefresh){
 	var responseData = null;
 	$.ajax({
 		url: (distro.SERVER + path),
@@ -63,7 +63,7 @@ distro.request = function(path, method, data, hollerback){
 		},
 		complete: function(){
 			if (responseData && 'userName' in responseData) {
-				distro.global.set({user: responseData.userName});
+				distro.global.set({user: responseData.userName}, { noRefresh: noRefresh });
 			}
 		}
 	});
@@ -98,23 +98,14 @@ distro.library = {
 			return +model.attributes.release;
 		}
 	})),
-	refresh: function(complete){
-		var self = this;
-		if (this.justUpdated) {
-			return;
-		} else {
-			this.justUpdated = true;
-			setTimeout(function(){
-				self.justUpdated = false;
-			}, 0);
-		}
+	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
 			success: function(data){
 				this.subscriptions.refresh(data.subscriptions || []);
 				this.tracks.refresh(data.tracks || []);
 			},
 			complete: complete
-		}, this));
+		}, this), silent);
 	}
 };
 distro.library.subscriptionListView = new (Backbone.View.extend({
@@ -237,8 +228,7 @@ distro.library.TrackView = Backbone.View.extend({
 	],
 	events: {
 		"dblclick": "play",
-		"click": "select",
-		"mousedown": "blockEvent"
+		"mousedown": "select"
 	},
 	initialize: function() {
 		_.bindAll(this, 'render', 'setPlaying', 'play');
@@ -261,12 +251,12 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	select: function(e){
 		if (e.target.tagName === 'A') { return; }
-		distro.library.trackListView.setSelected(this.model);
+		distro.library.trackListView.setSelected((e.metaKey && distro.library.trackListView.selectedTrack === this.model) ? null : this.model);
+		e.preventDefault();
 	},
 	moveSelection: function(){
 		this.setSelected(distro.library.trackListView.relativeSelection(1));
-	},
-	blockEvent: function(e){ e.preventDefault(); }
+	}
 });
 
 distro.Slider = function (element, callback){
@@ -324,13 +314,15 @@ Hollerback.prototype.fail = function(){
 (function(){
 	var $account = $('#account'),
 	    $accountName = $('#accountName');
-	distro.global.bind('change:user', function(model, user){
+	distro.global.bind('change:user', function(model, user, options){
 		if (user) {
 			$accountName.text(user);
 			$account.addClass('loggedIn');
-			distro.library.refresh();
 		} else {
 			$account.removeClass('loggedIn');
+		}
+		if ( ! (options && options.noRefresh)) {
+			distro.library.refresh();
 		}
 	});
 })();
@@ -338,6 +330,7 @@ Hollerback.prototype.fail = function(){
 distro.lightbox = new (function(){
 	function Lightbox(){
 		var self = this;
+		this.content = [];
 		this.$lightbox = $('#lightbox');
 		this.$contentWrapper = $('#lightboxWrapper');
 		this.$contentWrapper.delegate('.close.button', 'click', function(){
@@ -368,13 +361,25 @@ distro.lightbox = new (function(){
 			}
 		});
 	}
+	Lightbox.prototype.push = function(content){
+		this.content.push(content);
+		this.show();
+	};
 	Lightbox.prototype.show = function(content){
-		var self = this;
+		var self = this, old = this.content[this.content.length - 1];
+		if (content) {
+			this.content = [content];
+		} else {
+			if (old) {
+				content = old;
+			} else {
+				return;
+			}
+		}
 		this.$contentWrapper.fadeOut(200).queue(function(next){
 			var $content;
-			self.hideContent();
+			self.hideContent(old);
 			$content = $('<div>', { 'class': 'lightboxContent' });
-			self.content = content;
 			self.$contentWrapper.html($content);
 			content.show($content, self);
 			Backbone.history.saveLocation('/' + content.name);
@@ -384,20 +389,28 @@ distro.lightbox = new (function(){
 		this.$lightbox.fadeIn(200);
 	};
 	Lightbox.prototype.hide = function(name){
-		if (!name || (this.content && name === this.content.name)) {
-			var self = this;
-			this.$lightbox.fadeOut(200);
-			this.$contentWrapper.fadeOut(200, function(){
-				self.hideContent();
-			});
-			Backbone.history.saveLocation('');
-			document.title = distro.TITLE;
+		this.content.splice(0, this.content.length - 1);
+		this.pop(name);
+	}
+	Lightbox.prototype.pop = function(name){
+		var self = this, old;
+		if ((!name || (this.content.length && name === this.content[this.content.length - 1].name)) && (old = this.content.pop())) {
+			if (this.content.length) {
+				this.show();
+			} else {
+				this.$lightbox.fadeOut(200);
+				this.$contentWrapper.fadeOut(200, function(){
+					self.hideContent(old);
+				});
+				Backbone.history.saveLocation('');
+				document.title = distro.TITLE;
+			}
+			return old;
 		}
 	};
-	Lightbox.prototype.hideContent = function(){
-		if (this.content) {
-			this.content.hide && this.content.hide(this);
-			this.content = null;
+	Lightbox.prototype.hideContent = function(content){
+		if (content) {
+			content.hide && content.hide(this);
 		}
 		this.$contentWrapper.empty();
 	};
@@ -408,7 +421,7 @@ distro.lightbox = new (function(){
 (function(){
 	distro.global.bind('change:user', function(model, user){
 		if (user) {
-			distro.lightbox.hide('login');
+			distro.lightbox.pop('login');
 		}
 	});
 })();
@@ -572,7 +585,8 @@ distro.loadLandingPage = function(name, callback){
 				name: model.name,
 				longName: model.get('fullname'),
 				show: function($content){
-					var $subscribeButton,
+					var self = this,
+					    $subscribeButton,
 					    subscribed = distro.library.subscriptions.isSubscribed(model.name);
 					$content.attr('id', 'landingBox');
 					$content.stencil(["%form", {},
@@ -616,6 +630,7 @@ distro.loadLandingPage = function(name, callback){
 					$subscribeButton.click(function(){
 						if (!distro.global.get('user')) {
 							if (confirm('You need a free account to subscribe to networks on DISTRO.\n\nWould you like to log in or create one now?')) {
+								self.willSubscribe = true;
 								document.location.hash = '/login';
 							}
 							return;
@@ -626,11 +641,19 @@ distro.loadLandingPage = function(name, callback){
 								success: function(){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
+									distro.lightbox.pop();
 								}
 							});
 						}
 					});
 					$('.email').click(function(){$('.emailList').toggle()});
+					if (this.willSubscribe) { // If we're returning from logging in
+						if (distro.global.get('user')) {
+							setTimeout(function(){
+								$subscribeButton.click();
+							}, 800);
+						}
+					}
 				}
 			});
 			callback(model);
@@ -788,7 +811,7 @@ distro.Router = Backbone.Controller.extend({
 			window.location.hash = '';
 			return;
 		}
-		distro.lightbox.show({
+		distro.lightbox.push({
 			name: 'login',
 			longName: 'Login',
 			show: function($content){
@@ -861,8 +884,6 @@ distro.init(function(){
 	distro.loc.replacePlaceholders();
 	
 	$('#logOut').click(function(){
-		distro.library.subscriptions.refresh([]);
-		distro.library.tracks.refresh([]);
 		distro.request('logout', 'POST', null, new Hollerback({}));
 	});
 
@@ -874,22 +895,53 @@ distro.init(function(){
 	distro.router = new distro.Router();
 	distro.library.refresh(function(){
 		Backbone.history.start();
-	});
-	$(document).keydown(function(e){
-		//{up:38, down:40, left:37, right:39}
-		var emptySelection = !distro.library.trackListView.selectedTrack;
-		if (distro.lightbox.content) { return; } //Don't handle hotkeys if we're in a lightbox.
-
-		if(e.keyCode == 38){
-			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)] : distro.library.trackListView.relativeSelection(-1));
-		} else if(e.keyCode == 40){
-			distro.library.trackListView.setSelected(emptySelection ? distro.library.trackListView.collection.models[0] : distro.library.trackListView.relativeSelection(1));
-		} else if(e.keyCode == 32 || e.keyCode == 13){
-			if(distro.library.trackListView.relativeSelection(0) && distro.library.trackListView.relativeSelection(0) == distro.library.trackListView.playingTrack){
-				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
-			} else{
-				distro.player.play(distro.library.trackListView.relativeSelection(0));
+	}, true); // Don't refresh again if user is updated
+	
+	$('#musicTableBodyContainer')
+	.mousedown(function(){
+		this.focus();
+	})
+	.keydown(function(e){
+		var emptySelection = !distro.library.trackListView.selectedTrack,
+			firstTrack = distro.library.trackListView.collection.models[0],
+			selected,
+			newSelection;
+		if(e.keyCode == 38 || e.keyCode == 40){
+			if(e.keyCode == 38){ // up arrow
+				newSelection = emptySelection
+						? distro.library.trackListView.collection.models[(distro.library.trackListView.collection.length-1)]
+						: distro.library.trackListView.relativeSelection(-1);
+			} else if(e.keyCode == 40){ // down arrow
+				newSelection = emptySelection
+					? distro.library.trackListView.collection.models[0]
+					: distro.library.trackListView.relativeSelection(1);
 			}
+			if(newSelection){ 
+				distro.library.trackListView.setSelected(newSelection);
+				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+			}
+			e.preventDefault();
+		} else if(e.keyCode == 13){ // enter
+			if ((selected = distro.library.trackListView.selectedTrack)){ 
+				distro.player.play(selected);
+			}
+		}
+	})
+	.focus(); // Give initial focus to the music table 
+	$(document).keydown(function(e){
+		// { up:38, down:40, left:37, right:39, space:32, enter:13 }
+		var emptySelection = !distro.library.trackListView.selectedTrack,
+			firstTrack = distro.library.trackListView.collection.models[0],
+			selected;
+		if ($(e.target).is('input, textarea, select, [contenteditable]')) { return; }
+
+		if(e.keyCode == 32){
+			if(distro.player.current){
+				distro.player.current.paused ? distro.player.current.play() : distro.player.current.pause();
+			} else {
+				distro.player.play(firstTrack);
+			}
+			e.preventDefault();
 		} else if(e.keyCode == 37){
 			if (distro.player.current) {
 				if (distro.player.current.position > 1000) {
@@ -913,6 +965,20 @@ distro.init(function(){
 			return original.apply(this, arguments);
 		};
 	})(jQuery);
+	
+	//credit: Abhijit Rao (http://stackoverflow.com/questions/1805808)
+	$.scrollIntoView = function(element, container) {
+		var containerTop = $(container).scrollTop(),
+			containerBottom = containerTop + $(container).height(), 
+			elemTop = element.offsetTop,
+			elemBottom = elemTop + $(element).height();
+		if (elemTop < containerTop) {
+			$(container).scrollTop(elemTop);
+		} else if (elemBottom > containerBottom) {
+			$(container).scrollTop(elemBottom - $(container).height());
+		}
+	}	
+
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
 	_gaq.push(['_setDomainName', '.distro.fm']);
