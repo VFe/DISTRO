@@ -1077,20 +1077,97 @@ ul.aboutIcons{
 	padding: 0 0.25em;
 	.border-radius(0.25em);
 }
-#loginRegisterBox{
-	width: 30em;
-}
-#loginRegisterBox dt, #loginRegisterBox dd{
-	font-size: 1.3em;
-	margin-left: 1em;
-}
-#loginRegisterBox dd{
-	padding-bottom: 0.5em;
-	border-bottom: 0.3em solid @brightBlue;
-	margin-bottom: 1em;
-}
-#loginRegisterBox input{
-	font: inherit;
+#lightboxWrapper #loginRegisterBox{
+	font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+	width: 350px;
+	padding: 0.4em;
+	a:link, a:visited{
+		color: #DD3;
+	}
+	h2{
+		margin: 0.3em 1.4em;
+		font-size: 1.05em;
+		font-weight: 500;
+	}
+	h1{
+		background: #444;
+		.backgroundGradient(rgba(40, 40, 40, 0), rgba(70, 70, 70, 1));
+		border-top: 2px solid #333;
+		font-size: 1.4em;
+		font-weight: normal;
+		padding: 0.4em 1.2em;
+		margin: 0.5em 0;
+	}
+	#logIn h1{
+		color: #FF0;
+	}
+	#register h1, a:link, a:visited{
+		color: #3CF;
+	}
+	form{
+		margin: 1.5em 1.5em;
+	}
+	input[type='text'], input[type='password']{
+		display: block;
+		.border-box;
+		width: 100%;
+		margin: 0.8em 0;
+		font: inherit;
+		padding: 0.8em;
+		font-size: 1em;
+		background: #4A4A4A;
+		border: 1px solid #999;
+		.border-radius(0.4em);
+		color: white;
+	}
+	input[type='text']:disabled, input[type='password']:disabled{
+		background: #666;
+		border-color: #888;
+	}
+	label{
+		color: #777;
+	}
+	input:focus{
+		border-color: #EEE;
+		outline: none;
+	}
+	button{
+		color: black;
+		border: none;
+		.border-radius(0.7em);
+		font: inherit;
+		font-size: 1em;
+		font-weight: 500;
+		padding: 0.5em 0;
+		width: 5em;
+		margin-right: 1em;
+	}
+	#logIn button{
+		background-color: #DD5;
+	}
+	#register button{
+		background-color: #6CE;
+	}
+	button:not(:disabled){
+		cursor: pointer;
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0)), color-stop(0.5, rgba(50, 50, 50, 0)), to(rgba(50, 50, 50, 0.8)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0) 50%, rgba(50, 50, 50, 0.8));
+	}
+	button:disabled{
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.5)), color-stop(0.5, rgba(50, 50, 50, 0.5)), to(rgba(50, 50, 50, 0.9)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.5) 50%, rgba(50, 50, 50, 0.8));
+		color: #333;
+	}
+	button:not(:disabled):active{
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.9)), color-stop(0.5, rgba(50, 50, 50, 0)), to(rgba(50, 50, 50, 0)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.9), rgba(50, 50, 50, 0) 50%);
+	}
+	#register label{
+		text-transform: uppercase;
+		color: white;
+		font-size: 0.75em;
+		vertical-align: 0.2em;
+	}
 }
 .hidden{
 	display: none !important;

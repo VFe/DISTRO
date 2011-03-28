@@ -815,54 +815,75 @@ distro.Router = Backbone.Controller.extend({
 			name: 'login',
 			longName: 'Login',
 			show: function($content){
-				var $form, $emailField, $passwordField, $registerCheckbox, $submitButton, submitStatus = new Backbone.Model({submitting:false});
+				var $loginForm, $registerForm, submitStatus = new Backbone.Model({submitting:false}), $inputs;
+				function bindToSubmit(){
+					var $field = $(this);
+					submitStatus.bind('change:submitting', function(m, submitting){
+						$field.attr('disabled', submitting ? true : null);
+					});
+				}
 				$content.attr('id', 'loginRegisterBox');
-				$content.haml(['%form', {$:{$:function(){ $form = this; }}},
-					['%dl',
-						['%dt', ['%label', {'for':'emailAddress'}, distro.loc.str('registration.emailAddressQuery')]],
-						['%dd', ['%input#emailAddress', {$:{$:function(){
-							$emailField = this;
-							submitStatus.bind('change:submitting', function(m, submitting){ $emailField.attr('disabled', submitting ? true : null) });
-						}}, size:'35', placeholder:'s@distro.fm'}]],
-						['%dt', ['%label', {'for':'password'}, distro.loc.str('registration.passwordQuery')]],
-						['%dd', ['%input#password', {$:{$:function(){
-							$passwordField = this;
-							submitStatus.bind('change:submitting', function(m, submitting){ $passwordField.attr('disabled', submitting ? true : null) });
-						}}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
-						['%dt', ['%label', {'for':'registrationType'}, distro.loc.str('registration.registerQuery')]],
-						['%dd', ['%input#registrationType', {$:{$:function(){
-							$registerCheckbox = this;
-							submitStatus.bind('change:submitting', function(m, submitting){ $registerCheckbox.attr('disabled', submitting ? true : null) });
-						}}, type:'checkbox'}]]
+				$content.haml([ "#container",
+					[ "#logIn",
+						[ "%h2", "Have an account?" ],
+						[ "%h1", "Log In" ],
+						[ "%form", { $:{$:function(){ $loginForm = this; }}},
+							[ "%input", { $:{$:bindToSubmit}, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:{$:bindToSubmit}, "type": "password", "name": "password", "placeholder": "Password" } ],
+							[ "%p",
+								[ "%button", { $:{$:bindToSubmit} }, "Log In" ],
+								[ "%input#login_remember_me", { $:{$:bindToSubmit}, "type": "checkbox", "name": "remember_me" } ],
+								[ "%label", { "for": "login_remember_me" }, "Remember me" ]
+							]
+						]
 					],
-					['%div', {style:"text-align: right"},
-						['%button#submitButton', {$:{$:function(){
-							$submitButton = this;
-							submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
-						}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')]
+					[ "#register",
+						[ "%h2", "New to DISTRO?" ],
+						[ "%h1", "Sign up" ],
+						[ "%form", { $:{$:function(){ $registerForm = this; }}},
+							[ "%input", { $:{$:bindToSubmit}, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:{$:bindToSubmit}, "type": "password", "name": "password", "placeholder": "Password" } ],
+							[ "%p",
+								[ "%button", { $:{$:function(){
+									var $button = $(this), terms = $registerForm[0].elements.accept_terms;
+									submitStatus.bind('change:submitting', function(m, submitting){
+										$button.attr('disabled', submitting || ! terms.checked ? true : null);
+									});
+									$(terms).change(function(){
+										$button.attr('disabled', ! this.checked || submitStatus.get('submitting') ? true : null);
+									})
+								}}, "disabled": "disabled" }, "Sign Up" ],
+								[ "%input#register_remember_me", { $:{$:bindToSubmit}, "type": "checkbox", "name": "accept_terms" } ],
+								[ "%label", { "for": "register_remember_me" }, "I agree with the ", [ "%a", { "href": "" }, "terms of use" ] ]
+							]
+						]
 					]
 				]);
-				$registerCheckbox.change(function(){
-					$submitButton.text($registerCheckbox[0].checked ? distro.loc.str('registration.registerLabel') : distro.loc.str('registration.logInLabel'));
-				});
-				$form.submit(function(e){
-					e.preventDefault();
-					var email = $emailField.val(), password = $passwordField.val(), register = $registerCheckbox[0].checked;
-					if (!email || !password) {
+				$content.submit(function(e){
+					var form = e.target,
+					    registering = e.target === $registerForm[0],
+					    elements = form.elements,
+						data = { email: elements.email.value, password: elements.password.value };
+					if ( ! (data.email && data.password)) {
 						alert(distro.loc.str('registration.errors.noCredentials'));
-					} else {
-						submitStatus.set({submitting: true});
-						distro.request(register ? 'register' : 'login', 'POST', {email: email, password: password}, new Hollerback({
-							failure: function(data){
-								if (data && data.errorMessage) {
-									alert(distro.loc.str(data.errorMessage) || data.errorMessage);
-								}
-							},
-							complete: function(){
-								submitStatus.set({submitting: false});
-							}
-						}));
+						return false;
 					}
+					if (registering) {
+						data.acceptTerms = elements.accept_terms.checked;
+					} else {
+						data.rememberMe = elements.remember_me.checked;
+					}
+					submitStatus.set({submitting: true});
+					distro.request(registering ? 'register' : 'login', 'POST', data, new Hollerback({
+						failure: function(data){
+							if (data && data.errorMessage) {
+								alert(distro.loc.str(data.errorMessage) || data.errorMessage);
+							}
+						},
+						complete: function(){
+							submitStatus.set({submitting: false});
+						}
+					}));
 					return false;
 				});
 			}
