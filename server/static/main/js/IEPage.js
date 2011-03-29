@@ -33,6 +33,11 @@ var ieWarn = ["#aboutBox.lightboxContent",
 		]
 	]
 ];
-$(document.body).css({'background-image':'url(\'https://s3.amazonaws.com/distro-static/IE/IEBGBig.jpg\')', 'background-repeat':'no-repeat', 'background-attachment':'fixed', 'background-position':'top left'});
-$('#lightboxWrapper').haml(ieWarn);
-$('#lightboxWrapper').show();
+$.ready(function(){
+	$(document.body).css({'background-image':'url(\'https://s3.amazonaws.com/distro-static/IE/IEBGBig.jpg\')', 'background-repeat':'no-repeat', 'background-attachment':'fixed', 'background-position':'top left'});
+	$('#top').hide();
+	$('#bottom').hide();
+	$('#content').hide();
+	$('#lightboxWrapper').haml(ieWarn);
+	$('#lightboxWrapper').show();	
+});
