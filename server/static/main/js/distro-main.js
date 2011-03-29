@@ -823,7 +823,7 @@ distro.Router = Backbone.Controller.extend({
 					});
 				}
 				$content.attr('id', 'loginRegisterBox');
-				$content.haml([ "#container",
+				$content.haml([["%span.close.button", {}, "x"], ["#container",
 					[ "#logIn",
 						[ "%h2", "Have an account?" ],
 						[ "%h1", "Log In" ],
@@ -858,7 +858,7 @@ distro.Router = Backbone.Controller.extend({
 							]
 						]
 					]
-				]);
+				]]);
 				$content.submit(function(e){
 					var form = e.target,
 					    registering = e.target === $registerForm[0],
