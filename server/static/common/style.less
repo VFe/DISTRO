@@ -642,10 +642,10 @@ table{
 	margin: 8em auto 0px;
 	vertical-align: middle;
 	max-height: 100em;
-	overflow-y: auto;
 	padding: 0.5em 1em 1em 1em;
 	.border-radius(0.5em);
 	.box-shadow(0px 0.5em 3em rgba(0, 0, 0, 0.5));
+	position: relative;
 }
 #lightboxWrapper .lightboxContent button.fancy{
 	margin: 0 1.5em 1.5em 1.5em;
@@ -669,14 +669,13 @@ table{
 	background-image: url(images/rainbow_big.png);
 	background-repeat: no-repeat;
 	background-position: center 0;
-	position: relative;
 }
 #calFrame {
 	border-width: 0;
 	width: 21em;
 	height: 300px;
 }
-#networkSearch .close{
+#networkSearch .close, #loginRegisterBox .close{
 	cursor: pointer;
 	position: absolute;
 	padding: 0.5em 1em 0.5em 0.5em;
@@ -1027,10 +1026,10 @@ ul.aboutIcons{
 	}
 }
 #landingBox .subscribeButton {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
 	font-size: 24px;
 	font-weight: 200;
 	color: rgb(96, 204, 54);
@@ -1038,15 +1037,15 @@ ul.aboutIcons{
 	cursor: pointer;
 	.button;
 	.icon, .label{
-	    background: black;
+		background: black;
 		border: 1px solid rgb(96, 204, 54);
 		line-height: 2.3em;
 		vertical-align: top;
 	}
 	.icon{
-	    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAXCAYAAACvd9dwAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAXpJREFUeNpiZKAROGdq0A+kDEBsZhYGBkVDFrA4oyIPA1OyMlzd4WWqFzxyKgpp4QZGGnlsPpBKALGZmBkYpDWYGdi5GBkYJTkhHuNgBqs7vkaJ4d5ZURBzQdrMtMRB7zliPTZ5nQoDz2lhBjaEVqp7kGkgPNa3U59h1Xlxhk3MzAy/ENoTZqXPmj8oPUesx9Y8C2d4IR7OwC3Iz/CGkZGmHmSip8dOvbdYcO6DCQMLGyuDnpMNzT3IRDOPwUpFqMeAINFRORWUp8D5ih4eZKSJx4yEGJiCZJGVJnILzV0A4+QfeQfSA3f8rRPnGF7ef8Qg8v8/g9/fv1QrZBjp7TF6epBxIDxGLw8yDpTH6OFBxoH0GK09yDjQHqOlBxkHg8do5UHGweIxWniQcTB5jNoeZBxsHqOmBxkHo8eo5UHGweoxaniQcTB7jFIPMg52j1HiQcah4DFyPcgIHaUqwPCYJj8DU7TCoPEYLg9eO3yS4e2T59g8OAEgwAAtsIYZr8zg5QAAAABJRU5ErkJggg==);
-	    background-repeat: no-repeat;
-    	background-position: center;
+		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAXCAYAAACvd9dwAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAXpJREFUeNpiZKAROGdq0A+kDEBsZhYGBkVDFrA4oyIPA1OyMlzd4WWqFzxyKgpp4QZGGnlsPpBKALGZmBkYpDWYGdi5GBkYJTkhHuNgBqs7vkaJ4d5ZURBzQdrMtMRB7zliPTZ5nQoDz2lhBjaEVqp7kGkgPNa3U59h1Xlxhk3MzAy/ENoTZqXPmj8oPUesx9Y8C2d4IR7OwC3Iz/CGkZGmHmSip8dOvbdYcO6DCQMLGyuDnpMNzT3IRDOPwUpFqMeAINFRORWUp8D5ih4eZKSJx4yEGJiCZJGVJnILzV0A4+QfeQfSA3f8rRPnGF7ef8Qg8v8/g9/fv1QrZBjp7TF6epBxIDxGLw8yDpTH6OFBxoH0GK09yDjQHqOlBxkHg8do5UHGweIxWniQcTB5jNoeZBxsHqOmBxkHo8eo5UHGweoxaniQcTB7jFIPMg52j1HiQcah4DFyPcgIHaUqwPCYJj8DU7TCoPEYLg9eO3yS4e2T59g8OAEgwAAtsIYZr8zg5QAAAABJRU5ErkJggg==);
+		background-repeat: no-repeat;
+		background-position: center;
 		float: left;
 		height: 2.3em;
 		width: 2.9em;
@@ -1059,14 +1058,14 @@ ul.aboutIcons{
 	&.disabled{
 		color: rgb(56, 66, 61);
 		cursor: default;
-    	.icon, .label{
-    		border-color: rgb(56, 66, 61);
-    	}
+		.icon, .label{
+			border-color: rgb(56, 66, 61);
+		}
 	}
 	&:not(.disabled):active .label{
 		color: black;
-    	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.6, rgb(96, 204, 54)), to(rgb(56, 66, 61)));
-    	background-image: -moz-linear-gradient(top, rgb(96, 204, 54) 60%, rgb(56, 66, 61));
+		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.6, rgb(96, 204, 54)), to(rgb(56, 66, 61)));
+		background-image: -moz-linear-gradient(top, rgb(96, 204, 54) 60%, rgb(56, 66, 61));
 	}
 }
 #mapLink {
@@ -1077,20 +1076,98 @@ ul.aboutIcons{
 	padding: 0 0.25em;
 	.border-radius(0.25em);
 }
-#loginRegisterBox{
-	width: 30em;
-}
-#loginRegisterBox dt, #loginRegisterBox dd{
-	font-size: 1.3em;
-	margin-left: 1em;
-}
-#loginRegisterBox dd{
-	padding-bottom: 0.5em;
-	border-bottom: 0.3em solid @brightBlue;
-	margin-bottom: 1em;
-}
-#loginRegisterBox input{
-	font: inherit;
+#lightboxWrapper #loginRegisterBox{
+	font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+	width: 350px;
+	padding: 0.4em;
+	a:link, a:visited{
+		color: #DD3;
+	}
+	h2{
+		margin: 0.3em 1.4em;
+		font-size: 1.05em;
+		font-weight: 500;
+	}
+	h1{
+		background: #444;
+		background: -webkit-gradient(linear, left top, left bottom, from(rgba(40, 40, 40, 0)), to(rgba(70, 70, 70, 1)));
+		background: -moz-linear-gradient(top, rgba(40, 40, 40, 0), rgba(70, 70, 70, 1));
+		border-top: 2px solid #333;
+		font-size: 1.4em;
+		font-weight: normal;
+		padding: 0.4em 1.2em;
+		margin: 0.5em 0;
+	}
+	#logIn h1{
+		color: #FF0;
+	}
+	#register h1, a:link, a:visited{
+		color: #3CF;
+	}
+	form{
+		margin: 1.5em 1.5em;
+	}
+	input[type='text'], input[type='password']{
+		display: block;
+		.border-box;
+		width: 100%;
+		margin: 0.8em 0;
+		font: inherit;
+		padding: 0.8em;
+		font-size: 1em;
+		background: #4A4A4A;
+		border: 1px solid #999;
+		.border-radius(0.4em);
+		color: white;
+	}
+	input[type='text']:disabled, input[type='password']:disabled{
+		background: #666;
+		border-color: #888;
+	}
+	label{
+		color: #777;
+	}
+	input:focus{
+		border-color: #EEE;
+		outline: none;
+	}
+	button{
+		color: black;
+		border: none;
+		.border-radius(0.7em);
+		font: inherit;
+		font-size: 1em;
+		font-weight: 500;
+		padding: 0.5em 0;
+		width: 5em;
+		margin-right: 1em;
+	}
+	#logIn button{
+		background-color: #DD5;
+	}
+	#register button{
+		background-color: #6CE;
+	}
+	button:not(:disabled){
+		cursor: pointer;
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0)), color-stop(0.5, rgba(50, 50, 50, 0)), to(rgba(50, 50, 50, 0.8)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0) 50%, rgba(50, 50, 50, 0.8));
+	}
+	button:disabled{
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.5)), color-stop(0.5, rgba(50, 50, 50, 0.5)), to(rgba(50, 50, 50, 0.9)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.5) 50%, rgba(50, 50, 50, 0.8));
+		color: #333;
+	}
+	button:not(:disabled):active{
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.9)), color-stop(0.5, rgba(50, 50, 50, 0)), to(rgba(50, 50, 50, 0)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.9), rgba(50, 50, 50, 0) 50%);
+	}
+	#register label{
+		text-transform: uppercase;
+		color: white;
+		font-size: 0.75em;
+		vertical-align: 0.2em;
+	}
 }
 .hidden{
 	display: none !important;

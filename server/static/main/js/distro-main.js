@@ -29,7 +29,7 @@ distro.pyramidHead = function(message, retryback, giveupback){
 		alert(composedMessage);
 	}
 };
-distro.request = function(path, method, data, hollerback){
+distro.request = function(path, method, data, hollerback, noRefresh){
 	var responseData = null;
 	$.ajax({
 		url: (distro.SERVER + path),
@@ -63,7 +63,7 @@ distro.request = function(path, method, data, hollerback){
 		},
 		complete: function(){
 			if (responseData && 'userName' in responseData) {
-				distro.global.set({user: responseData.userName});
+				distro.global.set({user: responseData.userName}, { noRefresh: noRefresh });
 			}
 		}
 	});
@@ -98,23 +98,14 @@ distro.library = {
 			return +model.attributes.release;
 		}
 	})),
-	refresh: function(complete){
-		if (this.justUpdated) {
-			return;
-		} else {
-			this.justUpdated = true;
-			self = this;
-			setTimeout(function(){
-				self.justUpdated = false;
-			}, 0);
-		}
+	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
 			success: function(data){
 				this.subscriptions.refresh(data.subscriptions || []);
 				this.tracks.refresh(data.tracks || []);
 			},
 			complete: complete
-		}, this));
+		}, this), silent);
 	}
 };
 distro.library.subscriptionListView = new (Backbone.View.extend({
@@ -148,7 +139,7 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	render: function(){
 		$(this.el).stencil(this.template, this.model.toJSON());
-	},
+	}
 });
 distro.library.trackListView = new (Backbone.View.extend({
 	el: $('#musicTableBody>tbody')[0],
@@ -229,7 +220,7 @@ distro.library.TrackView = Backbone.View.extend({
 				}], ['.perfVenue', {$key:'venue', $template:[
 					['%a', {href: {$join:['#/', {$key:'name'}]}, title:{$key:'fullname'}}, '^', {$key:'name'}, '^ '],
 					['%span.cityState', {$key:'citystate'}]
-				]}],
+				]}]
 			],
 			{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 		]] }, $else: ['%td'] }, $else: ['%td'] },
@@ -323,13 +314,15 @@ Hollerback.prototype.fail = function(){
 (function(){
 	var $account = $('#account'),
 	    $accountName = $('#accountName');
-	distro.global.bind('change:user', function(model, user){
+	distro.global.bind('change:user', function(model, user, options){
 		if (user) {
 			$accountName.text(user);
 			$account.addClass('loggedIn');
-			distro.library.refresh();
 		} else {
 			$account.removeClass('loggedIn');
+		}
+		if ( ! (options && options.noRefresh)) {
+			distro.library.refresh();
 		}
 	});
 })();
@@ -337,6 +330,7 @@ Hollerback.prototype.fail = function(){
 distro.lightbox = new (function(){
 	function Lightbox(){
 		var self = this;
+		this.content = [];
 		this.$lightbox = $('#lightbox');
 		this.$contentWrapper = $('#lightboxWrapper');
 		this.$contentWrapper.delegate('.close.button', 'click', function(){
@@ -367,13 +361,25 @@ distro.lightbox = new (function(){
 			}
 		});
 	}
+	Lightbox.prototype.push = function(content){
+		this.content.push(content);
+		this.show();
+	};
 	Lightbox.prototype.show = function(content){
-		var self = this;
+		var self = this, old = this.content[this.content.length - 1];
+		if (content) {
+			this.content = [content];
+		} else {
+			if (old) {
+				content = old;
+			} else {
+				return;
+			}
+		}
 		this.$contentWrapper.fadeOut(200).queue(function(next){
 			var $content;
-			self.hideContent();
+			self.hideContent(old);
 			$content = $('<div>', { 'class': 'lightboxContent' });
-			self.content = content;
 			self.$contentWrapper.html($content);
 			content.show($content, self);
 			Backbone.history.saveLocation('/' + content.name);
@@ -383,20 +389,28 @@ distro.lightbox = new (function(){
 		this.$lightbox.fadeIn(200);
 	};
 	Lightbox.prototype.hide = function(name){
-		if (!name || (this.content && name === this.content.name)) {
-			var self = this;
-			this.$lightbox.fadeOut(200);
-			this.$contentWrapper.fadeOut(200, function(){
-				self.hideContent();
-			});
-			Backbone.history.saveLocation('');
-			document.title = distro.TITLE;
+		this.content.splice(0, this.content.length - 1);
+		this.pop(name);
+	}
+	Lightbox.prototype.pop = function(name){
+		var self = this, old;
+		if ((!name || (this.content.length && name === this.content[this.content.length - 1].name)) && (old = this.content.pop())) {
+			if (this.content.length) {
+				this.show();
+			} else {
+				this.$lightbox.fadeOut(200);
+				this.$contentWrapper.fadeOut(200, function(){
+					self.hideContent(old);
+				});
+				Backbone.history.saveLocation('');
+				document.title = distro.TITLE;
+			}
+			return old;
 		}
 	};
-	Lightbox.prototype.hideContent = function(){
-		if (this.content) {
-			this.content.hide && this.content.hide(this);
-			this.content = null;
+	Lightbox.prototype.hideContent = function(content){
+		if (content) {
+			content.hide && content.hide(this);
 		}
 		this.$contentWrapper.empty();
 	};
@@ -407,7 +421,7 @@ distro.lightbox = new (function(){
 (function(){
 	distro.global.bind('change:user', function(model, user){
 		if (user) {
-			distro.lightbox.hide('login');
+			distro.lightbox.pop('login');
 		}
 	});
 })();
@@ -571,7 +585,8 @@ distro.loadLandingPage = function(name, callback){
 				name: model.name,
 				longName: model.get('fullname'),
 				show: function($content){
-					var $subscribeButton,
+					var self = this,
+					    $subscribeButton,
 					    subscribed = distro.library.subscriptions.isSubscribed(model.name);
 					$content.attr('id', 'landingBox');
 					$content.stencil(["%form", {},
@@ -604,8 +619,7 @@ distro.loadLandingPage = function(name, callback){
 											["%li", {'class': {$key:"."}, style:"margin: 0px 1em;"}, 
 												["%a", {href: {$join: ["mailto:",{$key:""}]}, title:{$key:""}}, {$key:"."}]]}]]}, { $key: 'presence', $children: [
 										['%li', { 'class': { $key: 'name' } }, ['%a', { target:"_blank", href: { $key: 'url' } }]]
-									] }],
-									
+									] }]
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
@@ -616,6 +630,7 @@ distro.loadLandingPage = function(name, callback){
 					$subscribeButton.click(function(){
 						if (!distro.global.get('user')) {
 							if (confirm('You need a free account to subscribe to networks on DISTRO.\n\nWould you like to log in or create one now?')) {
+								self.willSubscribe = true;
 								document.location.hash = '/login';
 							}
 							return;
@@ -626,11 +641,19 @@ distro.loadLandingPage = function(name, callback){
 								success: function(){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
+									distro.lightbox.pop();
 								}
 							});
 						}
 					});
 					$('.email').click(function(){$('.emailList').toggle()});
+					if (this.willSubscribe) { // If we're returning from logging in
+						if (distro.global.get('user')) {
+							setTimeout(function(){
+								$subscribeButton.click();
+							}, 800);
+						}
+					}
 				}
 			});
 			callback(model);
@@ -788,58 +811,79 @@ distro.Router = Backbone.Controller.extend({
 			window.location.hash = '';
 			return;
 		}
-		distro.lightbox.show({
+		distro.lightbox.push({
 			name: 'login',
 			longName: 'Login',
 			show: function($content){
-				var $form, $emailField, $passwordField, $registerCheckbox, $submitButton, submitStatus = new Backbone.Model({submitting:false});
+				var $loginForm, $registerForm, submitStatus = new Backbone.Model({submitting:false}), $inputs;
+				function bindToSubmit(){
+					var $field = $(this);
+					submitStatus.bind('change:submitting', function(m, submitting){
+						$field.attr('disabled', submitting ? true : null);
+					});
+				}
 				$content.attr('id', 'loginRegisterBox');
-				$content.haml(['%form', {$:{$:function(){ $form = this; }}},
-					['%dl',
-						['%dt', ['%label', {'for':'emailAddress'}, distro.loc.str('registration.emailAddressQuery')]],
-						['%dd', ['%input#emailAddress', {$:{$:function(){
-							$emailField = this;
-							submitStatus.bind('change:submitting', function(m, submitting){ $emailField.attr('disabled', submitting ? true : null) });
-						}}, size:'35', placeholder:'s@distro.fm'}]],
-						['%dt', ['%label', {'for':'password'}, distro.loc.str('registration.passwordQuery')]],
-						['%dd', ['%input#password', {$:{$:function(){
-							$passwordField = this;
-							submitStatus.bind('change:submitting', function(m, submitting){ $passwordField.attr('disabled', submitting ? true : null) });
-						}}, size:'35', type:'password', placeholder:'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}]],
-						['%dt', ['%label', {'for':'registrationType'}, distro.loc.str('registration.registerQuery')]],
-						['%dd', ['%input#registrationType', {$:{$:function(){
-							$registerCheckbox = this;
-							submitStatus.bind('change:submitting', function(m, submitting){ $registerCheckbox.attr('disabled', submitting ? true : null) });
-						}}, type:'checkbox'}]]
+				$content.haml([["%span.close.button", {}, "x"], ["#container",
+					[ "#logIn",
+						[ "%h2", "Have an account?" ],
+						[ "%h1", "Log In" ],
+						[ "%form", { $:{$:function(){ $loginForm = this; }}},
+							[ "%input", { $:{$:bindToSubmit}, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:{$:bindToSubmit}, "type": "password", "name": "password", "placeholder": "Password" } ],
+							[ "%p",
+								[ "%button", { $:{$:bindToSubmit} }, "Log In" ],
+								[ "%input#login_remember_me", { $:{$:bindToSubmit}, "type": "checkbox", "name": "remember_me" } ],
+								[ "%label", { "for": "login_remember_me" }, "Remember me" ]
+							]
+						]
 					],
-					['%div', {style:"text-align: right"},
-						['%button#submitButton', {$:{$:function(){
-							$submitButton = this;
-							submitStatus.bind('change:submitting', function(m, submitting){ $submitButton.attr('disabled', submitting ? true : null) });
-						}}, 'class': "button lightboxButton"}, distro.loc.str('registration.logInLabel')],
+					[ "#register",
+						[ "%h2", "New to DISTRO?" ],
+						[ "%h1", "Sign up" ],
+						[ "%form", { $:{$:function(){ $registerForm = this; }}},
+							[ "%input", { $:{$:bindToSubmit}, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:{$:bindToSubmit}, "type": "password", "name": "password", "placeholder": "Password" } ],
+							[ "%p",
+								[ "%button", { $:{$:function(){
+									var $button = $(this), terms = $registerForm[0].elements.accept_terms;
+									submitStatus.bind('change:submitting', function(m, submitting){
+										$button.attr('disabled', submitting || ! terms.checked ? true : null);
+									});
+									$(terms).change(function(){
+										$button.attr('disabled', ! this.checked || submitStatus.get('submitting') ? true : null);
+									})
+								}}, "disabled": "disabled" }, "Sign Up" ],
+								[ "%input#register_remember_me", { $:{$:bindToSubmit}, "type": "checkbox", "name": "accept_terms" } ],
+								[ "%label", { "for": "register_remember_me" }, "I agree with the ", [ "%a", "terms of use" ] ]
+							]
+						]
 					]
-				]);
-				$registerCheckbox.change(function(){
-					$submitButton.text($registerCheckbox[0].checked ? distro.loc.str('registration.registerLabel') : distro.loc.str('registration.logInLabel'));
-				});
-				$form.submit(function(e){
-					e.preventDefault();
-					var email = $emailField.val(), password = $passwordField.val(), register = $registerCheckbox[0].checked;
-					if (!email || !password) {
+				]]);
+				$content.submit(function(e){
+					var form = e.target,
+					    registering = e.target === $registerForm[0],
+					    elements = form.elements,
+						data = { email: elements.email.value, password: elements.password.value };
+					if ( ! (data.email && data.password)) {
 						alert(distro.loc.str('registration.errors.noCredentials'));
-					} else {
-						submitStatus.set({submitting: true});
-						distro.request(register ? 'register' : 'login', 'POST', {email: email, password: password}, new Hollerback({
-							failure: function(data){
-								if (data && data.errorMessage) {
-									alert(distro.loc.str(data.errorMessage) || data.errorMessage);
-								}
-							},
-							complete: function(){
-								submitStatus.set({submitting: false});
-							}
-						}));
+						return false;
 					}
+					if (registering) {
+						data.acceptTerms = elements.accept_terms.checked;
+					} else {
+						data.rememberMe = elements.remember_me.checked;
+					}
+					submitStatus.set({submitting: true});
+					distro.request(registering ? 'register' : 'login', 'POST', data, new Hollerback({
+						failure: function(data){
+							if (data && data.errorMessage) {
+								alert(distro.loc.str(data.errorMessage) || data.errorMessage);
+							}
+						},
+						complete: function(){
+							submitStatus.set({submitting: false});
+						}
+					}));
 					return false;
 				});
 			}
@@ -861,8 +905,6 @@ distro.init(function(){
 	distro.loc.replacePlaceholders();
 	
 	$('#logOut').click(function(){
-		distro.library.subscriptions.refresh([]);
-		distro.library.tracks.refresh([]);
 		distro.request('logout', 'POST', null, new Hollerback({}));
 	});
 
@@ -874,7 +916,7 @@ distro.init(function(){
 	distro.router = new distro.Router();
 	distro.library.refresh(function(){
 		Backbone.history.start();
-	});
+	}, true); // Don't refresh again if user is updated
 	
 	$('#musicTableBodyContainer')
 	.mousedown(function(){
