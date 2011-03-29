@@ -854,7 +854,7 @@ distro.Router = Backbone.Controller.extend({
 									})
 								}}, "disabled": "disabled" }, "Sign Up" ],
 								[ "%input#register_remember_me", { $:{$:bindToSubmit}, "type": "checkbox", "name": "accept_terms" } ],
-								[ "%label", { "for": "register_remember_me" }, "I agree with the ", [ "%a", "terms of use" ] ]
+								[ "%label", { "for": "register_remember_me" }, "I agree with the ", [ "%a", { "href": "/terms.html", target: "_blank" }, "terms of use" ] ]
 							]
 						]
 					]
