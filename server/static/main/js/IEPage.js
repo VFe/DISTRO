@@ -15,23 +15,6 @@ var ieWarn = ["#aboutBox.lightboxContent",
 				]
 			],
 			[".rightContent",
-				["%ul.aboutIcons",
-					["%li.FAQ", {"title":"FAQ"},
-						["%a", {"href":"#/about/faq"}]
-					],
-					["%li.About", {"title":"About"},
-						["%a", {"href":"#/about/about"}]
-					],
-					["%li.Contact", {"title":"Contact"},
-						["%a", {"href":"#/about/contact"}]
-					],
-					["%li.Invest", {"title":"Invest"},
-						["%a", {"href":"#/about/invest"}]
-					],
-					["%li.Jobs", {"title":"Jobs"},
-						["%a", {"href":"#/about/jobs"}]
-					]
-				],
 				[".content",
 					["%div",
 						["%h1", "Uh Oh!"],
@@ -50,5 +33,6 @@ var ieWarn = ["#aboutBox.lightboxContent",
 		]
 	]
 ];
+$(document.body).css({'background-image':'url(\'https://s3.amazonaws.com/distro-static/IE/IEBGBig.jpg\')', 'background-repeat':'no-repeat', 'background-attachment':'fixed', 'background-position':'top left'});
 $('#lightboxWrapper').haml(ieWarn);
 $('#lightboxWrapper').show();
