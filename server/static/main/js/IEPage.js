@@ -8,7 +8,7 @@ var ieWarn = ["#aboutBox.lightboxContent",
 			[".content.leftContent",
 				["%img.photo",
 					{
-						"src":"http://distro-static.s3.amazonaws.com/TRDD/UH_OH.jpg",
+						"src":"http://distro-static.s3.amazonaws.com/IE/UH_OH.jpg",
 						"width":"510",
 						"height":"450"
 					}
