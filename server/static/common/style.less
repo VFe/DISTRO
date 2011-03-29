@@ -1062,10 +1062,20 @@ ul.aboutIcons{
 			border-color: rgb(56, 66, 61);
 		}
 	}
-	&:not(.disabled):active .label{
-		color: black;
-		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.6, rgb(96, 204, 54)), to(rgb(56, 66, 61)));
-		background-image: -moz-linear-gradient(top, rgb(96, 204, 54) 60%, rgb(56, 66, 61));
+	&:not(.disabled){
+		&:active{
+			.label{
+				color: black;
+				background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.6, rgb(96, 204, 54)), to(rgb(56, 66, 61)));
+				background-image: -moz-linear-gradient(top, rgb(96, 204, 54) 60%, rgb(56, 66, 61));
+			}
+		}
+		&:hover{
+			color: rgb(116, 255, 80);
+			.icon, .label{
+				border-color: rgb(116, 255, 40);
+			}
+		}
 	}
 }
 #mapLink {
