@@ -913,7 +913,7 @@ distro.init(function(){
 		e.preventDefault();
 	});
 	
-	distro.router = new distro.Router();
+	$.browser.msie ? null : distro.router = new distro.Router();
 	distro.library.refresh(function(){
 		Backbone.history.start();
 	}, true); // Don't refresh again if user is updated
@@ -999,26 +999,6 @@ distro.init(function(){
 			$(container).scrollTop(elemBottom - $(container).height());
 		}
 	}	
-
-    //Naughty Browser sniffing code, which _may_ stop working in future
-    //versions of jQuery!!
-    if( $.browser.msie){
-            var ieVersion = parseInt($.browser.version, 10);
-            switch (ieVersion){
-                    case 6:
-                            alert("IE 6\nOH NOES");
-                            break;
-                    case 7:
-                            alert("IE 7\nAlmost there...");
-                            break;
-                    case 8:
-                            alert("IE 8\nMuch warmer.");
-                            break;
-                    case 9:
-                            alert("IE 9\nYay, you're using a semi-modern browser!");
-                            break;
-            }
-    }
 
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
