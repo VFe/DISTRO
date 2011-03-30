@@ -913,7 +913,7 @@ distro.init(function(){
 		e.preventDefault();
 	});
 	
-	distro.router = new distro.Router();
+	$.browser.msie ? null : distro.router = new distro.Router();
 	distro.library.refresh(function(){
 		Backbone.history.start();
 	}, true); // Don't refresh again if user is updated
