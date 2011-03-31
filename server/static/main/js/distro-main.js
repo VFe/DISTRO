@@ -901,7 +901,7 @@ distro.Router = Backbone.Controller.extend({
 
 // Initialization
 distro.init(function(){
-	
+	if($.browser.msie){return;}
 	distro.loc.replacePlaceholders();
 	
 	$('#logOut').click(function(){
@@ -913,7 +913,7 @@ distro.init(function(){
 		e.preventDefault();
 	});
 	
-	$.browser.msie ? null : distro.router = new distro.Router();
+	distro.router = new distro.Router();
 	distro.library.refresh(function(){
 		Backbone.history.start();
 	}, true); // Don't refresh again if user is updated
