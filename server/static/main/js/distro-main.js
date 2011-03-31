@@ -94,9 +94,39 @@ distro.library = {
 				this.validate(this.attributes);
 			}
 		}),
-		comparator: function(model){
-			return +model.attributes.release;
-		}
+		// Replace sortedIndex and sortBy with ones which uses native-style comparators
+		sortedIndex: function(candidate, comparator){
+			var i = 0;
+			while (i < this.models.length && comparator(this.models[i], candidate) <= 0) {
+				i++;
+			}
+			return i;
+		},
+		sortBy: function(comparator){
+			return this.models.sort(comparator);
+		},
+		comparator: (function(){
+			function flexiComparator(modelA, modelB){
+				var key = flexiComparator.mode.key,
+					ascending = flexiComparator.mode.order,
+					a = modelA.attributes[key],
+					b = modelB.attributes[key];
+				if (typeof a === 'string' || typeof b === 'string') {
+					a = ('' + a).toLowerCase();
+					b = ('' + b).toLowerCase();
+				}
+				if (a > b) {
+					return ascending ? 1 : -1;
+				} else if (a < b) {
+					return ascending ? -1 : 1;
+				} else {
+					return 0;
+				}
+			}
+			flexiComparator.mode = { key: 'release', order: 1 };
+			
+			return flexiComparator;
+		})()
 	})),
 	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
