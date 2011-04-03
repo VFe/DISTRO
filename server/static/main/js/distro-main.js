@@ -901,7 +901,7 @@ distro.Router = Backbone.Controller.extend({
 
 // Initialization
 distro.init(function(){
-	
+	if($.browser.msie){return;}
 	distro.loc.replacePlaceholders();
 	
 	$('#logOut').click(function(){
