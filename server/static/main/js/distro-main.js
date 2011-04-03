@@ -128,6 +128,7 @@ distro.library = {
 				this.validate(this.attributes);
 			},
 			getForComparison: function(key){
+				var now;
 				switch (key) {
 				case 'artist':
 					return this.attributes.artistNetwork ? this.attributes.artistNetwork.fullname : this.attributes.artist;
@@ -136,7 +137,8 @@ distro.library = {
 					return this.attributes.network[0].fullname;
 					break;
 				case 'performance':
-					return this.attributes.performance ? +this.attributes.performance.date : 0;
+					now = new Date;
+					return (this.attributes.performance && this.attributes.performance.date > now) ? this.attributes.performance.date - now : Number.MAX_VALUE;
 					break;
 				default:
 					return this.attributes[key];
