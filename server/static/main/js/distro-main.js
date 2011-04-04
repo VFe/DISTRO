@@ -188,8 +188,12 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }]]
+		['.subscription', ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', 'M'], ['.solo', 'S']]]
 	],
+	events: {
+		"click .mute": "mute",
+		"click .solo": "solo"
+	},
 	initialize: function() {
 		_.bindAll(this, 'render');
 		this.model.bind('change', this.render);
@@ -198,6 +202,12 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	render: function(){
 		$(this.el).stencil(this.template, this.model.toJSON());
+	},
+	mute: function(){
+		alert('mute '+this.model.id);
+	},
+	solo: function(){
+		alert('solo '+this.model.id);
 	}
 });
 distro.library.trackListHeaderView = new (Backbone.View.extend({
