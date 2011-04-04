@@ -138,7 +138,7 @@ distro.library = {
 					break;
 				case 'performance':
 					now = new Date;
-					return (this.attributes.performance && this.attributes.performance.date > now) ? this.attributes.performance.date - now : Number.MAX_VALUE;
+					return (this.attributes.performance && this.attributes.performance.date > now) ? now - this.attributes.performance.date : -Number.MAX_VALUE;
 					break;
 				default:
 					return this.attributes[key];
