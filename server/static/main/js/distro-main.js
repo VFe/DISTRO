@@ -195,7 +195,7 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		"click .solo": "solo"
 	},
 	initialize: function() {
-		_.bindAll(this, 'render');
+		_.bindAll(this, 'render', 'mute', 'solo');
 		this.model.bind('change', this.render);
 		this.model.view = this;
 		this.render();
@@ -204,10 +204,10 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		$(this.el).stencil(this.template, this.model.toJSON());
 	},
 	mute: function(){
-		alert('mute '+this.model.id);
+		alert('mute '+this.model.attributes.name);
 	},
 	solo: function(){
-		alert('solo '+this.model.id);
+		alert('solo '+this.model.attributes.name);
 	}
 });
 distro.library.trackListHeaderView = new (Backbone.View.extend({
