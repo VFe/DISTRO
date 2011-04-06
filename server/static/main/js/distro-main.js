@@ -68,6 +68,32 @@ distro.request = function(path, method, data, hollerback, noRefresh){
 		}
 	});
 };
+distro.FlexiComparator = function(initialSort){
+	var constructor = this.constructor;
+	function comparator(modelA, modelB){
+		return constructor.comparator.call(comparator, modelA, modelB);
+	}
+	comparator.sort = new Backbone.Model({ key: 'release', order: 1 });
+	return comparator;
+};
+distro.FlexiComparator.comparator = function (modelA, modelB){
+	var key = this.sort.attributes.key,
+		ascending = this.sort.attributes.order,
+		a = modelA.getForComparison ? modelA.getForComparison(key) : modelA.attributes[key],
+		b = modelB.getForComparison ? modelB.getForComparison(key) : modelB.attributes[key];
+	if (typeof a === 'string' || typeof b === 'string') {
+		a = ('' + a).toLowerCase();
+		b = ('' + b).toLowerCase();
+	}
+	if (a > b) {
+		return ascending ? 1 : -1;
+	} else if (a < b) {
+		return ascending ? -1 : 1;
+	} else {
+		return 0;
+	}
+}
+
 distro.library = {
 	subscriptions: new (Backbone.Collection.extend({
 		url: 'library/subscriptions',
@@ -80,6 +106,14 @@ distro.library = {
 		}
 	})),
 	tracks: new (Backbone.Collection.extend({
+		initialize: function(){
+			var self = this;
+			this.comparator = new distro.FlexiComparator({ key: 'release', order: 1 });
+			this.comparator.sort.bind('change', function(){
+				
+				self.sort();
+			})
+		},
 		url: 'library/tracks',
 		model: Backbone.Model.extend({
 			validate: function(attributes){
@@ -92,10 +126,35 @@ distro.library = {
 			},
 			initialize: function(){
 				this.validate(this.attributes);
+			},
+			getForComparison: function(key){
+				var now;
+				switch (key) {
+				case 'artist':
+					return this.attributes.artistNetwork ? this.attributes.artistNetwork.fullname : this.attributes.artist;
+					break;
+				case 'network':
+					return this.attributes.network[0].fullname;
+					break;
+				case 'performance':
+					now = new Date;
+					return (this.attributes.performance && this.attributes.performance.date > now) ? now - this.attributes.performance.date : -Number.MAX_VALUE;
+					break;
+				default:
+					return this.attributes[key];
+				}
 			}
 		}),
-		comparator: function(model){
-			return +model.attributes.release;
+		// Replace sortedIndex and sortBy with ones which uses native-style comparators
+		sortedIndex: function(candidate, comparator){
+			var i = 0;
+			while (i < this.models.length && comparator(this.models[i], candidate) <= 0) {
+				i++;
+			}
+			return i;
+		},
+		sortBy: function(comparator){
+			return this.models.sort(comparator);
 		}
 	})),
 	refresh: function(complete, silent){
@@ -141,19 +200,64 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		$(this.el).stencil(this.template, this.model.toJSON());
 	}
 });
+distro.library.trackListHeaderView = new (Backbone.View.extend({
+	el: $('#musicTableHead>thead')[0],
+	initialize: function() {
+		_.bindAll(this, 'handle', 'render');
+		this.$el = $(this.el);
+		this.currentSort = {};
+		this.lastSorts = {};
+		this.model.bind('change', this.render);
+		this.$el.mousedown(function(e){
+			e.preventDefault();
+		});
+		this.$el.delegate('th', 'click', this.handle);
+	},
+	handle: function(e){
+		var key, $target = $(e.target).closest('th');
+		if(this.currentSort.$el && $target[0] === this.currentSort.$el[0]){
+			this.model.set({ order: (this.lastSorts[this.model.attributes.key] = this.model.attributes.order ? 0 : 1) });
+		} else {
+			key = $target.attr('data-sort');
+			this.model.set({
+				key: key,
+				order: (key in this.lastSorts) ? this.lastSorts[key] : this.lastSorts[key] = ($target.attr('data-sort-direction') === 'descending' ? 0 : 1)
+			});
+		}
+	},
+	render: function(){
+		if (this.currentSort.$el) {
+			this.currentSort.$el.removeClass('ascending descending');
+		}
+		this.currentSort.$el = this.$el.find('[data-sort='+this.model.attributes.key+']')
+		 .addClass(this.model.attributes.order ? 'ascending' : 'descending');
+	}
+}))({ model: distro.library.tracks.comparator.sort });
 distro.library.trackListView = new (Backbone.View.extend({
 	el: $('#musicTableBody>tbody')[0],
 	initialize: function() {
+		var self = this;
+		this.viewCache = {};
 		_.bindAll(this, 'add', 'render');
 		this.$el = $(this.el);
 		this.$foot = this.$el.children('.filler:first');
-		this.collection.bind('refresh', this.render);
+		this.collection.bind('refresh', function(){
+			self.oldViewCache = self.viewCache;
+			self.viewCache = {};
+			self.render();
+			delete self.oldViewCache;
+		});
 		distro.library.subscriptions.bind('add', function(){
 			distro.library.tracks.fetch();
 		});
 	},
 	add: function(network){
-		this.$foot.before((new distro.library.TrackView({ model: network, parent: this })).el);
+		var view;
+		if ( ! (this.oldViewCache && (view = this.oldViewCache[network.cid]))) {
+			view = (new distro.library.TrackView({ model: network, parent: this }));
+		}
+		this.viewCache[network.cid] = view;
+		this.$foot.before(view.el);
 	},
 	render: function(){
 		this.$el.empty().append(this.$foot);

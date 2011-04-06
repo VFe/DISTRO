@@ -33,7 +33,7 @@ var ieWarn = ["#aboutBox.lightboxContent",
 		]
 	]
 ];
-$(document.body).css({'background-image':'url(\'https://s3.amazonaws.com/distro-static/IE/IEBG.jpg\')', 'background-repeat':'no-repeat', 'background-attachment':'fixed', 'background-position':'top left'});
+$(document.body).css({'background-image':'url(\'https://s3.amazonaws.com/distro-static/IE/IEBG.png\')', 'background-repeat':'no-repeat', 'background-attachment':'fixed', 'background-position':'top left'});
 $('#top').hide();
 $('#bottom').hide();
 $('#content').hide();
