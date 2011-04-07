@@ -330,6 +330,18 @@ distro.library.TrackView = Backbone.View.extend({
 			],
 			{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 		]] }, $else: ['%td'] }, $else: ['%td'] },
+		['%td.fresh', { $test: { $key: 'release' }, $if: ['.fresh', { class: { $key: 'release', $handler: function(date){
+			var diff = (new Date) - date;
+			if (diff < 0) {
+				return '';
+			} else if (diff < 345600000) { // 4d
+				return 'indigo ' + Math.floor(diff / 86400000).toString();
+			} else if (diff < 691200000) { // 1w + 1d
+				return 'violet ' + Math.floor(diff / 86400000).toString();
+			} else {
+				return '';
+			}
+		} } }] }],
 		['%td', ['%ul.inlineList', { $key: 'network', $children: ['%li', ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]]}]]
 	],
 	events: {

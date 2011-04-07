@@ -478,6 +478,23 @@ thead.sortable th.descending{
 		background-image: url('http://distro-static.s3.amazonaws.com/music_library/red.png');
 	}
 }
+#musicTableBody td.fresh div.fresh{
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	background-position: center;
+	background-repeat: no-repeat;
+	&.blue{
+		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/blue.png');
+	}
+	&.indigo{
+		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/indigo.png');
+	}
+	&.violet{
+		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/violet.png');
+	}
+}
 #musicTableBody td.event div.event:not(:hover) .eventDetails{
 	display: none;
 }
