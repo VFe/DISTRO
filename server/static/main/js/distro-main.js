@@ -254,7 +254,7 @@ distro.library.trackListView = new (Backbone.View.extend({
 	add: function(network){
 		var view;
 		if (this.oldViewCache && (view = this.oldViewCache[network.cid])) {
-			view.delegateEvents();
+			view.delegateEvents(); 	
 		} else {
 			view = (new distro.library.TrackView({ model: network, parent: this }));
 		}
@@ -330,7 +330,7 @@ distro.library.TrackView = Backbone.View.extend({
 			],
 			{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 		]] }, $else: ['%td'] }, $else: ['%td'] },
-		['%td.fresh', { $test: { $key: 'release' }, $if: ['.fresh', { class: { $key: 'release', $handler: function(date){
+		['%td.fresh', { $test: { $key: 'release' }, $if: ['.fresh', { 'class': { $key: 'release', $handler: function(date){
 			var diff = (new Date) - date;
 			if (diff < 0) {
 				return '';
