@@ -73,7 +73,7 @@ distro.FlexiComparator = function(initialSort){
 	function comparator(modelA, modelB){
 		return constructor.comparator.call(comparator, modelA, modelB);
 	}
-	comparator.sort = new Backbone.Model({ key: 'release', order: 1 });
+	comparator.sort = new Backbone.Model(initialSort);
 	return comparator;
 };
 distro.FlexiComparator.comparator = function (modelA, modelB){
@@ -108,7 +108,7 @@ distro.library = {
 	tracks: new (Backbone.Collection.extend({
 		initialize: function(){
 			var self = this;
-			this.comparator = new distro.FlexiComparator({ key: 'release', order: 1 });
+			this.comparator = new distro.FlexiComparator({ key: 'release', order: 0 });
 			this.comparator.sort.bind('change', function(){
 				
 				self.sort();
@@ -205,7 +205,7 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 	initialize: function() {
 		_.bindAll(this, 'handle', 'render');
 		this.$el = $(this.el);
-		this.currentSort = {};
+		this.currentSort = {$el:this.$el.find('th[data-sort=release]')};
 		this.lastSorts = {};
 		this.model.bind('change', this.render);
 		this.$el.mousedown(function(e){
