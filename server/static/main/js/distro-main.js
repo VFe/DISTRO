@@ -253,7 +253,9 @@ distro.library.trackListView = new (Backbone.View.extend({
 	},
 	add: function(network){
 		var view;
-		if ( ! (this.oldViewCache && (view = this.oldViewCache[network.cid]))) {
+		if (this.oldViewCache && (view = this.oldViewCache[network.cid])) {
+			view.delegateEvents();
+		} else {
 			view = (new distro.library.TrackView({ model: network, parent: this }));
 		}
 		this.viewCache[network.cid] = view;
