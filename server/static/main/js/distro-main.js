@@ -73,7 +73,7 @@ distro.FlexiComparator = function(initialSort){
 	function comparator(modelA, modelB){
 		return constructor.comparator.call(comparator, modelA, modelB);
 	}
-	comparator.sort = new Backbone.Model({ key: 'release', order: 1 });
+	comparator.sort = new Backbone.Model(initialSort);
 	return comparator;
 };
 distro.FlexiComparator.comparator = function (modelA, modelB){
@@ -108,7 +108,7 @@ distro.library = {
 	tracks: new (Backbone.Collection.extend({
 		initialize: function(){
 			var self = this;
-			this.comparator = new distro.FlexiComparator({ key: 'release', order: 1 });
+			this.comparator = new distro.FlexiComparator({ key: 'release', order: 0 });
 			this.comparator.sort.bind('change', function(){
 				
 				self.sort();
@@ -205,7 +205,7 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 	initialize: function() {
 		_.bindAll(this, 'handle', 'render');
 		this.$el = $(this.el);
-		this.currentSort = {};
+		this.currentSort = {$el:this.$el.find('th[data-sort=release]')};
 		this.lastSorts = {};
 		this.model.bind('change', this.render);
 		this.$el.mousedown(function(e){
@@ -254,7 +254,7 @@ distro.library.trackListView = new (Backbone.View.extend({
 	add: function(network){
 		var view;
 		if (this.oldViewCache && (view = this.oldViewCache[network.cid])) {
-			view.delegateEvents();
+			view.delegateEvents(); 	
 		} else {
 			view = (new distro.library.TrackView({ model: network, parent: this }));
 		}
@@ -330,6 +330,18 @@ distro.library.TrackView = Backbone.View.extend({
 			],
 			{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 		]] }, $else: ['%td'] }, $else: ['%td'] },
+		['%td.fresh', { $test: { $key: 'release' }, $if: ['.fresh', { 'class': { $key: 'release', $handler: function(date){
+			var diff = (new Date) - date;
+			if (diff < 0) {
+				return '';
+			} else if (diff < 345600000) { // 4d
+				return 'indigo ' + Math.floor(diff / 86400000).toString();
+			} else if (diff < 691200000) { // 1w + 1d
+				return 'violet ' + Math.floor(diff / 86400000).toString();
+			} else {
+				return '';
+			}
+		} } }] }],
 		['%td', ['%ul.inlineList', { $key: 'network', $children: ['%li', ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]]}]]
 	],
 	events: {
