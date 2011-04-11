@@ -47,28 +47,34 @@ Users.prototype.userWithUserID = function(userID, callback){
 	this.collection.findOne({"_id":userID}, callback);
 };
 Users.prototype.registerUser = function(email, password, callback){
-	var self = this;
-	var salt = Math.floor(Math.random() * 0x100000000).toString(16);
-	self.userExists(email, function(err, exists){
-		if(err){
-			callback(err, null);
-		} else if (exists){
-			callback(new error.ClientError("registration.errors.existingUser"), null);
-		} else {
-			self.collection.insert({
-			    email: email,
-			    hash: hash(password, salt),
-			    salt: salt,
-			    subscriptions: [ { network: BSON.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ]
-			}, function(err, doc){
-				if (doc && doc[0] && doc[0]._id) {
-					callback(err, doc[0]._id);
-				} else {
-					callback(err || new Error("registerUser: user could not be created"), null);
-				}
-			});
-		}
-	});
+	var self = this,
+		user = { subscriptions: [ { network: BSON.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ] },
+		salt = Math.floor(Math.random() * 0x100000000).toString(16);
+	function createUser(){
+		self.collection.insert(user, function(err, doc){
+			if (doc && doc[0]) {
+				callback(err, doc[0]);
+			} else {
+				callback(err || new Error("registerUser: user could not be created"), null);
+			}
+		});
+	}
+	if (email) {
+		self.userExists(email, function(err, exists){
+			if(err){
+				callback(err, null);
+			} else if (exists){
+				callback(new error.ClientError("registration.errors.existingUser"), null);
+			} else {
+				user.email = email;
+				user.hash = hash(password, salt),
+				user.salt = salt;
+				createUser();
+			}
+		});
+	} else {
+		createUser();
+	}
 };
 Users.prototype.subscribeToNetwork = function(user, networkID, callback){
 	var now = new Date;
