@@ -124,7 +124,7 @@ global.db.open(function(err, db){
 							if (err) {
 								errback(err);
 							}
-							successback({ name: doc.name, fullname: doc.fullname });
+							successback({ id: doc.name, name: doc.name, fullname: doc.fullname });
 						});
 					} else {
 						errback(new distro.error.ClientError("networks.errors.noNetwork"));
