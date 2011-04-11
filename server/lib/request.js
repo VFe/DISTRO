@@ -48,7 +48,7 @@ exports.handleRequest = function(requireAuthentication, callback){
 					endResponse(res, 403, {}, responseContent);
 				} else {
 					responseContent.userName = user && user.email;
-					callback(user ? {user: user, session: sessionID} : null, req, res, successback, errback);
+					callback(user ? {user: user, id: sessionID} : null, req, res, successback, errback);
 				}
 			}
 		});

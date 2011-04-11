@@ -56,7 +56,7 @@ global.db.open(function(err, db){
 			}));
 			app.get('/logout', methodNotAllowed);
 			app.post('/logout', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-				global.sessions.endSession(session.sessionID, res, function(err){
+				global.sessions.endSession(session.id, res, function(err){
 					if (err) {
 						errback(err);
 					} else {
