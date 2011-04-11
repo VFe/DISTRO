@@ -91,7 +91,7 @@ Users.prototype.subscriptions = function(user, callback){
 	user.subscriptions.forEach(function(subscription) {
 		var idString = subscription.network.toHexString();
 		if ( ! (idString in subscriptionNetworks)) {
-			networkProxies.create(subscription.network);
+			networkProxies.create(subscription.network, [{name: 'id', key: 'name'}, 'name', 'fullname']);
 			subscriptionNetworks[idString] = true;
 		}
 	});
