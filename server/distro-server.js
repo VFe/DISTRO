@@ -38,6 +38,10 @@ global.db.open(function(err, db){
 				var login = req.body;
 				if(login && login.email && login.password){
 					global.users.userWithCredentials(login.email, login.password, function(err, user){
+						if (session) {
+							// The cookie is cleared synchronously, so it's safe to not wait to call startSessionForUserID
+							global.sessions.endSession(session.id, res, function(){});
+						}
 						if(user){
 							global.sessions.startSessionForUserID(user._id, login.rememberMe, req, res, function(err){
 								if(err){
@@ -111,7 +115,7 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
-			app.post('/library/subscriptions', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+			app.post('/library/subscriptions', distro.request.handleRequest('ondemand', function(session, req, res, successback, errback){
 				if (!req.body || !req.body.name) {
 					errback(new distro.error.ClientError("networks.errors.noNetwork"));
 					return;

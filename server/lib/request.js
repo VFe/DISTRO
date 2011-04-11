@@ -42,10 +42,27 @@ exports.handleRequest = function(requireAuthentication, callback){
 				errback(err);
 				return;
 			} else {
-				if (requireAuthentication && ! (user && user.email)) {
+				if (requireAuthentication && ! (user && user)) {
 					responseContent.userName = null;
-					responseContent.status = "unauthorized";
-					endResponse(res, 403, {}, responseContent);
+					if (requireAuthentication === 'ondemand') {
+						// Register an "unclaimed" account
+						global.users.registerUser(null, null, function(err, user){
+							if (err) {
+								errback(err);
+							} else {
+								global.sessions.startSessionForUserID(user._id, true, req, res, function(err, sessionID){
+									if(err){
+										errback(err);
+									} else {
+										callback({user: user, session: sessionID}, req, res, successback, errback);
+									}
+								});
+							}
+						});
+					} else {
+						responseContent.status = "unauthorized";
+						endResponse(res, 403, {}, responseContent);
+					}
 				} else {
 					responseContent.userName = user && user.email;
 					callback(user ? {user: user, id: sessionID} : null, req, res, successback, errback);

@@ -788,13 +788,6 @@ distro.loadLandingPage = function(name, callback){
 						]
 					], model.attributes);
 					$subscribeButton.click(function(){
-						if (!distro.global.get('user')) {
-							if (confirm('You need a free account to subscribe to networks on DISTRO.\n\nWould you like to log in or create one now?')) {
-								self.willSubscribe = true;
-								document.location.hash = '/login';
-							}
-							return;
-						}
 						if (!subscribed) {
 							mpq.push(['track', 'subscribe', {'name': model.name, 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
 							distro.library.subscriptions.create({ name:model.name, fullname: model.get('fullname') }, {

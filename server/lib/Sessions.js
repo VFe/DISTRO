@@ -47,7 +47,7 @@ Sessions.prototype.getRequestSession = function(req, res, callback){
 				// Success!
 				global.users.userWithUserID(doc.userID, function(err, user){
 					if(err) { callback(err, null, null); return; }
-					if(user && user.email){
+					if(user){
 						callback(null, user, sessionID);
 					} else {
 						attachCookieToResponse("", {expires:new Date(0)}, res); //Destroy Cookie
@@ -79,6 +79,6 @@ Sessions.prototype.startSessionForUserID = function (userID, extendedSession, re
 			cookieOpts.expires = new Date(+new Date + Sessions.EXTENDED_SESSION_LENGTH);
 		}
 		attachCookieToResponse(sessionID, cookieOpts, res);
-		callback(null);
+		callback(null, sessionID);
 	});
 };
