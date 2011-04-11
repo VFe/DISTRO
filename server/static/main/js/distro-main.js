@@ -97,7 +97,14 @@ distro.FlexiComparator.comparator = function (modelA, modelB){
 distro.library = {
 	subscriptions: new (Backbone.Collection.extend({
 		url: 'library/subscriptions',
-		model: Backbone.Model,
+		model: Backbone.Model.extend({
+			initialize: function(){
+				var self = this;
+				this.bind('change', function (){
+					distro.library.filteredTracks.rebuild();
+				});
+			}
+		}),
 		comparator: function(model){
 			return model.attributes.name;
 		},
@@ -106,14 +113,6 @@ distro.library = {
 		}
 	})),
 	tracks: new (Backbone.Collection.extend({
-		initialize: function(){
-			var self = this;
-			this.comparator = new distro.FlexiComparator({ key: 'release', order: 0 });
-			this.comparator.sort.bind('change', function(){
-				
-				self.sort();
-			})
-		},
 		url: 'library/tracks',
 		model: Backbone.Model.extend({
 			validate: function(attributes){
@@ -144,18 +143,7 @@ distro.library = {
 					return this.attributes[key];
 				}
 			}
-		}),
-		// Replace sortedIndex and sortBy with ones which uses native-style comparators
-		sortedIndex: function(candidate, comparator){
-			var i = 0;
-			while (i < this.models.length && comparator(this.models[i], candidate) <= 0) {
-				i++;
-			}
-			return i;
-		},
-		sortBy: function(comparator){
-			return this.models.sort(comparator);
-		}
+		})
 	})),
 	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
@@ -167,6 +155,50 @@ distro.library = {
 		}, this), silent);
 	}
 };
+distro.DependentCollection = Backbone.Collection.extend({
+	initialize: function(models, options){
+		var self = this;
+		this.parentCollection = options.parentCollection;
+		this.parentCollection.bind('all', function(event, what, options){
+			self.rebuild();
+		});
+	},
+	rebuild: function(options){
+		this.refresh(this.parentCollection.models, options);
+	}
+});
+distro.library.filteredTracks = new (distro.DependentCollection.extend({
+	_add: function(track, options){
+		if (_.any(track.attributes.network, function(n){
+			var subscription = distro.library.subscriptions.get(n.name);
+			return ! subscription.get('muted')
+				&& ( ! distro.library.subscriptions.any(function(subscription){ return subscription.get('soloed'); }) || subscription.get('soloed') );
+		})) {
+			Backbone.Collection.prototype._add.call(this, track, options);
+		}
+	}
+}))([], { parentCollection: distro.library.tracks });
+distro.library.sortedTracks = new (distro.DependentCollection.extend({
+	initialize: function(models, options){
+		var self = this;
+		distro.DependentCollection.prototype.initialize.call(this, models, options);
+		this.comparator = new distro.FlexiComparator({ key: 'release', order: 0 });
+		this.comparator.sort.bind('change', function(){
+			self.sort({ sort: true });
+		});
+	},
+	// Replace sortedIndex and sortBy with ones which uses native-style comparators
+	sortedIndex: function(candidate, comparator){
+		var i = 0;
+		while (i < this.models.length && comparator(this.models[i], candidate) <= 0) {
+			i++;
+		}
+		return i;
+	},
+	sortBy: function(comparator){
+		return this.models.sort(comparator);
+	}
+}))([], { parentCollection: distro.library.filteredTracks });
 distro.library.subscriptionListView = new (Backbone.View.extend({
 	el: $('#subscriptionsTable>tbody')[0],
 	initialize: function() {
@@ -188,16 +220,26 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }]]
+		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', 'M'], ['.solo', 'S']]]
 	],
+	events: {
+		"click .mute": "mute",
+		"click .solo": "solo"
+	},
 	initialize: function() {
-		_.bindAll(this, 'render');
+		_.bindAll(this, 'render', 'mute', 'solo');
 		this.model.bind('change', this.render);
 		this.model.view = this;
 		this.render();
 	},
 	render: function(){
-		$(this.el).stencil(this.template, this.model.toJSON());
+		$(this.el).empty().stencil(this.template, this.model.toJSON());
+	},
+	mute: function(){
+		this.model.set({ muted: ! this.model.attributes.muted });
+	},
+	solo: function(){
+		this.model.set({ soloed: ! this.model.attributes.soloed });
 	}
 });
 distro.library.trackListHeaderView = new (Backbone.View.extend({
@@ -232,7 +274,7 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 		this.currentSort.$el = this.$el.find('[data-sort='+this.model.attributes.key+']')
 		 .addClass(this.model.attributes.order ? 'ascending' : 'descending');
 	}
-}))({ model: distro.library.tracks.comparator.sort });
+}))({ model: distro.library.sortedTracks.comparator.sort });
 distro.library.trackListView = new (Backbone.View.extend({
 	el: $('#musicTableBody>tbody')[0],
 	initialize: function() {
@@ -251,14 +293,14 @@ distro.library.trackListView = new (Backbone.View.extend({
 			distro.library.tracks.fetch();
 		});
 	},
-	add: function(network){
+	add: function(track){
 		var view;
-		if (this.oldViewCache && (view = this.oldViewCache[network.cid])) {
+		if (this.oldViewCache && (view = this.oldViewCache[track.cid])) {
 			view.delegateEvents(); 	
 		} else {
-			view = (new distro.library.TrackView({ model: network, parent: this }));
+			view = (new distro.library.TrackView({ model: track, parent: this }));
 		}
-		this.viewCache[network.cid] = view;
+		this.viewCache[track.cid] = view;
 		this.$foot.before(view.el);
 	},
 	render: function(){
@@ -290,7 +332,7 @@ distro.library.trackListView = new (Backbone.View.extend({
 	relativeSelection: function(shift){
 		return this.selectedTrack && this.collection.models[this.collection.indexOf(this.selectedTrack) + shift];
 	}
-}))({ collection: distro.library.tracks });
+}))({ collection: distro.library.sortedTracks });
 
 distro.library.TrackView = Backbone.View.extend({
 	tagName: 'tr',
@@ -645,7 +687,7 @@ distro.player = new (function(){
 			if (player.current) {
 				player.current.play();
 			} else {
-				player.play(distro.library.tracks.models[0]);
+				player.play(distro.library.sortedTracks.models[0]);
 			}
 		});
 		$('#skipBackButton').click(function(){
@@ -746,13 +788,6 @@ distro.loadLandingPage = function(name, callback){
 						]
 					], model.attributes);
 					$subscribeButton.click(function(){
-						if (!distro.global.get('user')) {
-							if (confirm('You need a free account to subscribe to networks on DISTRO.\n\nWould you like to log in or create one now?')) {
-								self.willSubscribe = true;
-								document.location.hash = '/login';
-							}
-							return;
-						}
 						if (!subscribed) {
 							mpq.push(['track', 'subscribe', {'name': model.name, 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
 							distro.library.subscriptions.create({ name:model.name, fullname: model.get('fullname') }, {

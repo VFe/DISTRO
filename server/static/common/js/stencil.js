@@ -41,7 +41,7 @@
 					return [stencil(template.$children, item, i)];
 				});
 			} else if ('$key' in template) {
-				template = (template.$key === '' ? data : template.$key === '.' ? dataIndex : (data[template.$key] === undefined || data[template.$key] == null) ? '' : data[template.$key]).toString();
+				template = (template.$key === '' ? data : template.$key === '.' ? dataIndex : (data[template.$key] === undefined || data[template.$key] == null) ? '' : data[template.$key]);
 			} else if(index === 1) {
 				template = $.extend({}, template);
 				for (var key in template){

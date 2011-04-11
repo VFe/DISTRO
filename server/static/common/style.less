@@ -628,8 +628,66 @@ th.descending #freshHead, th.ascending #freshHead{
 	position: relative;
 	white-space: nowrap;
 	.border-box;
+	.subscriptionControls{
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		div{
+			display: none;
+			line-height: 1.5em;
+			margin: 0.3em 0;
+			width: 1.5em;
+			height: 1.5em;
+			text-align: center;
+			position: absolute;
+			.border-radius(0.4em);
+			cursor: pointer;
+			&.mute{
+				background: #F88017;
+				right: 2.4em;
+				top: 0;
+			}
+			&.solo{
+				background: #87AFC7;
+				right: 0.5em;
+				top: 0;
+			}
+		}
+	}
+	&.soloed{
+		padding-right: 2em;
+	}
+	&:hover, &.muted{
+		padding-right: 4em;
+	}
 	&:hover{
 		background: rgba(220, 220, 220, 0.2);
+		.subscriptionControls div{
+			display: block;
+		}
+	}
+	&.muted{
+		&:not(:hover) .subscriptionControls div.mute{
+			display: block;
+			color: #F88017;
+			background: none;
+		}
+		&:hover .subscriptionControls div.mute{
+			background-color: #FF6929;
+			.box-shadow(0px 0px 0.7em #FF6929);
+		}
+	}
+	&.soloed{
+		&:not(:hover) .subscriptionControls div.solo{
+			display: block;
+			color: #87AFC7;
+			background: none;
+		}
+		&:hover .subscriptionControls div.solo{
+			background-color: #93C7E6;
+			.box-shadow(0px 0px 0.7em #95D6FC);
+		}
 	}
 }
 
