@@ -52,6 +52,7 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 		mapreduce: this.collection.collectionName,
 		map: mapSubscriptions.toString(),
 		reduce: reduceSubscriptions.toString(),
+		query: { network: { $in: subscribedNetworks } },
 		out: { inline: 1 },
 		scope: { subscriptions: subscriptionsByNetwork }
 	}), function(err, out){
