@@ -16,6 +16,7 @@ Sessions.TIME_TO_REFRESH = 600000; //Ten minutes
 function attachCookieToResponse(value, options, res){
 	// Based on Connect's session middleware
 	options.HttpOnly = true;
+	options.path = '/api';
 	var cookieString = connect.utils.serializeCookie(Sessions.SESSION_NAME, value, options);
 	writeHead = res.writeHead;
 	res.writeHead = function(status, headers){
