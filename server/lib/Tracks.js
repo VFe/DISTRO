@@ -7,7 +7,7 @@ module.exports = Tracks;
 Tracks.prototype = new CollectionManager();
 Tracks.prototype.constructor = Tracks;
 Tracks.collectionName = 'tracks';
-Tracks.publicKeys = [ 'name', 'release', 'network', 'filename', 'artist', 'artistNetwork', 'performance', 'time' ];
+Tracks.publicKeys = [ 'name', 'release', 'date', 'network', 'filename', 'artist', 'artistNetwork', 'performance', 'time' ];
 
 function mapSubscriptions(){
 	var i, networksLength, networkSubscriptions, subscription, j, onDeckPeriod, k;
@@ -18,11 +18,13 @@ function mapSubscriptions(){
 		}
 		for (j = networkSubscriptions.length - 1; (subscription = networkSubscriptions[j]), j >= 0; j--){
 			if (this.release > subscription.start && (!subscription.end || (this.release < subscription.end))) {
+				this.date = this.release;
 				emit(this._id, this);
 				return;
 			} else if (this.onDeck) {
 				for (k = this.onDeck.length - 1; (onDeckPeriod = this.onDeck[k]), k >= 0; k--){
 					if (onDeckPeriod.start < subscription.start && (!onDeckPeriod.end || onDeckPeriod.end > subscription.end)) {
+						this.date = subscription.start;
 						emit(this._id, this);
 						return;
 					}
@@ -37,7 +39,7 @@ function reduceSubscriptions(k, vals){
 }
 
 Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
-	var subscriptionsByNetwork = {}, subscribedNetworkMap = {}, subscribedNetworks = [];
+	var subscriptionsByNetwork = {}, subscribedNetworkMap = {}, subscribedNetworks = [], subscribedNetworkIds = [];
 	subscriptions.forEach(function(subscription){
 		var networkHex = subscription.network.toHexString();
 		(subscriptionsByNetwork[networkHex] || (subscriptionsByNetwork[networkHex] = [])).push(subscription);
@@ -47,6 +49,7 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 	});
 	for (var key in subscribedNetworkMap){
 		subscribedNetworks.push(subscribedNetworkMap[key]);
+		subscribedNetworkIds.push(subscribedNetworkMap[key].id);
 	}
 	this.collection.db.executeCommand(mongodb.DbCommand.createDbCommand(this.collection.db, {
 		mapreduce: this.collection.collectionName,
@@ -62,7 +65,7 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 		} else if (result.errmsg) {
 			callback(new Error('MapReduce failed: ' + result.errmsg), null);
 		} else {
-			var tracks = result.results.map(function(r){ return r.value; }).sort(function(docA, docB){ var a = docA.release, b = docB.release; return a > b ? 1 : a < b ? -1 : 0; }),
+			var tracks = result.results.map(function(r){ return r.value; }).sort(function(docA, docB){ var a = docA.date, b = docB.date; return a > b ? 1 : a < b ? -1 : 0; }),
 				networkProxies = new Networks.ProxySet;
 			tracks = tracks.map(function(inTrack) {
 				var track = {};
@@ -72,7 +75,7 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 					}
 				});
 				track.networkWithFile = networkProxies.create(track.network[0]);
-				track.network = track.network.filter(function(network){ return subscribedNetworks.indexOf(network.id) != -1; }).map(function(network){ return networkProxies.create(network); });
+				track.network = track.network.filter(function(network){ return subscribedNetworkIds.indexOf(network.id) != -1; }).map(function(network){ return networkProxies.create(network); });
 				if (track.artistNetwork) {
 					track.artistNetwork = networkProxies.create(track.artistNetwork);
 				}
