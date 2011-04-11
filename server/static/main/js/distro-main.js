@@ -180,6 +180,7 @@ distro.library.filteredTracks = new (distro.DependentCollection.extend({
 }))([], { parentCollection: distro.library.tracks });
 distro.library.sortedTracks = new (distro.DependentCollection.extend({
 	initialize: function(models, options){
+		var self = this;
 		distro.DependentCollection.prototype.initialize.call(this, models, options);
 		this.comparator = new distro.FlexiComparator({ key: 'release', order: 0 });
 		this.comparator.sort.bind('change', function(){
