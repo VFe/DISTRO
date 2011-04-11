@@ -188,7 +188,7 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', 'M'], ['.solo', 'S']]]
+		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', 'M'], ['.solo', 'S']]]
 	],
 	events: {
 		"click .mute": "mute",
@@ -201,13 +201,13 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		this.render();
 	},
 	render: function(){
-		$(this.el).stencil(this.template, this.model.toJSON());
+		$(this.el).empty().stencil(this.template, this.model.toJSON());
 	},
 	mute: function(){
-		alert('mute '+this.model.attributes.name);
+		this.model.set({ muted: ! this.model.attributes.muted });
 	},
 	solo: function(){
-		alert('solo '+this.model.attributes.name);
+		this.model.set({ soloed: ! this.model.attributes.soloed });
 	}
 });
 distro.library.trackListHeaderView = new (Backbone.View.extend({
