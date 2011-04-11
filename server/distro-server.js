@@ -39,7 +39,7 @@ global.db.open(function(err, db){
 				if(login && login.email && login.password){
 					global.users.userWithCredentials(login.email, login.password, function(err, user){
 						if(user){
-							global.sessions.startSessionForUserID(user._id, login.extendedSession, req, res, function(err){
+							global.sessions.startSessionForUserID(user._id, login.rememberMe, req, res, function(err){
 								if(err){
 									errback(err);
 								} else {
