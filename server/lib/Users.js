@@ -61,8 +61,8 @@ Users.prototype.registerUser = function(email, password, callback){
 			    salt: salt,
 			    subscriptions: [ { network: BSON.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ]
 			}, function(err, doc){
-				if (doc && doc[0] && doc[0]._id) {
-					callback(err, doc[0]._id);
+				if (doc && doc[0]) {
+					callback(err, doc[0]);
 				} else {
 					callback(err || new Error("registerUser: user could not be created"), null);
 				}

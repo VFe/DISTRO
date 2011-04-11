@@ -68,11 +68,11 @@ global.db.open(function(err, db){
 			app.post('/register', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				var body = req.body;
 				if(body && body.email && body.password){
-					global.users.registerUser(body.email, body.password, function(err, userID){
+					global.users.registerUser(body.email, body.password, function(err, user){
 						if (err) {
 							errback(err);
 						} else {
-							global.sessions.startSessionForUserID(userID, null, req, res, function(err){
+							global.sessions.startSessionForUserID(user._id, null, req, res, function(err){
 								if(err){
 									errback(err);
 								} else {
