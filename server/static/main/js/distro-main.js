@@ -261,14 +261,14 @@ distro.library.trackListView = new (Backbone.View.extend({
 			distro.library.tracks.fetch();
 		});
 	},
-	add: function(network){
+	add: function(track){
 		var view;
-		if (this.oldViewCache && (view = this.oldViewCache[network.cid])) {
+		if (this.oldViewCache && (view = this.oldViewCache[track.cid])) {
 			view.delegateEvents(); 	
 		} else {
-			view = (new distro.library.TrackView({ model: network, parent: this }));
+			view = (new distro.library.TrackView({ model: track, parent: this }));
 		}
-		this.viewCache[network.cid] = view;
+		this.viewCache[track.cid] = view;
 		this.$foot.before(view.el);
 	},
 	render: function(){
