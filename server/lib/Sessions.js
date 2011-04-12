@@ -23,7 +23,7 @@ function attachCookieToResponse(value, options, res){
 		// Multiple Set-Cookie headers
 		headers = headers || {};
 		if (headers['Set-Cookie']) {
-			headers['Set-Cookie'] += '\r\nSet-Cookie: ' + cookieString;
+			headers['Set-Cookie'] = cookieString + '\r\nSet-Cookie: ' + headers['Set-Cookie'];
 		} else {
 			headers['Set-Cookie'] = cookieString;
 		}
