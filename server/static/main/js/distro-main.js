@@ -119,6 +119,9 @@ distro.library = {
 				if (!(attributes.release instanceof Date)) {
 					attributes.release = new Date(attributes.release);
 				}
+				if (!(attributes.date instanceof Date)) {
+					attributes.date = new Date(attributes.date);
+				}
 				if (attributes.performance && attributes.performance.date && !(attributes.performance.date instanceof Date)) {
 					attributes.performance.date = new Date(attributes.performance.date);
 				}
@@ -182,7 +185,7 @@ distro.library.sortedTracks = new (distro.DependentCollection.extend({
 	initialize: function(models, options){
 		var self = this;
 		distro.DependentCollection.prototype.initialize.call(this, models, options);
-		this.comparator = new distro.FlexiComparator({ key: 'release', order: 0 });
+		this.comparator = new distro.FlexiComparator({ key: 'date', order: 0 });
 		this.comparator.sort.bind('change', function(){
 			self.sort({ sort: true });
 		});
@@ -247,7 +250,7 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 	initialize: function() {
 		_.bindAll(this, 'handle', 'render');
 		this.$el = $(this.el);
-		this.currentSort = {$el:this.$el.find('th[data-sort=release]')};
+		this.currentSort = {$el:this.$el.find('th[data-sort=date]')};
 		this.lastSorts = {};
 		this.model.bind('change', this.render);
 		this.$el.mousedown(function(e){
@@ -372,7 +375,7 @@ distro.library.TrackView = Backbone.View.extend({
 			],
 			{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 		]] }, $else: ['%td'] }, $else: ['%td'] },
-		['%td.fresh', { $test: { $key: 'release' }, $if: ['.fresh', { 'class': { $key: 'release', $handler: function(date){
+		['%td.fresh', { $test: { $key: 'date' }, $if: ['.fresh', { 'class': { $key: 'date', $handler: function(date){
 			var diff = (new Date) - date;
 			if (diff < 0) {
 				return '';
