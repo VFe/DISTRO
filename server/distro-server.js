@@ -22,10 +22,10 @@ global.db.open(function(err, db){
 	distro.init(function(){
 		connect.createServer(
 			connect.logger(),
-			connect.cookieDecoder(),
-			connect.bodyDecoder(),
-			connect.staticProvider(__dirname + '/static/main'),
-			connect.staticProvider(__dirname + '/static/common')
+			connect.cookieParser(),
+			connect.bodyParser(),
+			connect.static(__dirname + '/static/main'),
+			connect.static(__dirname + '/static/common')
 		)
 		.use('/api/', connect.router(function(app) {
 			function methodNotAllowed(req, res, params){
