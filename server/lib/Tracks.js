@@ -51,21 +51,15 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 		subscribedNetworks.push(subscribedNetworkMap[key]);
 		subscribedNetworkIds.push(subscribedNetworkMap[key].id);
 	}
-	this.collection.db.executeCommand(mongodb.DbCommand.createDbCommand(this.collection.db, {
-		mapreduce: this.collection.collectionName,
-		map: mapSubscriptions.toString(),
-		reduce: reduceSubscriptions.toString(),
+	this.collection.mapReduce(mapSubscriptions, reduceSubscriptions, {
 		query: { network: { $in: subscribedNetworks } },
 		out: { inline: 1 },
 		scope: { subscriptions: subscriptionsByNetwork }
-	}), function(err, out){
-		var result = out.documents[0];
+	}, function(err, results){
 		if (err) {
-			callback(err, null);
-		} else if (result.errmsg) {
-			callback(new Error('MapReduce failed: ' + result.errmsg), null);
+			callback(new Error(err.errmsg + ': ' + err.assertion), null);
 		} else {
-			var tracks = result.results.map(function(r){ return r.value; }).sort(function(docA, docB){ var a = docA.date, b = docB.date; return a > b ? 1 : a < b ? -1 : 0; }),
+			var tracks = results.map(function(r){ return r.value; }).sort(function(docA, docB){ var a = docA.date, b = docB.date; return a > b ? 1 : a < b ? -1 : 0; }),
 				networkProxies = new Networks.ProxySet;
 			tracks = tracks.map(function(inTrack) {
 				var track = {};
