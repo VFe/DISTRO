@@ -53,6 +53,6 @@
 	}
 	window.stencil = stencil;
 	jQuery.fn.stencil = function(template, data){
-		this.haml(stencil(template, data));
+		this.append(haj(stencil(template, data)));
 	};
 })();
