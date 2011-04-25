@@ -14,12 +14,12 @@ if [[ -z $DISTRO_AUTH_TOKEN ]]; then
 fi
 
 #Networks Download & Import
-curl -o $IMPORT_CSV -H "Authorization: GoogleLogin auth=$AUTH_TOKEN" "https://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=t-_CoQfsUmsCbS3DW1nxjjg&exportFormat=csv&gid=0" &&
+curl -sSfo $IMPORT_CSV -H "Authorization: GoogleLogin auth=$AUTH_TOKEN" "https://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=t-_CoQfsUmsCbS3DW1nxjjg&exportFormat=csv&gid=0" &&
 mongoimport -d Import -c import --type csv --headerline --drop --ignoreBlanks --file $IMPORT_CSV &&
 node NetworkImport.js
 
 #Tracks Download & Import
-curl -o $TRACK_CSV -H "Authorization: GoogleLogin auth=$DISTRO_AUTH_TOKEN" "https://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=tkPwAQgtbF6wfxaZWPx1RZQ&exportFormat=csv&gid=0" &&
+curl -sSfo $TRACK_CSV -H "Authorization: GoogleLogin auth=$DISTRO_AUTH_TOKEN" "https://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=tkPwAQgtbF6wfxaZWPx1RZQ&exportFormat=csv&gid=0" &&
 mongoimport -d Import -c tracks --type csv --headerline --drop --ignoreBlanks --file $TRACK_CSV &&
 node TrackImport.js
 
