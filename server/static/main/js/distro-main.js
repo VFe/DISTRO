@@ -1015,6 +1015,7 @@ distro.Router = Backbone.Controller.extend({
 						]
 					]
 				]]);
+				$content.find('input[placeholder]').placeholder();
 				$content.submit(function(e){
 					var form = e.target,
 					    registering = e.target === $registerForm[0],
