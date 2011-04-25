@@ -124,29 +124,26 @@ ul.inlineList{
 	display: inline-block;
 	text-align: center;
 	background-color: @helloGreen;
-	background-image: -webkit-gradient(radial, 17 50%, 0, 17 50%, 20, from(rgba(79, 79, 79, 0.7)), to(rgba(79, 79, 79, 0)));
-	background-image: -moz-radial-gradient(17px 50% 45deg, circle closest-corner, rgba(79, 79, 79, 0.7) 0%, rgba(79, 79, 79, 0) 100%);
+	text-shadow: rgba(0, 0, 0, 0.4) 0 -1px 0;
+	width: 100%;
+}
+#findNetwork:hover{
+	background-color: @helloGreen * 1.1;
 }
 #findNetwork .icon{
 	display: inline-block;
 	vertical-align: top;
-	width: 2.7em;
+	width: 15px;
+	margin-left: 6px;
+	margin-right: -21px;
 	height: 30px;
-	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAINJREFUeNpiZMAC5i9c3C8hLm4A4794+fJCYnxsIQMxYPuOXfv/IwEQH5s6JgYKwMBpZlm6fOV+IUFBFEE+Pj4DdD66v9+9f8/AcPLUmf/kAJC+AfTznbt3D7x79w7Dz1aW5gIw/rHjJz98+vTpAoafR2IiwSYIykU7du5G4WNTBxBgAOdKiaofa14hAAAAAElFTkSuQmCC);
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAQCAYAAADJViUEAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJNJREFUeNpiYKAAMOIQtwBiIST+SSB+S5SJ////3/8fFThgU8dEibMp0swCxJxAzIUs+OvXL1Y2NjY4/9KlS3xAShhN71uWjo4OYyDDGln027dvksiaX7586Q1Up4mspqKiohMUOA3/yQADH2AHsIjHA7ECEn8BED8cJomEieq5CuhHAyAlgCR0gZGR8QO6OoAAAwAFmnln6v3kTwAAAABJRU5ErkJggg==);
 	background-position: center;
 	background-repeat: no-repeat;
 }
 #findNetwork .text{
-	text-transform: uppercase;
-	padding-right: 0.5em;
-	font-size: 0.9em;
-	line-height: 2.8em;
-}
-#findNetwork:active {
-	color: #EEE;
-}
-#findNetwork:not(:hover) .text{
-	display: none;
+	font-size: 1.4em;
+	line-height: 1.8em;
 }
 #info{
 	width: 2.3em;
