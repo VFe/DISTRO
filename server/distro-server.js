@@ -1,3 +1,5 @@
+require.paths.unshift(__dirname + "/lib");
+
 var util = require('util'),
 	fs = require('fs'),
 	mongoDB = require('mongodb'),
