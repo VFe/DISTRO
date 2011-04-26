@@ -5,7 +5,7 @@ var util = require('util'),
 	mongoDB = require('mongodb'),
 	url = require('url'),
 	connect = require('connect'),
-	distro = require('./lib'),
+	distro = require('distro'),
 	port = process.env.PRODUCTION ? 8085 : 3000;
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
