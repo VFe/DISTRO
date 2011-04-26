@@ -1,10 +1,7 @@
-require.paths.unshift(__dirname + "/vendor");
-
 var util = require('util'),
 	fs = require('fs'),
 	mongoDB = require('mongodb'),
 	url = require('url'),
-	_ = require('underscore.js'),
 	connect = require('connect'),
 	distro = require('./lib'),
 	port = process.env.PRODUCTION ? 8085 : 3000;
