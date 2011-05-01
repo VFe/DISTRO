@@ -29,13 +29,7 @@
 			</ul>
 		</li>
 	</ul>
-		<!-- <div id="user" style="display:none">
-			<img id="userIcon" width="21" height="21" src="images/generic_avatar.png"><span id="userName"></span>
-			<ul class="dropdown">
-				<li><a href="#" id="logOut"><span data-distro-localized-string="chrome.logOut">&nbsp;</span></a></li>
-			</ul>
-		</div> -->
-	<img height="25" id="mastheadLogo" src="images/mastheadLogo.png">
+	<img height="25" id="mastheadLogo" src="//distro-static.s3.amazonaws.com/home/mastheadLogo.png">
 </div>
 <div id="content">
 	<div id="subscriptions">
@@ -47,7 +41,7 @@
 			</thead>
 		</table>
 		<ul id="subscriptionsButtonBar">
-			<li id="findNetwork"><a href="#/find"><div class="icon"></div><span class="text"  data-distro-localized-string="chrome.findNetwork">&nbsp;</span></a></li>
+			<li id="findNetwork"><a href="#/find"><span class="text" data-distro-localized-string="chrome.findNetwork">&nbsp;</span><div class="icon"></div></a></li>
 		</ul>
 		<div id="subscriptionsTableBodyContainer">
 			<table id="subscriptionsTable">
@@ -78,7 +72,7 @@
 					<th data-sort="time" data-sort-direction="descending"><span data-distro-localized-string="library.time">&nbsp;</span></th>
 					<th data-sort="artist"><span data-distro-localized-string="library.artist">&nbsp;</span></th>
 					<th data-sort="performance" data-sort-direction="descending"><span data-distro-localized-string="library.event">&nbsp;</span></th>
-					<th data-sort="release" class="descending"><div id="freshHead">&nbsp;</div></th>
+					<th data-sort="date" class="descending"><div id="freshHead">&nbsp;</div></th>
 					<th data-sort="network"><span data-distro-localized-string="library.receivedFrom">&nbsp;</span></th>
 				</tr>
 			</thead>
@@ -110,10 +104,8 @@
 <div id="bottom">
 	<ul id="transport">
 		<li class="button" id="skipBackButton" style="letter-spacing: -0.3em">&#x2758;<span style="letter-spacing: -0.35em;">&#x25C0;&#x25C0;</span></li>
-		<!-- <li class="button" id="rewindButton" style="letter-spacing: -0.4em">&#x25C0;&#x25C0;</li> -->
 		<li class="button" id="pauseButton" style="letter-spacing: 0.15em">&#x2759;&#x2759;</li>
 		<li class="button" id="playButton">&#x25BA;</li>
-		<!-- <li class="button" id="fastForwardButton"style="letter-spacing: -0.25em">&#x25BA;&#x25BA;</li> -->
 		<li class="button" id="skipForwardButton"style="letter-spacing: -0.25em">&#x25BA;&#x25BA;&#x2758;</li>
 	</ul>
 	<div id="scrubber"><div class="channel"><div class="backing"><div class="handle"></div></div></div></div>
@@ -121,13 +113,14 @@
 </div>
 <div id="lightbox" style="display: none"></div>
 <div id="lightboxWrapper" style="display: none"></div>
-<script src="js/jquery-1.4.4.js"></script>
-<script src="js/jquery-ui.js"></script>
-<script src="js/underscore.js"></script>
-<script src="js/backbone.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
+<script src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.5/underscore-min.js"></script>
+<script src="http://ajax.cdnjs.com/ajax/libs/backbone.js/0.3.3/backbone-min.js"></script>
+<script src="http://ajax.cdnjs.com/ajax/libs/es5-shim/0.0.4/es5-shim.min.js"></script>
+<script src="js/jquery.placeholder.js"></script>
 <script src="js/jquery.haml-1.3.js"></script>
 <script src="js/stencil.js"></script>
-<script src="js/es5-shim.js"></script>
 <script src="js/soundmanager2.js"></script>
 <script src="js/distro-common.js"></script>
 <script src="js/distro-main.js"></script>

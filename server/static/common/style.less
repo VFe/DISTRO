@@ -124,29 +124,26 @@ ul.inlineList{
 	display: inline-block;
 	text-align: center;
 	background-color: @helloGreen;
-	background-image: -webkit-gradient(radial, 17 50%, 0, 17 50%, 20, from(rgba(79, 79, 79, 0.7)), to(rgba(79, 79, 79, 0)));
-	background-image: -moz-radial-gradient(17px 50% 45deg, circle closest-corner, rgba(79, 79, 79, 0.7) 0%, rgba(79, 79, 79, 0) 100%);
+	text-shadow: rgba(0, 0, 0, 0.4) 0 -1px 0;
+	width: 100%;
+}
+#findNetwork:hover{
+	background-color: @helloGreen * 1.1;
 }
 #findNetwork .icon{
 	display: inline-block;
 	vertical-align: top;
-	width: 2.7em;
+	width: 15px;
+	margin-left: 6px;
+	margin-right: -21px;
 	height: 30px;
-	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAINJREFUeNpiZMAC5i9c3C8hLm4A4794+fJCYnxsIQMxYPuOXfv/IwEQH5s6JgYKwMBpZlm6fOV+IUFBFEE+Pj4DdD66v9+9f8/AcPLUmf/kAJC+AfTznbt3D7x79w7Dz1aW5gIw/rHjJz98+vTpAoafR2IiwSYIykU7du5G4WNTBxBgAOdKiaofa14hAAAAAElFTkSuQmCC);
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAQCAYAAADJViUEAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJNJREFUeNpiYKAAMOIQtwBiIST+SSB+S5SJ////3/8fFThgU8dEibMp0swCxJxAzIUs+OvXL1Y2NjY4/9KlS3xAShhN71uWjo4OYyDDGln027dvksiaX7586Q1Up4mspqKiohMUOA3/yQADH2AHsIjHA7ECEn8BED8cJomEieq5CuhHAyAlgCR0gZGR8QO6OoAAAwAFmnln6v3kTwAAAABJRU5ErkJggg==);
 	background-position: center;
 	background-repeat: no-repeat;
 }
 #findNetwork .text{
-	text-transform: uppercase;
-	padding-right: 0.5em;
-	font-size: 0.9em;
-	line-height: 2.8em;
-}
-#findNetwork:active {
-	color: #EEE;
-}
-#findNetwork:not(:hover) .text{
-	display: none;
+	font-size: 1.4em;
+	line-height: 1.8em;
 }
 #info{
 	width: 2.3em;
@@ -343,63 +340,6 @@ ul.inlineList{
 #mastheadLogo{
 	margin-left: 2em;
 	vertical-align: bottom;
-}
-#user{
-	margin: 0 0.5em;
-	display: inline-block;
-	padding: 0.3em 1.7em 0.3em 0.6em;
-	line-height: 100%;
-	.border-radius(0.4em);
-	margin: -0.1em 0.4em;
-	cursor: default;
-	background-image: url(images/menuDisclosure.png);
-	background-repeat: no-repeat;
-	background-position: right center;
-	position: relative;
-	top: -0.1em;
-}
-#user:hover{
-	background-color: rgb(50, 50, 50);
-	background-image: url(images/menuDisclosure.png), -webkit-gradient(linear, left top, left bottom, from(rgb(80, 80, 80)), to(rgb(40, 40, 40)));
-	background-image: url(images/menuDisclosure.png), -moz-linear-gradient(top, rgb(80, 80, 80), rgb(40, 40, 40));
-	border: 0.07em solid rgb(140, 140, 140);
-	margin: -0.07em 0.33em;
-	border: 0.1em solid rgba(255, 255, 255, 0.1);
-}
-#user>.dropdown{
-	display: none;
-}
-#user:hover>.dropdown{
-	display: block;
-}
-#userIcon{
-	vertical-align: middle;
-	margin-right: 0.5em;
-	.border-radius(0.2em);
-}
-#userName{
-	vertical-align: middle;
-}
-ul.dropdown{
-	background: #222;
-	list-style: none;
-	padding: 0px;
-	position: absolute;
-	min-width: 100%;
-	top: 1.4em;
-	right: 0;
-	.border-radius(0 0 0.5em 0.5em);
-}
-ul.dropdown>li>a{
-	color: inherit;
-	line-height: 2em;
-	padding: 1em;
-}
-.right{
-	float: right;
-}
-.bright{
-	color: @brightBlue;
 }
 #library{
 	position: relative;
@@ -701,13 +641,9 @@ th.descending #freshHead, th.ascending #freshHead{
 	z-index: 10;
 }
 #lightboxWrapper .lightboxContent .lightboxHeader{
-	.backgroundGradient(#1C1C1C, #212121);
-	background-attachment: initial;
-	background-origin: initial;
-	background-clip: initial;
-	background-color: initial;
+	.backgroundGradient(rgba(35, 35, 35, 0), rgba(50, 50, 50, 1));
 	margin-bottom: 0.5em;
-	line-height: 2.3em;
+	line-height: 3em;
 	width: 100%;
 	background-position: initial initial;
 	background-repeat: initial initial;
@@ -716,7 +652,7 @@ th.descending #freshHead, th.ascending #freshHead{
 	float: right;
 	color: #555;
 	font-size: 1.5em;
-	line-height: 1.3;
+	line-height: 2em;
 	margin-right: 0.5em;
 	vertical-align: top;
 	cursor: pointer;
@@ -724,9 +660,9 @@ th.descending #freshHead, th.ascending #freshHead{
 }
 #lightboxWrapper .lightboxContent .lightboxHeader h1{
 	color: #AAA;
-	font-weight: normal;
+	font-weight: 300;
 	text-align: center;
-	font-size: 1.1em;
+	font-size: 1.3em;
 	margin: 0;
 }
 #lightboxWrapper{
@@ -767,7 +703,7 @@ th.descending #freshHead, th.ascending #freshHead{
 .lightboxContent#networkSearch{
 	height: 16em;
 	width: 40em;
-	background-image: url(images/rainbow_big.png);
+	background-image: url(http://distro-static.s3.amazonaws.com/find_networks/rainbow_big.png);
 	background-repeat: no-repeat;
 	background-position: center 0;
 }
