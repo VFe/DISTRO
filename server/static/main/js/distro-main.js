@@ -786,7 +786,7 @@ distro.loadLandingPage = function(name, callback){
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
-								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:{$:function(){ $subscribeButton = this }}}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
+								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
 							]
 						]
 					], model.attributes);
@@ -908,12 +908,12 @@ distro.Router = Backbone.Controller.extend({
 			show: function($content){
 				var $field, $text, $placeholder;
 				$content.attr('id', 'networkSearch');
-				$content.haml([
+				$content.haj([
 					['%span.close.button', 'x'],
 					['.search',
-						['.field', {$:{$:function(){ $field = this; }}}, '^',
-							['%span.text', { contenteditable: 'true', $:{$:function(){ $text = this; }}}],
-							['%span.placeholder', {$:{$:function(){ $placeholder = this; }}}, distro.loc.str('findNetworks.placeholder')],
+						['.field', {$:function(){ $field = $(this); }}, '^',
+							['%span.text', { contenteditable: 'true', $:function(){ $text = $(this); }}],
+							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
 						'^' ]
 					]
 				]);
@@ -985,16 +985,16 @@ distro.Router = Backbone.Controller.extend({
 					});
 				}
 				$content.attr('id', 'loginRegisterBox');
-				$content.haml([["%span.close.button", {}, "x"], ["#container",
+				$content.haj([["%span.close.button", {}, "x"], ["#container",
 					[ "#logIn",
 						[ "%h2", "Have an account?" ],
 						[ "%h1", "Log In" ],
-						[ "%form", { $:{$:function(){ $loginForm = this; }}},
-							[ "%input", { $:{$:bindToSubmit}, "type": "text", "name": "email", "placeholder": "Email Address" } ],
-							[ "%input", { $:{$:bindToSubmit}, "type": "password", "name": "password", "placeholder": "Password" } ],
+						[ "%form", { $:function(){ $loginForm = $(this); }},
+							[ "%input", { $:bindToSubmit, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:bindToSubmit, "type": "password", "name": "password", "placeholder": "Password" } ],
 							[ "%p",
-								[ "%button", { $:{$:bindToSubmit} }, "Log In" ],
-								[ "%input#login_remember_me", { $:{$:bindToSubmit}, "type": "checkbox", "name": "remember_me" } ],
+								[ "%button", { $:bindToSubmit }, "Log In" ],
+								[ "%input#login_remember_me", { $:bindToSubmit, "type": "checkbox", "name": "remember_me" } ],
 								[ "%label", { "for": "login_remember_me" }, "Remember me" ]
 							]
 						]
@@ -1002,11 +1002,11 @@ distro.Router = Backbone.Controller.extend({
 					[ "#register",
 						[ "%h2", "New to DISTRO?" ],
 						[ "%h1", "Sign up" ],
-						[ "%form", { $:{$:function(){ $registerForm = this; }}},
-							[ "%input", { $:{$:bindToSubmit}, "type": "text", "name": "email", "placeholder": "Email Address" } ],
-							[ "%input", { $:{$:bindToSubmit}, "type": "password", "name": "password", "placeholder": "Password" } ],
+						[ "%form", { $:function(){ $registerForm = $(this); }},
+							[ "%input", { $:bindToSubmit, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:bindToSubmit, "type": "password", "name": "password", "placeholder": "Password" } ],
 							[ "%p",
-								[ "%button", { $:{$:function(){
+								[ "%button", { $async:function(){
 									var $button = $(this), terms = $registerForm[0].elements.accept_terms;
 									submitStatus.bind('change:submitting', function(m, submitting){
 										$button.attr('disabled', submitting || ! terms.checked ? true : null);
@@ -1014,8 +1014,8 @@ distro.Router = Backbone.Controller.extend({
 									$(terms).change(function(){
 										$button.attr('disabled', ! this.checked || submitStatus.get('submitting') ? true : null);
 									})
-								}}, "disabled": "disabled" }, "Sign Up" ],
-								[ "%input#register_remember_me", { $:{$:bindToSubmit}, "type": "checkbox", "name": "accept_terms" } ],
+								}, "disabled": "disabled" }, "Sign Up" ],
+								[ "%input#register_remember_me", { $:bindToSubmit, "type": "checkbox", "name": "accept_terms" } ],
 								[ "%label", { "for": "register_remember_me" }, "I agree with the ", [ "%a", { "href": "/terms.html", target: "_blank" }, "terms of use" ] ]
 							]
 						]
