@@ -951,11 +951,17 @@ distro.Router = Backbone.Controller.extend({
 						$text.trigger(event);
 					}
 				});
-				$('.text').autocomplete({source: function(request, response){
-					distro.request('search/'+encodeURIComponent(request.term), 'GET', null, new Hollerback({
-						success: function(data){response(data)}
-					}));
-				}})
+				$('.text').autocomplete({
+					position:{
+						my: "center top",
+						at: "center bottom",
+						collision: "none"
+					}, source: function(request, response){
+						distro.request('search/'+encodeURIComponent(request.term), 'GET', null, new Hollerback({
+							success: function(data){response(data)}
+						}));
+					}
+				});
 			},
 			hide: function(){
 				$(window.document).unbind('keypress', keypressHandler);
