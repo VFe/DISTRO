@@ -57,26 +57,28 @@
 		</div>
 	</div>
 	<div id="library">
-		<table id="musicTableHead" border=0>
-			<colgroup>
-				<col>
-				<col width="60">
-				<col width="25%">
-				<col width="65">
-				<col width="50">
-				<col width="25%">
-			</colgroup>
-			<thead class="sortable">
-				<tr>
-					<th data-sort="name"><span data-distro-localized-string="library.name">&nbsp;</span></th>
-					<th data-sort="time" data-sort-direction="descending"><span data-distro-localized-string="library.time">&nbsp;</span></th>
-					<th data-sort="artist"><span data-distro-localized-string="library.artist">&nbsp;</span></th>
-					<th data-sort="performance" data-sort-direction="descending"><span data-distro-localized-string="library.event">&nbsp;</span></th>
-					<th data-sort="date" class="descending"><div id="freshHead">&nbsp;</div></th>
-					<th data-sort="network"><span data-distro-localized-string="library.receivedFrom">&nbsp;</span></th>
-				</tr>
-			</thead>
-		</table>
+		<div id="musicTableHeadContainer">
+			<table id="musicTableHead" border=0>
+				<colgroup>
+					<col>
+					<col width="60">
+					<col width="25%">
+					<col width="65">
+					<col width="50">
+					<col width="25%">
+				</colgroup>
+				<thead class="sortable">
+					<tr>
+						<th data-sort="name"><span data-distro-localized-string="library.name">&nbsp;</span></th>
+						<th data-sort="time" data-sort-direction="descending"><span data-distro-localized-string="library.time">&nbsp;</span></th>
+						<th data-sort="artist"><span data-distro-localized-string="library.artist">&nbsp;</span></th>
+						<th data-sort="performance" data-sort-direction="descending"><span data-distro-localized-string="library.event">&nbsp;</span></th>
+						<th data-sort="date" class="descending"><div id="freshHead">&nbsp;</div></th>
+						<th data-sort="network"><span data-distro-localized-string="library.receivedFrom">&nbsp;</span></th>
+					</tr>
+				</thead>
+			</table>
+		</div>
 		<div id="musicTableBodyContainer" tabindex="3">
 			<table id="musicTableBody">
 				<colgroup>
