@@ -501,7 +501,7 @@ th.descending #freshHead, th.ascending #freshHead{
 #musicTableHead th {
 	border-left: 1px solid @lightBorder;
 }
-#musicTableHead thead tr, #subscriptions thead tr{
+#musicTableHeadContainer, #subscriptions thead tr{
 	background-color: rgb(225, 225, 225);
 	.commonGradient;
 }
@@ -521,6 +521,9 @@ th.descending #freshHead, th.ascending #freshHead{
 	left: 0;
 	top: 0;
 	position: absolute;
+}
+html.JS #musicTableBodyContainer{
+	overflow-y: scroll;
 }
 #musicTableBodyContainer{
 	top: 2.4em;

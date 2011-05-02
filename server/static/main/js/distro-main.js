@@ -1067,7 +1067,16 @@ distro.Router = Backbone.Controller.extend({
 distro.init(function(){
 	if($.browser.msie){return;}
 	distro.loc.replacePlaceholders();
-	
+	document.documentElement.className = 'JS';
+	(function(){
+		var bodyContainer = document.getElementById('musicTableBodyContainer'),
+			headContainer = document.getElementById('musicTableHeadContainer');
+		headContainer.style.paddingRight = bodyContainer.offsetWidth - bodyContainer.clientWidth + 'px';
+		if (/WebKit\//.test(navigator.userAgent)) {
+			// Work around https://bugs.webkit.org/show_bug.cgi?id=59483
+			headContainer.style.display = 'none'; headContainer.clientLeft; headContainer.style.display = '';
+		}
+	})();
 	$('#logOut').click(function(){
 		distro.request('logout', 'POST', null, new Hollerback({}));
 	});
