@@ -68,6 +68,20 @@ distro.request = function(path, method, data, hollerback, noRefresh){
 		}
 	});
 };
+distro.tutorial = {
+	shouldShow: function tutorialShouldShow(stage){
+		var tutorial;
+		return ! (distro.global.get('user') || ((tutorial = store.get('tutorial')) && tutorial[stage]));
+	},
+	passed: function tutorialDidShow(stage){
+		var tutorial;
+		if ( ! distro.global.get('user')) {
+			tutorial = store.get('tutorial') || {};
+			tutorial[stage] = true;
+			store.set('tutorial', tutorial);
+		}
+	}
+};
 distro.FlexiComparator = function(initialSort){
 	var constructor = this.constructor;
 	function comparator(modelA, modelB){
@@ -786,13 +800,18 @@ distro.loadLandingPage = function(name, callback){
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
-								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
+								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]],
+								{
+									$test: {$handler: function(){ return ! subscribed && distro.tutorial.shouldShow('subscribe'); }},
+									$if: ["#subscribeTutDialog", "Subscribe to start receiving music from ^", {$key:"name"}, "^ (it’s free!)"]
+								}
 							]
 						]
 					], model.attributes);
 					$subscribeButton.click(function(){
 						if (!subscribed) {
 							mpq.push(['track', 'subscribe', {'name': model.name, 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
+							distro.tutorial.passed('subscribe');
 							distro.library.subscriptions.create({ name:model.name, fullname: model.get('fullname') }, {
 								success: function(){
 									subscribed = true;
