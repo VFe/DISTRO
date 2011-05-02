@@ -37,5 +37,5 @@ $(document.body).css({'background-image':'url(\'https://s3.amazonaws.com/distro-
 $('#top').hide();
 $('#bottom').hide();
 $('#content').hide();
-$('#lightboxWrapper').haml(ieWarn);
+$('#lightboxWrapper').haj(ieWarn);
 $('#lightboxWrapper').show();
