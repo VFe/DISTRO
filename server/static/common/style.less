@@ -123,12 +123,27 @@ ul.inlineList{
 		}
 	}
 }
+#notice{
+	background-color: #FFF77B;
+	.backgroundGradient(#FFF59B, #EBCE51);
+	text-align: center;
+	font-size: 1.2em;
+	padding: 0.4em 0.5em;
+	border-bottom: 1px solid #C44;
+}
+#wrapper{
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
 #top{
 	color: white;
 	background-color: black;
 	.commonGradient;
 	line-height: @topBarHeight;
-	position: fixed;
+	position: absolute;
 	text-align: left;
 	left: 0;
 	right: 0;
@@ -247,7 +262,7 @@ ul.inlineList{
 	background: black;
 	.commonGradient;
 	line-height: @bottomBarHeight;
-	position: fixed;
+	position: absolute;
 	bottom: 0;
 	left: 0;
 	right: 0;
@@ -259,7 +274,7 @@ ul.inlineList{
 	bottom: @bottomBarHeight;
 	left: 0;
 	padding-left: @subscriptionPaneWidth;
-	position: fixed;
+	position: absolute;
 }
 #subscriptions{
 	color: #EEE;
@@ -659,7 +674,7 @@ html.JS #musicTableBodyContainer{
 #lightbox{
 	background: rgba(0, 0, 0, 0.7);
 	height: 100%;
-	position: fixed;
+	position: absolute;
 	width: 100%;
 	top: 0;
 	left: 0;

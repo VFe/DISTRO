@@ -1090,6 +1090,7 @@ distro.init(function(){
 	if($.browser.msie){return;}
 	distro.loc.replacePlaceholders();
 	document.documentElement.className = 'JS';
+	// Pad the music library header with the music library's scrollbar width
 	(function(){
 		var bodyContainer = document.getElementById('musicTableBodyContainer'),
 			headContainer = document.getElementById('musicTableHeadContainer');
@@ -1097,6 +1098,32 @@ distro.init(function(){
 		if (/WebKit\//.test(navigator.userAgent)) {
 			// Work around https://bugs.webkit.org/show_bug.cgi?id=59483
 			headContainer.style.display = 'none'; headContainer.clientLeft; headContainer.style.display = '';
+		}
+	})();
+	// Show a notice to users of old browsers
+	(function(){
+		function showNotice(message){
+			setTimeout(function(){
+				var $notice = $(haj(['#notice', message])),
+					$wrapper = $('#wrapper');
+				document.body.insertBefore($notice[0], $wrapper[0]);
+				$wrapper.animate({'top': $notice.outerHeight()}, 300);
+				$(window).resize(function(){
+					$wrapper.css('top', $notice.outerHeight());
+				});
+			}, 500);
+		}
+		
+		if (navigator.userAgent.indexOf('like Mac OS X') !== -1) {
+			showNotice(distro.loc.str('browsers.iOS'));
+		} else if ($.browser.name === 'firefox' && $.browser.versionNumber < 4) {
+			showNotice(stencil(distro.loc.str('browsers.old'), { browser: 'Firefox', url: 'http://firefox.com/' }));
+		} else if ($.browser.name === 'safari' && $.browser.versionNumber < 5) {
+			showNotice(stencil(distro.loc.str('browsers.old'), { browser: 'Safari', url: 'http://www.apple.com/safari/download/' }));
+		} else if ($.browser.name === 'chrome' && $.browser.versionNumber < 11) {
+			showNotice(stencil(distro.loc.str('browsers.old'), { browser: 'Chrome', url: 'http://www.google.com/chrome/' }));
+		} else if ( ! ($.browser.name in { chrome:1, firefox:1, safari:1 })) {
+			showNotice(distro.loc.str('browsers.noClue'));
 		}
 	})();
 	$('#logOut').click(function(){

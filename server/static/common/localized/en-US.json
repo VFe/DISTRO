@@ -6,6 +6,11 @@
 		},
 		"serverError": "The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken."
 	},
+	"browsers": {
+		"old": [ "It looks like you\u2019re using an older version of ", { "$key": "browser" }, " which isn\u2019t fully supported by DISTRO. Websites across the internet will work better if you ", ["%a", { "href": { "$key": "url" }, "target": "_blank" }, "upgrade to the latest version (it's free!)"], "."],
+		"iOS": "It looks like you\u2019re using a iOS device to visit DISTRO. We can\u2019t make any guarantees about how well that will work.",
+		"noClue": [ "We can\u2019t tell which web browser you’re using. DISTRO might work, or it might not. ", ["%a", { "href": "#/about/contact" }, "Talk to us about it"], "! We know that DISTRO works great in ", ["%a", { "href": "http://www.google.com/chrome/", "target": "_blank" }, "Chrome"], ", a free web browser from Google."]
+	},
 	"chrome": {
 		"logIn": "Log in",
 		"logOut": "Log out",
