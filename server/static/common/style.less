@@ -64,10 +64,38 @@
 	.backgroundGradientVertical(@distroDark, @distroLight);
 }
 
+@font-face {
+	font-family:"FF DIN Web";
+	font-style:normal;
+	font-weight:300;
+	src: url('/fonts/DINWeb-Light.eot');
+	src: url('/fonts/DINWeb-Light.eot?iefix') format('eot'),
+	     url('/fonts/DINWeb-Light.woff') format('woff'),
+	     url('/fonts/DINWeb-Light.ttf')  format('truetype');
+}
+@font-face {
+	font-family:"FF DIN Web";
+	font-style:normal;
+	font-weight:400;
+	src: url('/fonts/DINWeb.eot');
+	src: url('/fonts/DINWeb.eot?iefix') format('eot'),
+	     url('/fonts/DINWeb.woff') format('woff'),
+	     url('/fonts/DINWeb.ttf')  format('truetype');
+}
+@font-face {
+	font-family:"FF DIN Web";
+	font-style:normal;
+	font-weight:600;
+	src: url('/fonts/DINWeb-Medium.eot');
+	src: url('/fonts/DINWeb-Medium.eot?iefix') format('eot'),
+	     url('/fonts/DINWeb-Medium.woff') format('woff'),
+	     url('/fonts/DINWeb-Medium.ttf')  format('truetype');
+}
+
 html, body{
 	margin: 0;
 	height: 100%;
-	font: 12px "Helvetica Neue", Helvetica, sans-serif;
+	font: 12px "FF DIN Web", "Helvetica Neue", Helvetica, sans-serif;
 	color: #222;
 }
 img{
@@ -1151,7 +1179,7 @@ ul.aboutIcons{
 	.border-radius(0.25em);
 }
 #lightboxWrapper #loginRegisterBox{
-	font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 11px;
 	width: 350px;
 	padding: 0.4em;
 	a:link, a:visited{
