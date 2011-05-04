@@ -805,7 +805,7 @@ distro.loadLandingPage = function(name, callback){
 									$test: {$handler: function(){ return ! subscribed && distro.tutorial.shouldShow('subscribe'); }},
 									$if: ["#subscribeTutDialog", {
 										$test: { $handler: function(d){ return d.name === 'northside' } },
-										$if: "Subscribe to listen to music from northside (it\u2019s free!)",
+										$if: "Subscribe to listen to music from Northside Festival (it\u2019s free!)",
 										$else: ["Subscribe to start receiving music from ^", {$key:"name"}, "^ (it\u2019s free!)"]
 									}]
 								}
