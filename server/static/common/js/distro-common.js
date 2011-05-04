@@ -60,5 +60,14 @@
 			});
 		}
 	};
+	distro.init.add({
+		init: function(done){
+			yepnope({
+				test: 'JSON' in window,
+				nope: 'http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js',
+				complete: done
+			});
+		}
+	})
 	distro.init.add(distro.loc);
 })();
