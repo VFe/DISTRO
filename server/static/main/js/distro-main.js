@@ -1104,13 +1104,21 @@ distro.init(function(){
 	(function(){
 		function showNotice(message){
 			setTimeout(function(){
-				var $notice = $(haj(['#notice', message])),
+				var exports = {},
+					$notice = $(haj(['#notice', ['.close', { $export: 'close' }], message], exports)),
 					$wrapper = $('#wrapper');
+				function resizeHandler(){
+					$wrapper.css('top', $notice.outerHeight());
+				}
 				document.body.insertBefore($notice[0], $wrapper[0]);
 				$wrapper.animate({'top': $notice.outerHeight()}, 300);
-				$(window).resize(function(){
-					$wrapper.css('top', $notice.outerHeight());
-				});
+				$(window).resize(resizeHandler);
+				$(exports.close).click(function(){
+					$(window).unbind('resize', resizeHandler);
+					$wrapper.animate({'top': 0}, 300, function(){
+						$notice.remove();
+					})
+				})
 			}, 500);
 		}
 		
