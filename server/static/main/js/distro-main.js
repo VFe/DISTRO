@@ -1123,7 +1123,9 @@ distro.init(function(){
 		}
 		
 		if (navigator.userAgent.indexOf('like Mac OS X') !== -1) {
-			showNotice(distro.loc.str('browsers.iOS'));
+			var deviceMatch = navigator.userAgent.match(/iPhone|iPad|iPod/),
+				device = deviceMatch ? deviceMatch[0] : 'iOS';
+			showNotice(stencil(distro.loc.str('browsers.iOS'), { device: device }));
 		} else if ($.browser.name === 'firefox' && $.browser.versionNumber < 4) {
 			showNotice(stencil(distro.loc.str('browsers.old'), { browser: 'Firefox', url: 'http://firefox.com/' }));
 		} else if ($.browser.name === 'safari' && $.browser.versionNumber < 5) {
