@@ -16,104 +16,106 @@
 </head>
 
 <body>
-<div id="top">
-	<ul id="topNav">
-		<li id="account"><a href="#/login" id="logIn" data-distro-localized-string="chrome.logIn">&nbsp;</a><span id="accountName"></span><a id="logOut" data-distro-localized-string="chrome.logOut">&nbsp;</a></li>
-		<li id="info">
-			<ul id="aboutButtons" class="aboutIcons">
-				<li class="FAQ"><a href="#/about/faq"><span class="label" data-distro-localized-string="chrome.about.faq"></span></a></li>
-				<li class="About"><a href="#/about/about"><span class="label" data-distro-localized-string="chrome.about.about"></span></a></li>
-				<li class="Contact"><a href="#/about/contact"><span class="label" data-distro-localized-string="chrome.about.contact"></span></a></li>
-				<li class="Invest"><a href="#/about/invest"><span class="label" data-distro-localized-string="chrome.about.invest"></span></a></li>
-				<li class="Jobs"><a href="#/about/jobs"><span class="label" data-distro-localized-string="chrome.about.jobs"></span></a></li>
-			</ul>
-		</li>
-	</ul>
-	<img height="25" id="mastheadLogo" src="//distro-static.s3.amazonaws.com/home/mastheadLogo.png">
-</div>
-<div id="content">
-	<div id="subscriptions">
-		<table id="subscriptionsTableHead" border=0>
-			<thead>
-				<tr>
-					<th><span data-distro-localized-string="library.networks">&nbsp;</span></th>
-				</tr>
-			</thead>
-		</table>
-		<ul id="subscriptionsButtonBar">
-			<li id="findNetwork"><a href="#/find"><span data-distro-localized-string="chrome.findNetwork">&nbsp;</span><div class="icon"></div></a></li>
+<div id="wrapper">
+	<div id="top">
+		<ul id="topNav">
+			<li id="account"><a href="#/login" id="logIn" data-distro-localized-string="chrome.logIn">&nbsp;</a><span id="accountName"></span><a id="logOut" data-distro-localized-string="chrome.logOut">&nbsp;</a></li>
+			<li id="info">
+				<ul id="aboutButtons" class="aboutIcons">
+					<li class="FAQ"><a href="#/about/faq"><span class="label" data-distro-localized-string="chrome.about.faq"></span></a></li>
+					<li class="About"><a href="#/about/about"><span class="label" data-distro-localized-string="chrome.about.about"></span></a></li>
+					<li class="Contact"><a href="#/about/contact"><span class="label" data-distro-localized-string="chrome.about.contact"></span></a></li>
+					<li class="Invest"><a href="#/about/invest"><span class="label" data-distro-localized-string="chrome.about.invest"></span></a></li>
+					<li class="Jobs"><a href="#/about/jobs"><span class="label" data-distro-localized-string="chrome.about.jobs"></span></a></li>
+				</ul>
+			</li>
 		</ul>
-		<div id="subscriptionsTableBodyContainer">
-			<table id="subscriptionsTable">
-				<colgroup>
-					<col>
-				</colgroup>
-				<tbody>
-					<tr class="filler">
-						<td></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<img height="25" id="mastheadLogo" src="//distro-static.s3.amazonaws.com/home/mastheadLogo.png">
 	</div>
-	<div id="library">
-		<div id="musicTableHeadContainer">
-			<table id="musicTableHead" border=0>
-				<colgroup>
-					<col>
-					<col width="60">
-					<col width="25%">
-					<col width="65">
-					<col width="50">
-					<col width="25%">
-				</colgroup>
-				<thead class="sortable">
+	<div id="content">
+		<div id="subscriptions">
+			<table id="subscriptionsTableHead" border=0>
+				<thead>
 					<tr>
-						<th data-sort="name"><span data-distro-localized-string="library.name">&nbsp;</span></th>
-						<th data-sort="time" data-sort-direction="descending"><span data-distro-localized-string="library.time">&nbsp;</span></th>
-						<th data-sort="artist"><span data-distro-localized-string="library.artist">&nbsp;</span></th>
-						<th data-sort="performance" data-sort-direction="descending"><span data-distro-localized-string="library.event">&nbsp;</span></th>
-						<th data-sort="date" class="descending"><div id="freshHead">&nbsp;</div></th>
-						<th data-sort="network"><span data-distro-localized-string="library.receivedFrom">&nbsp;</span></th>
+						<th><span data-distro-localized-string="library.networks">&nbsp;</span></th>
 					</tr>
 				</thead>
 			</table>
+			<ul id="subscriptionsButtonBar">
+				<li id="findNetwork"><a href="#/find"><span data-distro-localized-string="chrome.findNetwork">&nbsp;</span><div class="icon"></div></a></li>
+			</ul>
+			<div id="subscriptionsTableBodyContainer">
+				<table id="subscriptionsTable">
+					<colgroup>
+						<col>
+					</colgroup>
+					<tbody>
+						<tr class="filler">
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
-		<div id="musicTableBodyContainer" tabindex="3">
-			<table id="musicTableBody">
-				<colgroup>
-					<col>
-					<col width="60">
-					<col width="25%">
-					<col width="65">
-					<col width="50">
-					<col width="25%">
-				</colgroup>
-				<tbody>
-					<tr class="filler">
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-					</tr>
-				</tbody>
-			</table>
+		<div id="library">
+			<div id="musicTableHeadContainer">
+				<table id="musicTableHead" border=0>
+					<colgroup>
+						<col>
+						<col width="60">
+						<col width="25%">
+						<col width="65">
+						<col width="50">
+						<col width="25%">
+					</colgroup>
+					<thead class="sortable">
+						<tr>
+							<th data-sort="name"><span data-distro-localized-string="library.name">&nbsp;</span></th>
+							<th data-sort="time" data-sort-direction="descending"><span data-distro-localized-string="library.time">&nbsp;</span></th>
+							<th data-sort="artist"><span data-distro-localized-string="library.artist">&nbsp;</span></th>
+							<th data-sort="performance" data-sort-direction="descending"><span data-distro-localized-string="library.event">&nbsp;</span></th>
+							<th data-sort="date" class="descending"><div id="freshHead">&nbsp;</div></th>
+							<th data-sort="network"><span data-distro-localized-string="library.receivedFrom">&nbsp;</span></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div id="musicTableBodyContainer" tabindex="3">
+				<table id="musicTableBody">
+					<colgroup>
+						<col>
+						<col width="60">
+						<col width="25%">
+						<col width="65">
+						<col width="50">
+						<col width="25%">
+					</colgroup>
+					<tbody>
+						<tr class="filler">
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
+	<div id="bottom">
+		<ul id="transport">
+			<li class="button" id="skipBackButton" style="letter-spacing: -0.3em">&#x2758;<span style="letter-spacing: -0.35em;">&#x25C0;&#x25C0;</span></li>
+			<li class="button" id="pauseButton" style="letter-spacing: 0.15em">&#x2759;&#x2759;</li>
+			<li class="button" id="playButton">&#x25BA;</li>
+			<li class="button" id="skipForwardButton"style="letter-spacing: -0.25em">&#x25BA;&#x25BA;&#x2758;</li>
+		</ul>
+		<div id="scrubber"><div class="channel"><div class="backing"><div class="handle"></div></div></div></div>
+		<div id="timecode"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></div>
+	</div>
+	<div id="lightbox" style="display: none"></div>
 </div>
-<div id="bottom">
-	<ul id="transport">
-		<li class="button" id="skipBackButton" style="letter-spacing: -0.3em">&#x2758;<span style="letter-spacing: -0.35em;">&#x25C0;&#x25C0;</span></li>
-		<li class="button" id="pauseButton" style="letter-spacing: 0.15em">&#x2759;&#x2759;</li>
-		<li class="button" id="playButton">&#x25BA;</li>
-		<li class="button" id="skipForwardButton"style="letter-spacing: -0.25em">&#x25BA;&#x25BA;&#x2758;</li>
-	</ul>
-	<div id="scrubber"><div class="channel"><div class="backing"><div class="handle"></div></div></div></div>
-	<div id="timecode"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></div>
-</div>
-<div id="lightbox" style="display: none"></div>
 <div id="lightboxWrapper" style="display: none"></div>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
@@ -122,6 +124,7 @@
 <script src="http://ajax.cdnjs.com/ajax/libs/es5-shim/0.0.4/es5-shim.min.js"></script>
 <script src="http://distro-static.s3.amazonaws.com/js/store-1.1.1.min.js"></script>
 <script src="http://distro-static.s3.amazonaws.com/js/modernizr-1.7-custom.js"></script>
+<script src="js/jquery.browser.js"></script>
 <script src="js/jquery.placeholder.js"></script>
 <script src="js/haj.js"></script>
 <script src="js/stencil.js"></script>

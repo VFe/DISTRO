@@ -43,7 +43,7 @@
 				while ((pathComponent = path.shift())){
 					current = current[pathComponent];
 				}
-				if (typeof current === 'string') {
+				if (typeof current === 'string' || current && current.constructor != 'object') {
 					return current;
 				}
 			} catch (e) {}

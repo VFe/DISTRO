@@ -123,12 +123,45 @@ ul.inlineList{
 		}
 	}
 }
+#notice{
+	background-color: #FFF77B;
+	.backgroundGradient(#FFF59B, #EBCE51);
+	border-bottom: 1px solid #C44;
+	font-size: 1.2em;
+	padding: 0.4em 30px 0.4em 0.5em;
+	position: relative;
+	text-align: center;
+	.close{
+		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJVJREFUeNpiYBi2QAqLmDAQs6ELMmNR6ADElkD8GYjfImn2BWIFIL4LxH9xGcALxFZQcQWoIQxQzSDbuYD4FRB/gGlgxOFUXyTn/kJiHwDiW4S88B2IHwOxClSeGZdmEGCiNLSZifQCcpi8xWcAKBAD0Px8Ack7ClADPuAyAGSbANQVMD8jhwlI41nkaKQ4IQ0DABBgADzZHkqN1ORFAAAAAElFTkSuQmCC);
+		background-position: center;
+		background-repeat: no-repeat;
+		bottom: 0;
+		cursor: pointer;
+		position: absolute;
+		right: 10px;
+		top: 0;
+		width: 16px;
+		&:hover{
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQxJREFUeNqkk80LAVEUxWcQNWVlIUrNQhZiZSE7pSyUP1UpKxvZWVlZKKUUsZqFZqGUcm6dp+v6aOTUr3kz8+7nu8/3XpUHLVDiWnQFR7ABO73ZN8Yd0PS+6wSmdPrkYMioSSTGIxCnVOSkxqIs6MsizTp76mcEZiDkf6c5Ixf4HrgMQuN9w4ZNXJ00lu8rs7cpEdqq26KKeAYHsOdzy8hDk1WQ+VBjV2UTKeOs3Zjy/tQnB67mAnsUmZ48JPXkWLfTAqxV2jXTk7oeKnFwMdMnx3MGA1VzSCdVdYyipZvEFvlFUtYoreY7b7x/k2QzBjd9pjumXExwmSbvLpO+zg1QVhnFNHRT+tBdgAEAOdM5vyoF+4IAAAAASUVORK5CYII=);
+		}
+		&:active{
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAARNJREFUeNpiZMAEwkDsC8RqUDYIfAPiW0B8HIgvICtmRNMcBsTODPgByKDpUENRDCiG2koMAGluAeK3TEg2E6sZBLiAOBPEYIb6MxVJ8jEQzwFiAyBmRRJfAMTfgVgWyueHucAAzfTjUH/2wfwJ1QwS34um1hnkgiCk0AYBbZDJQHwViK9B6TNQm4vQXMXPgsOPCUiueYykmQtdIRMDhQCXATA/y0LD6DFamMABM9RZ2khiq4D4EJKzrdDCxA45UYEM+ISW+viA+AUQ5yH52QBqiClSNILAZlhKBKV9HxK9D/JWCzNS+hZBMx0fALmmE4h/MyMJXoA6WYmIzNSHLTMhZ2dnaN6QRbIRpPEYlIYDgAADAJ2xOYp76uZ1AAAAAElFTkSuQmCC);
+		}
+	}
+}
+#wrapper{
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
 #top{
 	color: white;
 	background-color: black;
 	.commonGradient;
 	line-height: @topBarHeight;
-	position: fixed;
+	position: absolute;
 	text-align: left;
 	left: 0;
 	right: 0;
@@ -247,7 +280,7 @@ ul.inlineList{
 	background: black;
 	.commonGradient;
 	line-height: @bottomBarHeight;
-	position: fixed;
+	position: absolute;
 	bottom: 0;
 	left: 0;
 	right: 0;
@@ -259,7 +292,7 @@ ul.inlineList{
 	bottom: @bottomBarHeight;
 	left: 0;
 	padding-left: @subscriptionPaneWidth;
-	position: fixed;
+	position: absolute;
 }
 #subscriptions{
 	color: #EEE;
@@ -659,7 +692,7 @@ html.JS #musicTableBodyContainer{
 #lightbox{
 	background: rgba(0, 0, 0, 0.7);
 	height: 100%;
-	position: fixed;
+	position: absolute;
 	width: 100%;
 	top: 0;
 	left: 0;
