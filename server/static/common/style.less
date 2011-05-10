@@ -40,7 +40,7 @@
 .zebra (@colorA, @colorB, @height) {
 	background-image: -webkit-gradient(linear, left top, left bottom, from(@colorA), color-stop(0.5, @colorA), color-stop(0.5, @colorB), to(@colorB));
 	background-image: -moz-linear-gradient(top, @colorA 50%, @colorB 50%);
-	.background-size(1px, (@height * 2));
+	.background-size(auto, (@height * 2));
 }
 .box-shadow (@args){
 	-webkit-box-shadow: @args;
