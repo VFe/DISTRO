@@ -802,7 +802,7 @@ distro.loadLandingPage = function(name, callback){
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
 								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]],
 								{
-									$test: {$handler: function(){ return ! subscribed && distro.tutorial.shouldShow('subscribe'); }},
+									$test: {$handler: function(d){ return ! subscribed && distro.tutorial.shouldShow('subscribe') && d.name !== 'delicatesteve'; }},
 									$if: ["#subscribeTutDialog", {
 										$test: { $handler: function(d){ return d.name === 'northside' } },
 										$if: "Subscribe to listen to music from Northside Festival (it\u2019s free!)",
