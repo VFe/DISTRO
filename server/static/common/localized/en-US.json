@@ -6,6 +6,11 @@
 		},
 		"serverError": "The DISTRO server responded in a way that I couldn't understand. Try again later, or let us know that something is broken."
 	},
+	"browsers": {
+		"old": [ "You\u2019re using an older version of ", { "$key": "browser" }, " which is not fully supported by DISTRO. We recommend that you upgrade to the ", ["%a", { "href": { "$key": "url" }, "target": "_blank" }, "latest version of ", { "$key": "browser" }], " (it's free!)"],
+		"iOS": ["DISTRO\u2019s current platform is not supported on ", { "$key": "device" }, ". It will be soon."],
+		"noClue": [ "We are unable to identify the web browser you\u2019re using to access DISTRO, so you may experience some unexpected problems. We recommend downloading ", ["%a", { "href": "http://www.google.com/chrome/", "target": "_blank" }, "Chrome"], ", a free web browser from Google."]
+	},
 	"chrome": {
 		"logIn": "Log in",
 		"logOut": "Log out",

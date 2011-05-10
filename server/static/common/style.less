@@ -40,7 +40,7 @@
 .zebra (@colorA, @colorB, @height) {
 	background-image: -webkit-gradient(linear, left top, left bottom, from(@colorA), color-stop(0.5, @colorA), color-stop(0.5, @colorB), to(@colorB));
 	background-image: -moz-linear-gradient(top, @colorA 50%, @colorB 50%);
-	.background-size(1px, (@height * 2));
+	.background-size(auto, (@height * 2));
 }
 .box-shadow (@args){
 	-webkit-box-shadow: @args;
@@ -64,10 +64,38 @@
 	.backgroundGradientVertical(@distroDark, @distroLight);
 }
 
+@font-face {
+	font-family:"FF DIN Web";
+	font-style:normal;
+	font-weight:300;
+	src: url('/fonts/DINWeb-Light.eot');
+	src: url('/fonts/DINWeb-Light.eot?iefix') format('eot'),
+	     url('/fonts/DINWeb-Light.woff') format('woff'),
+	     url('/fonts/DINWeb-Light.ttf')  format('truetype');
+}
+@font-face {
+	font-family:"FF DIN Web";
+	font-style:normal;
+	font-weight:400;
+	src: url('/fonts/DINWeb.eot');
+	src: url('/fonts/DINWeb.eot?iefix') format('eot'),
+	     url('/fonts/DINWeb.woff') format('woff'),
+	     url('/fonts/DINWeb.ttf')  format('truetype');
+}
+@font-face {
+	font-family:"FF DIN Web";
+	font-style:normal;
+	font-weight:600;
+	src: url('/fonts/DINWeb-Medium.eot');
+	src: url('/fonts/DINWeb-Medium.eot?iefix') format('eot'),
+	     url('/fonts/DINWeb-Medium.woff') format('woff'),
+	     url('/fonts/DINWeb-Medium.ttf')  format('truetype');
+}
+
 html, body{
 	margin: 0;
 	height: 100%;
-	font: 12px "Helvetica Neue", Helvetica, sans-serif;
+	font: 12px "FF DIN Web", "Helvetica Neue", Helvetica, sans-serif;
 	color: #222;
 }
 img{
@@ -95,12 +123,47 @@ ul.inlineList{
 		}
 	}
 }
+#notice{
+	background-color: #FFF77B;
+	.backgroundGradient(#FFF59B, #EBCE51);
+	border-bottom: 1px solid #C44;
+	font-size: 1.2em;
+	padding: 0.4em 30px 0.4em 0.5em;
+	position: fixed;
+	left: 0;
+	right: 0;
+	text-align: center;
+	.close{
+		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJVJREFUeNpiYBi2QAqLmDAQs6ELMmNR6ADElkD8GYjfImn2BWIFIL4LxH9xGcALxFZQcQWoIQxQzSDbuYD4FRB/gGlgxOFUXyTn/kJiHwDiW4S88B2IHwOxClSeGZdmEGCiNLSZifQCcpi8xWcAKBAD0Px8Ack7ClADPuAyAGSbANQVMD8jhwlI41nkaKQ4IQ0DABBgADzZHkqN1ORFAAAAAElFTkSuQmCC);
+		background-position: center;
+		background-repeat: no-repeat;
+		bottom: 0;
+		cursor: pointer;
+		position: absolute;
+		right: 10px;
+		top: 0;
+		width: 16px;
+		&:hover{
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQxJREFUeNqkk80LAVEUxWcQNWVlIUrNQhZiZSE7pSyUP1UpKxvZWVlZKKUUsZqFZqGUcm6dp+v6aOTUr3kz8+7nu8/3XpUHLVDiWnQFR7ABO73ZN8Yd0PS+6wSmdPrkYMioSSTGIxCnVOSkxqIs6MsizTp76mcEZiDkf6c5Ixf4HrgMQuN9w4ZNXJ00lu8rs7cpEdqq26KKeAYHsOdzy8hDk1WQ+VBjV2UTKeOs3Zjy/tQnB67mAnsUmZ48JPXkWLfTAqxV2jXTk7oeKnFwMdMnx3MGA1VzSCdVdYyipZvEFvlFUtYoreY7b7x/k2QzBjd9pjumXExwmSbvLpO+zg1QVhnFNHRT+tBdgAEAOdM5vyoF+4IAAAAASUVORK5CYII=);
+		}
+		&:active{
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAARNJREFUeNpiZMAEwkDsC8RqUDYIfAPiW0B8HIgvICtmRNMcBsTODPgByKDpUENRDCiG2koMAGluAeK3TEg2E6sZBLiAOBPEYIb6MxVJ8jEQzwFiAyBmRRJfAMTfgVgWyueHucAAzfTjUH/2wfwJ1QwS34um1hnkgiCk0AYBbZDJQHwViK9B6TNQm4vQXMXPgsOPCUiueYykmQtdIRMDhQCXATA/y0LD6DFamMABM9RZ2khiq4D4EJKzrdDCxA45UYEM+ISW+viA+AUQ5yH52QBqiClSNILAZlhKBKV9HxK9D/JWCzNS+hZBMx0fALmmE4h/MyMJXoA6WYmIzNSHLTMhZ2dnaN6QRbIRpPEYlIYDgAADAJ2xOYp76uZ1AAAAAElFTkSuQmCC);
+		}
+	}
+}
+#wrapper{
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
 #top{
 	color: white;
-	background-color: black;
+	background-color: rgb(20, 20, 20);
 	.commonGradient;
 	line-height: @topBarHeight;
-	position: fixed;
+	position: absolute;
 	text-align: left;
 	left: 0;
 	right: 0;
@@ -122,6 +185,8 @@ ul.inlineList{
 #findNetwork{
 	color: white;
 	display: inline-block;
+	font-size: 1.7em;
+	line-height: 30px;
 	text-align: center;
 	background-color: @helloGreen;
 	text-shadow: rgba(0, 0, 0, 0.4) 0 -1px 0;
@@ -140,10 +205,6 @@ ul.inlineList{
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAQCAYAAADJViUEAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJNJREFUeNpiYKAAMOIQtwBiIST+SSB+S5SJ////3/8fFThgU8dEibMp0swCxJxAzIUs+OvXL1Y2NjY4/9KlS3xAShhN71uWjo4OYyDDGln027dvksiaX7586Q1Up4mspqKiohMUOA3/yQADH2AHsIjHA7ECEn8BED8cJomEieq5CuhHAyAlgCR0gZGR8QO6OoAAAwAFmnln6v3kTwAAAABJRU5ErkJggg==);
 	background-position: center;
 	background-repeat: no-repeat;
-}
-#findNetwork .text{
-	font-size: 1.4em;
-	line-height: 1.8em;
 }
 #info{
 	width: 2.3em;
@@ -169,6 +230,7 @@ ul.inlineList{
 	z-index: 1;
 	white-space: nowrap;
 	padding: 1em 0.5em 0.5em 0.5em;
+	.border-radius(0 0 0.5em 0.5em);
 }
 #aboutButtons .label{
 	text-transform: uppercase;
@@ -217,10 +279,10 @@ ul.inlineList{
 	cursor: pointer;
 }
 #bottom{
-	background: black;
+	background-color: rgb(40, 40, 40);
 	.commonGradient;
 	line-height: @bottomBarHeight;
-	position: fixed;
+	position: absolute;
 	bottom: 0;
 	left: 0;
 	right: 0;
@@ -232,7 +294,7 @@ ul.inlineList{
 	bottom: @bottomBarHeight;
 	left: 0;
 	padding-left: @subscriptionPaneWidth;
-	position: fixed;
+	position: absolute;
 }
 #subscriptions{
 	color: #EEE;
@@ -270,6 +332,7 @@ ul.inlineList{
 #transport #playButton, #transport #pauseButton{
 	width: 1em;
 	color: @subtleGreen;
+	background-color: rgb(40, 40, 40);
 	.commonGradientVertical;
 }
 #transport:not(.playing) #pauseButton{
@@ -360,12 +423,12 @@ thead.sortable th{
 	cursor: pointer;
 }
 thead.sortable th.ascending{
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADdJREFUeNpi+P//PwMWHAXEbDjk8GJsgnX/IWA7OYbiMuw/uYbiM4wsQwkZRrKhxBhGkqEAAQYADeqGFuGltYsAAAAASUVORK5CYII=);
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFVJREFUeNpiZEADHR0dBkBqPRAHVlRUXGAgETBiMWw/EAsA8QcgdiTVUEYchsEAyYYyQg0TgBpmgEXNBaihH4gykIBhJBvKRIRhDFD5/VDL8QKAAAMAxs0gjq2gpg0AAAAASUVORK5CYII=);
 	background-repeat: no-repeat;
 	background-position: right center;
 }
 thead.sortable th.descending{
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAD5JREFUeNpi+P//f+N/4sB2IOYEYgZ8GMZopIZhyAbiM5Row9ANxGYoSYZhMxDZUJINw2UgCMeSYxgIAwQYAApQhjoA6KmKAAAAAElFTkSuQmCC);
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAG5JREFUeNpi7OjoOM/AwGDAQBhcqKioMCSkiAmIHUGKCRkGVUcQMIIIoCsFgNR+HC4FGwZ03QeiDYQaqgCkQN4XQJIHGWIINOwBA5GACcaAanKEGgIzzJEUw1BciORSkLfXA3Eg0LALDCQCgAADACgDHx3WLkrbAAAAAElFTkSuQmCC);
 	background-repeat: no-repeat;
 	background-position: right center;
 }
@@ -377,8 +440,21 @@ thead.sortable th.descending{
 #musicTableBodyContainer:focus{
 	outline: none;
 }
-#musicTableBody{
+#musicTableBody .filler:nth-child(even){
+	.zebra(rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.8), 2em);
+}
+#musicTableBody .filler:nth-child(odd){
 	.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8), 2em);
+}
+#musicTableBody tr:not(.filler){
+	cursor: default;
+	.button;
+	&:nth-child(odd){
+		background-color: rgba(255, 255, 255, 0.8);
+	}
+	&:nth-child(even){
+		background-color: rgba(240, 240, 240, 0.8);
+	}
 }
 #musicTableBody tr.playing td:not(.event){
 	font-weight: bold;
@@ -462,10 +538,6 @@ thead.sortable th.descending{
 	padding-left: 0.3em;
 	color: #999;
 }
-#musicTableBody tr:not(.filler){
-	cursor: default;
-	.button;
-}
 #musicTableBody a, #subscriptionsTable a {
 	text-decoration: none;
 }
@@ -495,14 +567,12 @@ thead.sortable th.descending{
 th.descending #freshHead, th.ascending #freshHead{
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAATtJREFUeNqckz1Ow0AQhePFRUrnBHFJmQMEBU6Ab4Bzg9AlVUJF6FzSkdzAJV2M5APkCM4JWDrKzFqf0cjymsCTRrvefTP75sfBwIPlchXJMuGz2m6fqy6eGfjhnA9Y6iP1BbgIQYf0RJYHsaR1lYvtJZVcOE7RTPbzoJXzG44u372Y5XosdktaBXuHnU7hgHMGaS12j/OCYE+qsDVCXt9wkVGwSHG+WBsFjygt6hSQ/unkQIqVs1PygZoGFq5TNTKqWLbl7EOkVCUGJ9uS/RtmqItDDo6e12PViS6MQ0UsPAH60joZeu5Ipz+kcKTglWHCmmGpLnDWKeVXZVl+T6c3AW1x7bkWG/YEeGVWXmQO3utJlM0GWQsUddWjYBJTlGY/kwjumLCUYJnqd9O6NQ/M5VH7779RH54FGAAHC1xQvuNSggAAAABJRU5ErkJggg==);
 } 
-#musicTableBody td:nth-last-child(n+2){
-	border-right: 1px solid rgba(50, 50, 50, 0.3);
-}
 #musicTableHead th {
 	border-left: 1px solid @lightBorder;
 }
 #musicTableHeadContainer, #subscriptions thead tr{
 	background-color: rgb(225, 225, 225);
+	background-color: rgb(40, 40, 40);
 	.commonGradient;
 }
 #musicTableHead th, #subscriptions th{
@@ -555,10 +625,8 @@ html.JS #musicTableBodyContainer{
 	bottom: 0;
 }
 #subscriptionsTable{
-	/*.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.2), 2em);*/
-	/*.backgroundGradientVertical(#333, #222);*/
-	background-image: -webkit-gradient(linear, left top, right top, from(#373737), color-stop(0.8, #373737), to(#222));
-	background-image: -moz-linear-gradient(left, #333, #222);
+	background-color: rgb(40, 40, 40);
+	.backgroundGradientVertical(#373737, #222);
 }
 #subscriptionsTable tr:not(.filler) {
 	border-bottom: 1px solid @lightBorder;
@@ -572,6 +640,7 @@ html.JS #musicTableBodyContainer{
 	white-space: nowrap;
 	.border-box;
 	.subscriptionControls{
+		font-family: "Helvetica Neue", Helvetica, sans-serif;
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -734,6 +803,7 @@ html.JS #musicTableBodyContainer{
 	font-size: 1.5em;
 	text-align: center;
 	width: 18.5em;
+	background-color: rgb(200, 200, 200);
 	.backgroundGradient(rgb(178, 178, 178), white);
 	font-weight: normal;
 	padding: 0.2em;
@@ -1151,7 +1221,7 @@ ul.aboutIcons{
 	.border-radius(0.25em);
 }
 #lightboxWrapper #loginRegisterBox{
-	font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 11px;
 	width: 350px;
 	padding: 0.4em;
 	a:link, a:visited{
@@ -1187,8 +1257,8 @@ ul.aboutIcons{
 		width: 100%;
 		margin: 0.8em 0;
 		font: inherit;
-		padding: 0.8em;
-		font-size: 1em;
+		padding: 0.7em;
+		font-size: 1.2em;
 		background: #4A4A4A;
 		border: 1px solid #999;
 		.border-radius(0.4em);
