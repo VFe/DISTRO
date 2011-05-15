@@ -1251,7 +1251,7 @@ ul.aboutIcons{
 	form{
 		margin: 1.5em 1.5em;
 	}
-	input[type='text'], input[type='password']{
+	input[type='text'], input[type='email'], input[type='password']{
 		display: block;
 		.border-box;
 		width: 100%;
@@ -1263,10 +1263,10 @@ ul.aboutIcons{
 		border: 1px solid #999;
 		.border-radius(0.4em);
 		color: white;
-	}
-	input[type='text']:disabled, input[type='password']:disabled{
-		background: #666;
-		border-color: #888;
+		&:disabled{
+			background: #666;
+			border-color: #888;
+		}
 	}
 	label{
 		color: #777;

@@ -1013,7 +1013,7 @@ distro.Router = Backbone.Controller.extend({
 						[ "%h2", "Have an account?" ],
 						[ "%h1", "Log In" ],
 						[ "%form", { $:function(){ $loginForm = $(this); }},
-							[ "%input", { $:bindToSubmit, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:bindToSubmit, "type": "email", "autocapitalize": "off", "name": "email", "placeholder": "Email Address" } ],
 							[ "%input", { $:bindToSubmit, "type": "password", "name": "password", "placeholder": "Password" } ],
 							[ "%p",
 								[ "%button", { $:bindToSubmit }, "Log In" ],
@@ -1026,7 +1026,7 @@ distro.Router = Backbone.Controller.extend({
 						[ "%h2", "New to DISTRO?" ],
 						[ "%h1", "Sign up" ],
 						[ "%form", { $:function(){ $registerForm = $(this); }},
-							[ "%input", { $:bindToSubmit, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:bindToSubmit, "type": "email", "autocapitalize": "off", "name": "email", "placeholder": "Email Address" } ],
 							[ "%input", { $:bindToSubmit, "type": "password", "name": "password", "placeholder": "Password" } ],
 							[ "%p",
 								[ "%button", { $async:function(){
