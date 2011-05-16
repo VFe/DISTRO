@@ -1244,7 +1244,6 @@ distro.init(function(){
 
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
-	_gaq.push(['_setDomainName', '.distro.fm']);
 	_gaq.push(['_trackPageview']);
 	
 	(function() {
