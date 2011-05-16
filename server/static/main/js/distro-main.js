@@ -821,6 +821,20 @@ distro.loadLandingPage = function(name, callback){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
 									distro.lightbox.pop();
+									if(distro.tutorial.shouldShow('newMusic')){
+										$('#subscriptions').after(haj(stencil([
+											"#newMusicTutDialog",
+											"Now that you have subscribed to",
+											["%p#newMusicTutNetworkName", "^", model.get('name'), "^"],
+											"this network appears in your Network List and you will automatically receive music",
+											["%br"], "from this network in your",
+											["%br"], "music library..."
+										])));
+										$('#newMusicTutDialog').click(function(e){
+											$('#newMusicTutDialog').hide();
+											distro.tutorial.passed('newMusic');
+										})
+									}
 								}
 							});
 						}
@@ -931,14 +945,18 @@ distro.Router = Backbone.Controller.extend({
 			show: function($content){
 				var $field, $text, $placeholder;
 				$content.attr('id', 'networkSearch');
-				$content.haj([
+				$content.stencil([
 					['%span.close.button', 'x'],
 					['.search',
 						['.field', {$:function(){ $field = $(this); }}, '^',
 							['%span.text', { contenteditable: 'true', $:function(){ $text = $(this); }}],
 							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
 						'^' ]
-					]
+					],
+					{
+						$test: {$handler: function(){ return distro.tutorial.shouldShow('search'); }},
+						$if: ["#searchTutDialog", "Enter a ^network^ name"]
+					}
 				]);
 				$field.click(function(e){
 					if (e.target != $text[0]) {
@@ -961,6 +979,7 @@ distro.Router = Backbone.Controller.extend({
 					if (e.keyCode === 13){
 						if ((search = $text.text())) {
 							distro.loadLandingPage($text.text(), function(){});
+							distro.tutorial.passed('search');
 						}
 						return false;
 					} else if (e.keyCode === 32) {
@@ -1230,8 +1249,14 @@ distro.init(function(){
 		} else if (elemBottom > containerBottom) {
 			$(container).scrollTop(elemBottom - $(container).height());
 		}
-	}	
-
+	}
+	if(distro.tutorial.shouldShow('findNetwork')){
+		$('#subscriptionsButtonBar').after(haj(["#findNetworkTutDialog", "Click here to find a ^network^"]));
+		$('#findNetwork').click(function(e){
+			$('#findNetworkTutDialog').hide();
+			distro.tutorial.passed('findNetwork');
+		})
+	}
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
 	_gaq.push(['_setDomainName', '.distro.fm']);
