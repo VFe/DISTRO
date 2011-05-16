@@ -803,7 +803,7 @@ distro.loadLandingPage = function(name, callback){
 								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]],
 								{
 									$test: {$handler: function(d){ return ! subscribed && distro.tutorial.shouldShow('subscribe') && d.name !== 'delicatesteve'; }},
-									$if: ["#subscribeTutDialog", {
+									$if: ["#subscribeTutDialog.tutorialDialog", {
 										$test: { $handler: function(d){ return d.name === 'northside' } },
 										$if: "Subscribe to listen to music from Northside Festival (it\u2019s free!)",
 										$else: ["Subscribe to start receiving music from ^", {$key:"name"}, "^ (it\u2019s free!)"]
@@ -823,16 +823,19 @@ distro.loadLandingPage = function(name, callback){
 									distro.lightbox.pop();
 									if(distro.tutorial.shouldShow('newMusic')){
 										$('#subscriptions').after(haj([
-											"#newMusicTutDialog",
+											"#newMusicTutDialog.tutorialDialog",
 											"Now that you have subscribed to",
 											["%p#newMusicTutNetworkName", "^", model.get('name'), "^"],
 											"this network appears in your Network List and you will automatically receive music",
 											["%br"], "from this network in your",
-											["%br"], "music library..."
+											["%br"], "music library\u2026"
 										]));
 										$('#newMusicTutDialog').click(function(e){
 											$('#newMusicTutDialog').hide();
 											distro.tutorial.passed('newMusic');
+											if(distro.tutorial.shouldShow('done')){
+												
+											}
 										})
 									}
 								}
@@ -955,7 +958,7 @@ distro.Router = Backbone.Controller.extend({
 					],
 					{
 						$test: {$handler: function(){ return distro.tutorial.shouldShow('search'); }},
-						$if: ["#searchTutDialog", "Enter a ^network^ name"]
+						$if: ["#searchTutDialog.tutorialDialog", "Enter a ^network^ name"]
 					}
 				]);
 				$field.click(function(e){
@@ -1251,7 +1254,7 @@ distro.init(function(){
 		}
 	}
 	if(distro.tutorial.shouldShow('findNetwork')){
-		$('#subscriptionsButtonBar').after(haj(["#findNetworkTutDialog", "Click here to find a ^network^"]));
+		$('#subscriptionsButtonBar').after(haj(["#findNetworkTutDialog.tutorialDialog", "Click here to find a ^network^"]));
 		$('#findNetwork').click(function(e){
 			$('#findNetworkTutDialog').hide();
 			distro.tutorial.passed('findNetwork');
