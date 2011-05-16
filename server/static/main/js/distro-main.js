@@ -822,14 +822,14 @@ distro.loadLandingPage = function(name, callback){
 									$subscribeButton.addClass('disabled');
 									distro.lightbox.pop();
 									if(distro.tutorial.shouldShow('newMusic')){
-										$('#subscriptions').after(haj(stencil([
+										$('#subscriptions').after(haj([
 											"#newMusicTutDialog",
 											"Now that you have subscribed to",
 											["%p#newMusicTutNetworkName", "^", model.get('name'), "^"],
 											"this network appears in your Network List and you will automatically receive music",
 											["%br"], "from this network in your",
 											["%br"], "music library..."
-										])));
+										]));
 										$('#newMusicTutDialog').click(function(e){
 											$('#newMusicTutDialog').hide();
 											distro.tutorial.passed('newMusic');
