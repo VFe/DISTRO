@@ -69,16 +69,74 @@ distro.request = function(path, method, data, hollerback, noRefresh){
 	});
 };
 distro.tutorial = {
-	shouldShow: function tutorialShouldShow(stage){
+	shouldShow: function(stage){
 		var tutorial;
 		return ! (distro.global.get('user') || ((tutorial = store.get('tutorial')) && tutorial[stage]));
 	},
-	passed: function tutorialDidShow(stage){
-		var tutorial;
+	passed: function(stage){
+		var tutorial, $element;
 		if ( ! distro.global.get('user')) {
 			tutorial = store.get('tutorial') || {};
 			tutorial[stage] = true;
 			store.set('tutorial', tutorial);
+			this.hide(stage);
+		}
+	},
+	show: function(stage){
+		if (this.shouldShow(stage)) {
+			this.stages[stage].show.apply(this.stages[stage], Array.prototype.slice.call(arguments, 1));
+		}
+	},
+	hide: function(stage){
+		var $element;
+		if (($element = this.stages[stage].$element)) {
+			delete this.stages[stage].$element;
+			$element.fadeOut(function(){
+				$(this).remove();
+			});
+		}
+	},
+	stages: {
+		findNetwork: {
+			show: function(options){
+				var after = options && options.after;
+				$('#subscriptionsButtonBar').after(this.$element = $(haj(["#findNetworkTutDialog.tutorialDialog" + (after ? '.alternate' : ''), after ? "Click here to find more ^networks^ " : "Click here to find a ^network^"])).hide().fadeIn());
+			}
+		},
+		search: {
+			show: function(){
+				$('#networkSearch').haj(["#searchTutDialog.tutorialDialog", "Enter a ^network^ name"]);
+			}
+		},
+		subscribe: {
+			show: function(network){
+				if (network.attributes.name !== 'delicatesteve') {
+					$('#landingBox .rightContent').stencil(["#subscribeTutDialog.tutorialDialog", {
+						$test: { $handler: function(d){ return d.name === 'northside' } },
+						$if: distro.loc.str('tutorial.subscribeNorthside'),
+						$else: distro.loc.str('tutorial.subscribe')
+					}], network.attributes);
+				}
+			}
+		},
+		newMusic: {
+			show: function(network){
+				this.$element = $(haj([
+					"#newMusicTutDialog.tutorialDialog",
+					"Now that you have subscribed to",
+					["%p#newMusicTutNetworkName", "^" + network.get('name') + "^"],
+					"this network appears in your Network List and you will automatically receive music",
+					["%br"], "from this network in your",
+					["%br"], "music library."
+				]))
+				.hide()
+				.insertAfter('#subscriptions')
+				.fadeIn()
+				.delay(8000)
+				.fadeOut(3000, function(e){
+					distro.tutorial.passed('newMusic');
+				});
+			}
 		}
 	}
 };
@@ -564,6 +622,7 @@ distro.lightbox = new (function(){
 			next();
 		}).fadeIn(200);
 		this.$lightbox.fadeIn(200);
+		distro.tutorial.hide('findNetwork');
 	};
 	Lightbox.prototype.hide = function(name){
 		this.content.splice(0, this.content.length - 1);
@@ -581,6 +640,7 @@ distro.lightbox = new (function(){
 				});
 				Backbone.history.saveLocation('');
 				document.title = distro.TITLE;
+				distro.tutorial.show('findNetwork', { after: true });
 			}
 			return old;
 		}
@@ -800,18 +860,13 @@ distro.loadLandingPage = function(name, callback){
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
-								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]],
-								{
-									$test: {$handler: function(d){ return ! subscribed && distro.tutorial.shouldShow('subscribe') && d.name !== 'delicatesteve'; }},
-									$if: ["#subscribeTutDialog.tutorialDialog", {
-										$test: { $handler: function(d){ return d.name === 'northside' } },
-										$if: distro.loc.str('tutorial.subscribeNorthside'),
-										$else: distro.loc.str('tutorial.subscribe')
-									}]
-								}
+								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
 							]
 						]
 					], model.attributes);
+					if ( ! subscribed) {
+						distro.tutorial.show('subscribe', model);
+					}
 					$subscribeButton.click(function(){
 						if (!subscribed) {
 							mpq.push(['track', 'subscribe', {'name': model.name, 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
@@ -821,23 +876,7 @@ distro.loadLandingPage = function(name, callback){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
 									distro.lightbox.pop();
-									if(distro.tutorial.shouldShow('newMusic')){
-										$('#subscriptions').after(haj([
-											"#newMusicTutDialog.tutorialDialog",
-											"Now that you have subscribed to",
-											["%p#newMusicTutNetworkName", "^", model.get('name'), "^"],
-											"this network appears in your Network List and you will automatically receive music",
-											["%br"], "from this network in your",
-											["%br"], "music library\u2026"
-										]));
-										$('#newMusicTutDialog').click(function(e){
-											$('#newMusicTutDialog').hide();
-											distro.tutorial.passed('newMusic');
-											if(distro.tutorial.shouldShow('done')){
-												
-											}
-										})
-									}
+									distro.tutorial.show('newMusic', model);
 								}
 							});
 						}
@@ -917,6 +956,7 @@ distro.Router = Backbone.Controller.extend({
 	},
 	blank: function(){
 		distro.lightbox.hide();
+		distro.tutorial.show('findNetwork');
 	},
 	network: function(name){
 		if (!name) {
@@ -942,25 +982,23 @@ distro.Router = Backbone.Controller.extend({
 	},
 	find: function(){
 		var keypressHandler;
+		distro.tutorial.passed('findNetwork');
 		distro.lightbox.show({
 			name: "find",
 			longName: "Find a network",
 			show: function($content){
 				var $field, $text, $placeholder;
 				$content.attr('id', 'networkSearch');
-				$content.stencil([
+				$content.haj([
 					['%span.close.button', 'x'],
 					['.search',
 						['.field', {$:function(){ $field = $(this); }}, '^',
 							['%span.text', { contenteditable: 'true', $:function(){ $text = $(this); }}],
 							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
 						'^' ]
-					],
-					{
-						$test: {$handler: function(){ return distro.tutorial.shouldShow('search'); }},
-						$if: ["#searchTutDialog.tutorialDialog", "Enter a ^network^ name"]
-					}
+					]
 				]);
+				distro.tutorial.show('search');
 				$field.click(function(e){
 					if (e.target != $text[0]) {
 						$text.focus();
@@ -1252,13 +1290,6 @@ distro.init(function(){
 		} else if (elemBottom > containerBottom) {
 			$(container).scrollTop(elemBottom - $(container).height());
 		}
-	}
-	if(distro.tutorial.shouldShow('findNetwork')){
-		$('#subscriptionsButtonBar').after(haj(["#findNetworkTutDialog.tutorialDialog", "Click here to find a ^network^"]));
-		$('#findNetwork').click(function(e){
-			$('#findNetworkTutDialog').hide();
-			distro.tutorial.passed('findNetwork');
-		})
 	}
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
