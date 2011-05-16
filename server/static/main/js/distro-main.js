@@ -581,6 +581,13 @@ distro.lightbox = new (function(){
 				});
 				Backbone.history.saveLocation('');
 				document.title = distro.TITLE;
+				if(distro.tutorial.shouldShow('findNetwork')){
+					$('#subscriptionsButtonBar').after(haj(["#findNetworkTutDialog.tutorialDialog", "Click here to find a ^network^"]));
+					$('#findNetwork').click(function(e){
+						$('#findNetworkTutDialog').hide();
+						distro.tutorial.passed('findNetwork');
+					})
+				}
 			}
 			return old;
 		}
@@ -917,6 +924,13 @@ distro.Router = Backbone.Controller.extend({
 	},
 	blank: function(){
 		distro.lightbox.hide();
+		if(distro.tutorial.shouldShow('findNetwork')){
+			$('#subscriptionsButtonBar').after(haj(["#findNetworkTutDialog.tutorialDialog", "Click here to find a ^network^"]));
+			$('#findNetwork').click(function(e){
+				$('#findNetworkTutDialog').hide();
+				distro.tutorial.passed('findNetwork');
+			})
+		}
 	},
 	network: function(name){
 		if (!name) {
@@ -1252,13 +1266,6 @@ distro.init(function(){
 		} else if (elemBottom > containerBottom) {
 			$(container).scrollTop(elemBottom - $(container).height());
 		}
-	}
-	if(distro.tutorial.shouldShow('findNetwork')){
-		$('#subscriptionsButtonBar').after(haj(["#findNetworkTutDialog.tutorialDialog", "Click here to find a ^network^"]));
-		$('#findNetwork').click(function(e){
-			$('#findNetworkTutDialog').hide();
-			distro.tutorial.passed('findNetwork');
-		})
 	}
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
