@@ -803,10 +803,10 @@ distro.loadLandingPage = function(name, callback){
 								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]],
 								{
 									$test: {$handler: function(d){ return ! subscribed && distro.tutorial.shouldShow('subscribe') && d.name !== 'delicatesteve'; }},
-									$if: ["#subscribeTutDialog", {
+									$if: ["#subscribeTutDialog.tutorialDialog", {
 										$test: { $handler: function(d){ return d.name === 'northside' } },
-										$if: "Subscribe to listen to music from Northside Festival (it\u2019s free!)",
-										$else: ["Subscribe to start receiving music from ^", {$key:"name"}, "^ (it\u2019s free!)"]
+										$if: distro.loc.str('tutorial.subscribeNorthside'),
+										$else: distro.loc.str('tutorial.subscribe')
 									}]
 								}
 							]
@@ -821,6 +821,23 @@ distro.loadLandingPage = function(name, callback){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
 									distro.lightbox.pop();
+									if(distro.tutorial.shouldShow('newMusic')){
+										$('#subscriptions').after(haj([
+											"#newMusicTutDialog.tutorialDialog",
+											"Now that you have subscribed to",
+											["%p#newMusicTutNetworkName", "^", model.get('name'), "^"],
+											"this network appears in your Network List and you will automatically receive music",
+											["%br"], "from this network in your",
+											["%br"], "music library\u2026"
+										]));
+										$('#newMusicTutDialog').click(function(e){
+											$('#newMusicTutDialog').hide();
+											distro.tutorial.passed('newMusic');
+											if(distro.tutorial.shouldShow('done')){
+												
+											}
+										})
+									}
 								}
 							});
 						}
@@ -931,14 +948,18 @@ distro.Router = Backbone.Controller.extend({
 			show: function($content){
 				var $field, $text, $placeholder;
 				$content.attr('id', 'networkSearch');
-				$content.haj([
+				$content.stencil([
 					['%span.close.button', 'x'],
 					['.search',
 						['.field', {$:function(){ $field = $(this); }}, '^',
 							['%span.text', { contenteditable: 'true', $:function(){ $text = $(this); }}],
 							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
 						'^' ]
-					]
+					],
+					{
+						$test: {$handler: function(){ return distro.tutorial.shouldShow('search'); }},
+						$if: ["#searchTutDialog.tutorialDialog", "Enter a ^network^ name"]
+					}
 				]);
 				$field.click(function(e){
 					if (e.target != $text[0]) {
@@ -961,6 +982,7 @@ distro.Router = Backbone.Controller.extend({
 					if (e.keyCode === 13){
 						if ((search = $text.text())) {
 							distro.loadLandingPage($text.text(), function(){});
+							distro.tutorial.passed('search');
 						}
 						return false;
 					} else if (e.keyCode === 32) {
@@ -1230,8 +1252,14 @@ distro.init(function(){
 		} else if (elemBottom > containerBottom) {
 			$(container).scrollTop(elemBottom - $(container).height());
 		}
-	}	
-
+	}
+	if(distro.tutorial.shouldShow('findNetwork')){
+		$('#subscriptionsButtonBar').after(haj(["#findNetworkTutDialog.tutorialDialog", "Click here to find a ^network^"]));
+		$('#findNetwork').click(function(e){
+			$('#findNetworkTutDialog').hide();
+			distro.tutorial.passed('findNetwork');
+		})
+	}
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
 	_gaq.push(['_setDomainName', '.distro.fm']);

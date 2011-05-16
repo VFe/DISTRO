@@ -23,6 +23,10 @@
 			"jobs": "Jobs"
 		}
 	},
+	"tutorial": {
+		"subscribe": ["Subscribe to start receiving music from ^", {"$key":"name"}, "^ (it\u2019s free!)"],
+		"subscribeNorthside": "Subscribe to listen to music from Northside Festival (it\u2019s free!)"
+	},
 	"library": {
 		"networks": "Network list",
 		"name": "Name",
