@@ -720,6 +720,16 @@ distro.player = new (function(){
 			slider.setPosition(player.current.position/(player.loaded ? player.current.duration : player.current.durationEstimate));
 		}
 		this.play = function(track){
+			mpq.push([
+				"track",
+				"trackPlay",
+				{
+					"user": distro.global.get('user'),
+					"title": track.get('name'),
+					"artist": track.get('artist'),
+					"artistNetwork": track.get('artistNetwork').name
+				}
+			]);
 			if (!soundManager.ok()) {
 				this.heldTrack = track;
 				return;
@@ -869,7 +879,7 @@ distro.loadLandingPage = function(name, callback){
 					}
 					$subscribeButton.click(function(){
 						if (!subscribed) {
-							mpq.push(['track', 'subscribe', {'name': model.name, 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
+							mpq.push(['track', 'subscribe', {'name': model.get('name'), 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
 							distro.tutorial.passed('subscribe');
 							distro.library.subscriptions.create({ name:model.name, fullname: model.get('fullname') }, {
 								success: function(){
@@ -1293,7 +1303,6 @@ distro.init(function(){
 	}
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
-	_gaq.push(['_setDomainName', '.distro.fm']);
 	_gaq.push(['_trackPageview']);
 	
 	(function() {
