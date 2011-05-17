@@ -720,6 +720,8 @@ distro.player = new (function(){
 			slider.setPosition(player.current.position/(player.loaded ? player.current.duration : player.current.durationEstimate));
 		}
 		this.play = function(track){
+			var artistNetwork = track.get('artistNetwork'),
+				artistNetworkName = artistNetwork && artistNetwork.name;
 			mpq.push([
 				"track",
 				"trackPlay",
@@ -727,7 +729,7 @@ distro.player = new (function(){
 					"user": distro.global.get('user'),
 					"title": track.get('name'),
 					"artist": track.get('artist'),
-					"artistNetwork": track.get('artistNetwork').name
+					"artistNetwork": artistNetworkName
 				}
 			]);
 			if (!soundManager.ok()) {
