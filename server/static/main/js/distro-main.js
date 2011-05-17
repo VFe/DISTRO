@@ -133,7 +133,7 @@ distro.tutorial = {
 				.insertAfter('#subscriptions')
 				.fadeIn()
 				.delay(8000)
-				.fadeOut(3000, function(e){
+				.fadeOut(function(e){
 					distro.tutorial.passed('newMusic');
 				});
 			}
