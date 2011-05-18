@@ -69,16 +69,74 @@ distro.request = function(path, method, data, hollerback, noRefresh){
 	});
 };
 distro.tutorial = {
-	shouldShow: function tutorialShouldShow(stage){
+	shouldShow: function(stage){
 		var tutorial;
 		return ! (distro.global.get('user') || ((tutorial = store.get('tutorial')) && tutorial[stage]));
 	},
-	passed: function tutorialDidShow(stage){
-		var tutorial;
+	passed: function(stage){
+		var tutorial, $element;
 		if ( ! distro.global.get('user')) {
 			tutorial = store.get('tutorial') || {};
 			tutorial[stage] = true;
 			store.set('tutorial', tutorial);
+			this.hide(stage);
+		}
+	},
+	show: function(stage){
+		if (this.shouldShow(stage)) {
+			this.stages[stage].show.apply(this.stages[stage], Array.prototype.slice.call(arguments, 1));
+		}
+	},
+	hide: function(stage){
+		var $element;
+		if (($element = this.stages[stage].$element)) {
+			delete this.stages[stage].$element;
+			$element.fadeOut(function(){
+				$(this).remove();
+			});
+		}
+	},
+	stages: {
+		findNetwork: {
+			show: function(options){
+				var after = options && options.after;
+				$('#subscriptionsButtonBar').after(this.$element = $(haj(["#findNetworkTutDialog.tutorialDialog" + (after ? '.alternate' : ''), after ? "Click here to find more ^networks^ " : "Click here to find a ^network^"])).hide().fadeIn());
+			}
+		},
+		search: {
+			show: function(){
+				$('#networkSearch').haj(["#searchTutDialog.tutorialDialog", "Enter a ^network^ name"]);
+			}
+		},
+		subscribe: {
+			show: function(network){
+				if (network.attributes.name !== 'delicatesteve') {
+					$('#landingBox .rightContent').stencil(["#subscribeTutDialog.tutorialDialog", {
+						$test: { $handler: function(d){ return d.name === 'northside' } },
+						$if: distro.loc.str('tutorial.subscribeNorthside'),
+						$else: distro.loc.str('tutorial.subscribe')
+					}], network.attributes);
+				}
+			}
+		},
+		newMusic: {
+			show: function(network){
+				this.$element = $(haj([
+					"#newMusicTutDialog.tutorialDialog",
+					"Now that you have subscribed to",
+					["%p#newMusicTutNetworkName", "^" + network.get('name') + "^"],
+					"this network appears in your Network List and you will automatically receive music",
+					["%br"], "from this network in your",
+					["%br"], "music library."
+				]))
+				.hide()
+				.insertAfter('#subscriptions')
+				.fadeIn()
+				.delay(8000)
+				.fadeOut(function(e){
+					distro.tutorial.passed('newMusic');
+				});
+			}
 		}
 	}
 };
@@ -564,6 +622,7 @@ distro.lightbox = new (function(){
 			next();
 		}).fadeIn(200);
 		this.$lightbox.fadeIn(200);
+		distro.tutorial.hide('findNetwork');
 	};
 	Lightbox.prototype.hide = function(name){
 		this.content.splice(0, this.content.length - 1);
@@ -581,6 +640,7 @@ distro.lightbox = new (function(){
 				});
 				Backbone.history.saveLocation('');
 				document.title = distro.TITLE;
+				distro.tutorial.show('findNetwork', { after: true });
 			}
 			return old;
 		}
@@ -812,18 +872,13 @@ distro.loadLandingPage = function(name, callback){
 								]},
 								["%div", {style:"height: 1em; background-color: #212121;"}],
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
-								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]],
-								{
-									$test: {$handler: function(d){ return ! subscribed && distro.tutorial.shouldShow('subscribe') && d.name !== 'delicatesteve'; }},
-									$if: ["#subscribeTutDialog", {
-										$test: { $handler: function(d){ return d.name === 'northside' } },
-										$if: "Subscribe to listen to music from Northside Festival (it\u2019s free!)",
-										$else: ["Subscribe to start receiving music from ^", {$key:"name"}, "^ (it\u2019s free!)"]
-									}]
-								}
+								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
 							]
 						]
 					], model.attributes);
+					if ( ! subscribed) {
+						distro.tutorial.show('subscribe', model);
+					}
 					$subscribeButton.click(function(){
 						if (!subscribed) {
 							mpq.push(['track', 'subscribe', {'name': model.get('name'), 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
@@ -833,6 +888,7 @@ distro.loadLandingPage = function(name, callback){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
 									distro.lightbox.pop();
+									distro.tutorial.show('newMusic', model);
 								}
 							});
 						}
@@ -912,6 +968,7 @@ distro.Router = Backbone.Controller.extend({
 	},
 	blank: function(){
 		distro.lightbox.hide();
+		distro.tutorial.show('findNetwork');
 	},
 	network: function(name){
 		if (!name) {
@@ -937,6 +994,7 @@ distro.Router = Backbone.Controller.extend({
 	},
 	find: function(){
 		var keypressHandler;
+		distro.tutorial.passed('findNetwork');
 		distro.lightbox.show({
 			name: "find",
 			longName: "Find a network",
@@ -952,6 +1010,7 @@ distro.Router = Backbone.Controller.extend({
 						'^' ]
 					]
 				]);
+				distro.tutorial.show('search');
 				$field.click(function(e){
 					if (e.target != $text[0]) {
 						$text.focus();
@@ -973,6 +1032,7 @@ distro.Router = Backbone.Controller.extend({
 					if (e.keyCode === 13){
 						if ((search = $text.text())) {
 							distro.loadLandingPage($text.text(), function(){});
+							distro.tutorial.passed('search');
 						}
 						return false;
 					} else if (e.keyCode === 32) {
@@ -1025,7 +1085,7 @@ distro.Router = Backbone.Controller.extend({
 						[ "%h2", "Have an account?" ],
 						[ "%h1", "Log In" ],
 						[ "%form", { $:function(){ $loginForm = $(this); }},
-							[ "%input", { $:bindToSubmit, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:bindToSubmit, "type": "email", "autocapitalize": "off", "name": "email", "placeholder": "Email Address" } ],
 							[ "%input", { $:bindToSubmit, "type": "password", "name": "password", "placeholder": "Password" } ],
 							[ "%p",
 								[ "%button", { $:bindToSubmit }, "Log In" ],
@@ -1038,7 +1098,7 @@ distro.Router = Backbone.Controller.extend({
 						[ "%h2", "New to DISTRO?" ],
 						[ "%h1", "Sign up" ],
 						[ "%form", { $:function(){ $registerForm = $(this); }},
-							[ "%input", { $:bindToSubmit, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:bindToSubmit, "type": "email", "autocapitalize": "off", "name": "email", "placeholder": "Email Address" } ],
 							[ "%input", { $:bindToSubmit, "type": "password", "name": "password", "placeholder": "Password" } ],
 							[ "%p",
 								[ "%button", { $async:function(){
@@ -1242,8 +1302,7 @@ distro.init(function(){
 		} else if (elemBottom > containerBottom) {
 			$(container).scrollTop(elemBottom - $(container).height());
 		}
-	}	
-
+	}
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
 	_gaq.push(['_trackPageview']);
