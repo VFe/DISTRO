@@ -901,6 +901,7 @@ distro.loadLandingPage = function(name, callback){
 							}, 800);
 						}
 					}
+					mpq.push(['track', 'visitNetwork', {'network': model.name, 'user': distro.global.get('user')}]);
 				}
 			});
 			callback(model);
@@ -1306,6 +1307,8 @@ distro.init(function(){
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
 	_gaq.push(['_trackPageview']);
+	
+	mpq.push(['track', 'visit', {'user': distro.global.get('user')}]);
 	
 	(function() {
 		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
