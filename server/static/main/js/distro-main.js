@@ -1046,6 +1046,10 @@ distro.Router = Backbone.Controller.extend({
 					if(event.target !== $text[0]){
 						$text.trigger(event);
 					}
+					$('#searchTutDialog').fadeOut(function(){
+						// distro.tutorial.passed('search');
+						$(this).remove();
+					})
 				});
 				$('.text').autocomplete({
 					position:{
