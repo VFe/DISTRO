@@ -83,7 +83,10 @@ distro.tutorial = {
 		}
 	},
 	show: function(stage){
-		if (this.shouldShow(stage)) {
+		if (this.current) {
+			this.next = stage;
+		} else if (this.shouldShow(stage)) {
+			this.current = stage;
 			this.stages[stage].show.apply(this.stages[stage], Array.prototype.slice.call(arguments, 1));
 		}
 	},
@@ -94,6 +97,13 @@ distro.tutorial = {
 			$element.fadeOut(function(){
 				$(this).remove();
 			});
+		}
+		if (this.current === stage) {
+			delete this.current;
+		}
+		if (this.next) {
+			this.show(this.next);
+			delete this.next;
 		}
 	},
 	stages: {
@@ -887,8 +897,8 @@ distro.loadLandingPage = function(name, callback){
 								success: function(){
 									subscribed = true;
 									$subscribeButton.addClass('disabled');
-									distro.lightbox.pop();
 									distro.tutorial.show('newMusic', model);
+									distro.lightbox.pop();
 								}
 							});
 						}
@@ -902,6 +912,9 @@ distro.loadLandingPage = function(name, callback){
 						}
 					}
 					mpq.push(['track', 'visitNetwork', {'network': model.name, 'user': distro.global.get('user')}]);
+				},
+				hide: function(){
+					distro.tutorial.hide('subscribe');
 				}
 			});
 			callback(model);
@@ -1046,6 +1059,10 @@ distro.Router = Backbone.Controller.extend({
 					if(event.target !== $text[0]){
 						$text.trigger(event);
 					}
+					$('#searchTutDialog').fadeOut(function(){
+						// distro.tutorial.passed('search');
+						$(this).remove();
+					})
 				});
 				$('.text').autocomplete({
 					position:{
@@ -1061,6 +1078,7 @@ distro.Router = Backbone.Controller.extend({
 			},
 			hide: function(){
 				$(window.document).unbind('keypress', keypressHandler);
+				distro.tutorial.hide('search');
 			}
 		});
 	},
