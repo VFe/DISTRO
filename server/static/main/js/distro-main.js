@@ -305,7 +305,7 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', 'M'], ['.solo', 'S']]]
+		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title:'Mute - Hide songs from this network'}, 'M'], ['.solo', {title: 'Solo - Only show songs from this network'},'S']]]
 	],
 	events: {
 		"click .mute": "mute",
@@ -730,6 +730,18 @@ distro.player = new (function(){
 			slider.setPosition(player.current.position/(player.loaded ? player.current.duration : player.current.durationEstimate));
 		}
 		this.play = function(track){
+			var artistNetwork = track.get('artistNetwork'),
+				artistNetworkName = artistNetwork && artistNetwork.name;
+			mpq.push([
+				"track",
+				"trackPlay",
+				{
+					"user": distro.global.get('user'),
+					"title": track.get('name'),
+					"artist": track.get('artist'),
+					"artistNetwork": artistNetworkName
+				}
+			]);
 			if (!soundManager.ok()) {
 				this.heldTrack = track;
 				return;
@@ -879,7 +891,7 @@ distro.loadLandingPage = function(name, callback){
 					}
 					$subscribeButton.click(function(){
 						if (!subscribed) {
-							mpq.push(['track', 'subscribe', {'name': model.name, 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
+							mpq.push(['track', 'subscribe', {'name': model.get('name'), 'fullname': model.get('fullname'), 'user': distro.global.get('user')}]);
 							distro.tutorial.passed('subscribe');
 							distro.library.subscriptions.create({ name:model.name, fullname: model.get('fullname') }, {
 								success: function(){
@@ -899,6 +911,7 @@ distro.loadLandingPage = function(name, callback){
 							}, 800);
 						}
 					}
+					mpq.push(['track', 'visitNetwork', {'network': model.name, 'user': distro.global.get('user')}]);
 				},
 				hide: function(){
 					distro.tutorial.hide('subscribe');
@@ -1091,7 +1104,7 @@ distro.Router = Backbone.Controller.extend({
 						[ "%h2", "Have an account?" ],
 						[ "%h1", "Log In" ],
 						[ "%form", { $:function(){ $loginForm = $(this); }},
-							[ "%input", { $:bindToSubmit, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:bindToSubmit, "type": "email", "autocapitalize": "off", "name": "email", "placeholder": "Email Address" } ],
 							[ "%input", { $:bindToSubmit, "type": "password", "name": "password", "placeholder": "Password" } ],
 							[ "%p",
 								[ "%button", { $:bindToSubmit }, "Log In" ],
@@ -1104,7 +1117,7 @@ distro.Router = Backbone.Controller.extend({
 						[ "%h2", "New to DISTRO?" ],
 						[ "%h1", "Sign up" ],
 						[ "%form", { $:function(){ $registerForm = $(this); }},
-							[ "%input", { $:bindToSubmit, "type": "text", "name": "email", "placeholder": "Email Address" } ],
+							[ "%input", { $:bindToSubmit, "type": "email", "autocapitalize": "off", "name": "email", "placeholder": "Email Address" } ],
 							[ "%input", { $:bindToSubmit, "type": "password", "name": "password", "placeholder": "Password" } ],
 							[ "%p",
 								[ "%button", { $async:function(){
@@ -1311,8 +1324,9 @@ distro.init(function(){
 	}
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-21896928-1']);
-	_gaq.push(['_setDomainName', '.distro.fm']);
 	_gaq.push(['_trackPageview']);
+	
+	mpq.push(['track', 'visit', {'user': distro.global.get('user')}]);
 	
 	(function() {
 		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
