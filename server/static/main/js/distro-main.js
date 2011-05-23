@@ -143,7 +143,7 @@ distro.tutorial = {
 				.insertAfter('#subscriptions')
 				.fadeIn()
 				.delay(8000)
-				.fadeOut(function(e){
+				.fadeOut(180, function(e){
 					distro.tutorial.passed('newMusic');
 				});
 			}
@@ -305,7 +305,7 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', 'M'], ['.solo', 'S']]]
+		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title:'Mute - Hide songs from this network'}, 'M'], ['.solo', {title: 'Solo - Only show songs from this network'},'S']]]
 	],
 	events: {
 		"click .mute": "mute",
