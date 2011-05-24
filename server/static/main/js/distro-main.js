@@ -1180,7 +1180,6 @@ distro.Router = Backbone.Controller.extend({
 distro.init(function(){
 	if($.browser.msie){return;}
 	distro.loc.replacePlaceholders();
-	document.documentElement.className = 'JS';
 	// Pad the music library header with the music library's scrollbar width
 	(function(){
 		var bodyContainer = document.getElementById('musicTableBodyContainer'),
