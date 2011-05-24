@@ -110,12 +110,12 @@ distro.tutorial = {
 		findNetwork: {
 			show: function(options){
 				var after = options && options.after;
-				$('#subscriptionsButtonBar').after(this.$element = $(haj(["#findNetworkTutDialog.tutorialDialog" + (after ? '.alternate' : ''), after ? "Click here to find more ^networks^ " : "Click here to find a ^network^"])).hide().fadeIn());
+				$('#subscriptionsButtonBar').after(this.$element = $(haj(["#findNetworkTutDialog.tutorialDialog" + (after ? '.alternate' : ''), after ? distro.loc.str("tutorial.findNetworkAfter") : distro.loc.str("tutorial.findNetwork")])).hide().fadeIn());
 			}
 		},
 		search: {
 			show: function(){
-				$('#networkSearch').haj(["#searchTutDialog.tutorialDialog", "Enter a ^network^ name"]);
+				$('#networkSearch').haj(["#searchTutDialog.tutorialDialog", distro.loc.str("tutorial.search")]);
 			}
 		},
 		subscribe: {
@@ -131,14 +131,8 @@ distro.tutorial = {
 		},
 		newMusic: {
 			show: function(network){
-				this.$element = $(haj([
-					"#newMusicTutDialog.tutorialDialog",
-					"Now that you have subscribed to",
-					["%p#newMusicTutNetworkName", "^" + network.get('name') + "^"],
-					"this network appears in your Network List and you will automatically receive music",
-					["%br"], "from this network in your",
-					["%br"], "music library."
-				]))
+				debugger;
+				this.$element = $(haj(stencil(distro.loc.str("tutorial.newMusic"), {name: network.get('name')})))
 				.hide()
 				.insertAfter('#subscriptions')
 				.fadeIn()
