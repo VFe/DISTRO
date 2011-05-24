@@ -83,11 +83,12 @@ distro.tutorial = {
 		}
 	},
 	show: function(stage){
+		var args = Array.prototype.slice.call(arguments, 1);
 		if (this.current) {
-			this.next = stage;
+			this.next = { stage: stage, arguments: args };
 		} else if (this.shouldShow(stage)) {
 			this.current = stage;
-			this.stages[stage].show.apply(this.stages[stage], Array.prototype.slice.call(arguments, 1));
+			this.stages[stage].show.apply(this.stages[stage], args);
 		}
 	},
 	hide: function(stage){
@@ -102,7 +103,7 @@ distro.tutorial = {
 			delete this.current;
 		}
 		if (this.next) {
-			this.show(this.next);
+			this.show.apply(this, [this.next.stage].concat(this.next.arguments));
 			delete this.next;
 		}
 	},
