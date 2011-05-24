@@ -255,6 +255,11 @@ ul.inlineList{
 #account>a{
 	text-transform: uppercase;
 }
+html.fontface #account>a{
+	text-transform: lowercase;
+	font-variant: small-caps;
+	font-size: 1.5em;
+}
 #account:hover>a{
 	color: #EEE;
 }
@@ -581,8 +586,16 @@ th.descending #freshHead, th.ascending #freshHead{
 	font-weight: 200;
 	font-size: 0.8em;
 	line-height: 3em;
-	padding: 0 0 0 0.8em;
+	padding: 0 0 0 7px;
 	text-transform: uppercase;
+}
+html.fontface{
+	#musicTableHead th, #subscriptions th{
+		text-transform: lowercase;
+		font-variant: small-caps;
+		font-size: 1.2em;
+		line-height: 28px;
+	}
 }
 #musicTableBodyContainer, #subscriptionsTableBodyContainer{
 	overflow-y: auto;
