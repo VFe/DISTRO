@@ -24,8 +24,19 @@
 		}
 	},
 	"tutorial": {
+		"findNetwork": "Click here to find a ^network^",
+		"findNetworkAfter": "Click here to find more ^networks^ ",
+		"search": "Enter a ^network^ name",
 		"subscribe": ["Subscribe to start receiving music from ^", {"$key":"name"}, "^ (it\u2019s free!)"],
-		"subscribeNorthside": "Subscribe to listen to music from Northside Festival (it\u2019s free!)"
+		"subscribeNorthside": "Subscribe to listen to music from Northside Festival (it\u2019s free!)",
+		"newMusic": [
+			"#newMusicTutDialog.tutorialDialog",
+			"Now that you have subscribed to",
+			["%p#newMusicTutNetworkName", "^", {"$key": "name"}, "^"],
+			"this network appears in your Network List and you will automatically receive music",
+			["%br"], "from this network in your",
+			["%br"], "music library."
+		]
 	},
 	"library": {
 		"networks": "Network list",
