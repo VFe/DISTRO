@@ -110,7 +110,7 @@ distro.tutorial = {
 		findNetwork: {
 			show: function(options){
 				var after = options && options.after;
-				$('#subscriptionsButtonBar').after(this.$element = $(haj(["#findNetworkTutDialog.tutorialDialog" + (after ? '.alternate' : ''), after ? distro.loc.str("tutorial.findNetworkAfter") : distro.loc.str("tutorial.findNetwork")])).hide().fadeIn());
+				$('#findNetwork').after(this.$element = $(haj(["#findNetworkTutDialog.tutorialDialog" + (after ? '.alternate' : ''), after ? distro.loc.str("tutorial.findNetworkAfter") : distro.loc.str("tutorial.findNetwork")])).hide().fadeIn());
 			}
 		},
 		search: {
