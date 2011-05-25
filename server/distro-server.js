@@ -2,11 +2,11 @@ require.paths.unshift(__dirname + "/lib");
 
 var util = require('util'),
 	fs = require('fs'),
-	mongoDB = require('mongodb'),
 	url = require('url'),
 	connect = require('connect'),
 	distro = require('distro'),
-	port = process.env.PRODUCTION ? 8085 : 3000;
+	port = process.env.PRODUCTION ? 8085 : 3000,
+	mongoose = require('mongoose');
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 global.users = new distro.Users();
@@ -14,7 +14,7 @@ global.sessions = new distro.Sessions();
 global.tracks = new distro.Tracks();
 global.networks = new distro.Networks();
 
-global.db.open(function(err, db){
+mongoose.connect(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', 'Distro', process.env['MONGO_NODE_DRIVER_PORT'], function(err, db){
 	if (err){
 		throw err;
 	}

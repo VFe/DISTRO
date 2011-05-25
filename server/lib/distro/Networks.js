@@ -1,7 +1,43 @@
-var CollectionManager = require('./lib/CollectionManager');
+var mongoose = require('mongoose');
+
+var Network = new mongoose.Schema({
+	timestamp : Date,
+	type: String,
+	fullname: { type: String, set: function(fullname){
+		this.lfullname = fullname.toLowerCase();
+		return fullname;
+	}},
+	location : {
+		citystate: String,
+		country: String
+	},
+	presence : {
+		homepage: String,
+		facebook: String,
+		twitter: String,
+		flickr: String,
+		linkedin: String,
+		vimeo: String,
+		bandcamp: String,
+		blog: String
+	},
+	email : {
+		general: String
+	},
+	phone: String,
+	name: { type: String, set: function(name){
+		this.lname = name.toLowerCase();
+		return name;
+	}},
+	photoCred: String,
+	lname: String,
+	lfullname: String
+});
+
+
+module.exports = mongoose.model('Network', Network, 'networks');
 
 function Networks(){ require('./init').add(this); }
-module.exports = Networks;
 Networks.prototype = new CollectionManager();
 Networks.prototype.constructor = Networks;
 Networks.collectionName = 'networks';
