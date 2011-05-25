@@ -21,6 +21,13 @@
 			"contact": "Contact",
 			"invest": "Invest",
 			"jobs": "Jobs"
+		},
+		"hover": {
+			"login": "Log in or sign up to keep track of your DISTRO subscriptions",
+			"event": "Sort by the date of upcoming events",
+			"freshness": "Freshness – Sort by date added to your music library",
+			"mute": "Mute – Hide songs from this network",
+			"solo": "Solo – Only show songs from this network"
 		}
 	},
 	"tutorial": {

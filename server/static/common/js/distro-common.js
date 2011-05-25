@@ -49,6 +49,13 @@
 			} catch (e) {}
 			return '';
 		},
+		stencil: function(string){
+			return {
+				$handler: function(){
+					return distro.loc.str(string);
+				}
+			};
+		},
 		replacePlaceholders: function(){
 			var self = this;
 			$('[data-distro-localized-string]').each(function(){
@@ -57,6 +64,13 @@
 					console && console.error && console.error("Couldn't find localized string '" + stringPath + "'");
 				}
 				$el.text(string);
+			});
+			$('[data-distro-localized-attrs]').each(function(){
+				var $el = $(this), attrsRawJSON = JSON.parse($el.attr('data-distro-localized-attrs')), attrsParsedJSON = {};
+				_.each(attrsRawJSON, function(l10nString, attr){
+					attrsParsedJSON[attr] = self.str(l10nString);
+				});
+				$el.attr(attrsParsedJSON);
 			});
 		}
 	};
