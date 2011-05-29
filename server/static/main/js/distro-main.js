@@ -83,11 +83,12 @@ distro.tutorial = {
 		}
 	},
 	show: function(stage){
+		var args = Array.prototype.slice.call(arguments, 1);
 		if (this.current) {
-			this.next = stage;
+			this.next = { stage: stage, arguments: args };
 		} else if (this.shouldShow(stage)) {
 			this.current = stage;
-			this.stages[stage].show.apply(this.stages[stage], Array.prototype.slice.call(arguments, 1));
+			this.stages[stage].show.apply(this.stages[stage], args);
 		}
 	},
 	hide: function(stage){
@@ -102,7 +103,7 @@ distro.tutorial = {
 			delete this.current;
 		}
 		if (this.next) {
-			this.show(this.next);
+			this.show.apply(this, [this.next.stage].concat(this.next.arguments));
 			delete this.next;
 		}
 	},
@@ -110,12 +111,12 @@ distro.tutorial = {
 		findNetwork: {
 			show: function(options){
 				var after = options && options.after;
-				$('#subscriptionsButtonBar').after(this.$element = $(haj(["#findNetworkTutDialog.tutorialDialog" + (after ? '.alternate' : ''), after ? "Click here to find more ^networks^ " : "Click here to find a ^network^"])).hide().fadeIn());
+				$('#findNetwork').after(this.$element = $(haj(["#findNetworkTutDialog.tutorialDialog" + (after ? '.alternate' : ''), after ? distro.loc.str("tutorial.findNetworkAfter") : distro.loc.str("tutorial.findNetwork")])).hide().fadeIn());
 			}
 		},
 		search: {
 			show: function(){
-				$('#networkSearch').haj(["#searchTutDialog.tutorialDialog", "Enter a ^network^ name"]);
+				$('#networkSearch').haj(["#searchTutDialog.tutorialDialog", distro.loc.str("tutorial.search")]);
 			}
 		},
 		subscribe: {
@@ -131,14 +132,7 @@ distro.tutorial = {
 		},
 		newMusic: {
 			show: function(network){
-				this.$element = $(haj([
-					"#newMusicTutDialog.tutorialDialog",
-					"Now that you have subscribed to",
-					["%p#newMusicTutNetworkName", "^" + network.get('name') + "^"],
-					"this network appears in your Network List and you will automatically receive music",
-					["%br"], "from this network in your",
-					["%br"], "music library."
-				]))
+				this.$element = $(haj(stencil(distro.loc.str("tutorial.newMusic"), {name: network.get('name')})))
 				.hide()
 				.insertAfter('#subscriptions')
 				.fadeIn()
@@ -301,11 +295,10 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 		this.collection.each(this.add);
 	}
 }))({ collection: distro.library.subscriptions });
-
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title:'Mute - Hide songs from this network'}, 'M'], ['.solo', {title: 'Solo - Only show songs from this network'},'S']]]
+		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'], ['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']]]
 	],
 	events: {
 		"click .mute": "mute",
@@ -1180,7 +1173,6 @@ distro.Router = Backbone.Controller.extend({
 distro.init(function(){
 	if($.browser.msie){return;}
 	distro.loc.replacePlaceholders();
-	document.documentElement.className = 'JS';
 	// Pad the music library header with the music library's scrollbar width
 	(function(){
 		var bodyContainer = document.getElementById('musicTableBodyContainer'),
@@ -1191,6 +1183,8 @@ distro.init(function(){
 			headContainer.style.display = 'none'; headContainer.clientLeft; headContainer.style.display = '';
 		}
 	})();
+	// font-variant with @font-face is broken in the WebKit in Safari 5.0.5 ()
+	Modernizr.addTest('brokenFontVariant', function() { return (navigator.userAgent.match(/WebKit\/([^.]+)/) || [] )[1] < 534; });
 	// Show a notice to users of old browsers
 	(function(){
 		function showNotice(message){

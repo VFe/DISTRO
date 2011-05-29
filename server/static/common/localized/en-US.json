@@ -14,18 +14,36 @@
 	"chrome": {
 		"logIn": "Log in",
 		"logOut": "Log out",
-		"findNetwork": "Find more networks",
+		"findNetwork": "Find a network",
 		"about": {
 			"faq": "FAQ",
 			"about": "About",
 			"contact": "Contact",
 			"invest": "Invest",
 			"jobs": "Jobs"
+		},
+		"hover": {
+			"login": "Log in or sign up to keep track of your DISTRO subscriptions",
+			"event": "Sort by the date of upcoming events",
+			"freshness": "Freshness – Sort by date added to your music library",
+			"mute": "Mute – Hide songs from this network",
+			"solo": "Solo – Only show songs from this network"
 		}
 	},
 	"tutorial": {
+		"findNetwork": "Click here to find a ^network^",
+		"findNetworkAfter": "Click here to find more ^networks^ ",
+		"search": "Enter a ^network^ name",
 		"subscribe": ["Subscribe to start receiving music from ^", {"$key":"name"}, "^ (it\u2019s free!)"],
-		"subscribeNorthside": "Subscribe to listen to music from Northside Festival (it\u2019s free!)"
+		"subscribeNorthside": "Subscribe to listen to music from Northside Festival (it\u2019s free!)",
+		"newMusic": [
+			"#newMusicTutDialog.tutorialDialog",
+			"Now that you have subscribed to",
+			["%p#newMusicTutNetworkName", "^", {"$key": "name"}, "^"],
+			"this network appears in your Network List and you will automatically receive music",
+			["%br"], "from this network in your",
+			["%br"], "music library."
+		]
 	},
 	"library": {
 		"networks": "Network list",
