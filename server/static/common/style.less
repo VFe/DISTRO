@@ -765,13 +765,6 @@ html.js #musicTableBodyContainer{
 #lightboxWrapper .lightboxContent .content{
 	background: #171717;
 }
-.lightboxContent#networkSearch{
-	height: 16em;
-	width: 40em;
-	background-image: url(http://distro-static.s3.amazonaws.com/find_networks/rainbow_big.png);
-	background-repeat: no-repeat;
-	background-position: center 0;
-}
 #calFrame {
 	border-width: 0;
 	width: 21em;
@@ -784,39 +777,51 @@ html.js #musicTableBodyContainer{
 	right: 0;
 	top: 0;
 }
-#networkSearch .search{
-	position: relative;
-	text-align: center;
-	top: 10em;
-}
-#networkSearch .search .field{
-	color: black;
-	display: inline-block;
-	.border-radius(0.15em);
-	font-size: 1.5em;
-	text-align: center;
-	width: 18.5em;
-	background-color: rgb(200, 200, 200);
-	.backgroundGradient(rgb(178, 178, 178), white);
-	font-weight: normal;
-	padding: 0.2em;
-	-webkit-user-select: none;
-	-moz-user-select: -moz-none;
-	font-weight: 200;
-}
-#networkSearch .search .field.focus{
-	.box-shadow(#68F 0 0 0.4em);
-}
-#networkSearch .search .field .text{
-	outline: none;
-	padding: 0 0.1em;
-	margin: 0 -0.1em;
-	display: inline-block;
-	-webkit-user-select: text;
-	-moz-user-select: text;
-}
-#networkSearch .search .field .placeholder{
-	color: rgba(0, 0, 0, 0.4);
+.lightboxContent#networkSearch{
+	height: 16em;
+	width: 40em;
+	background-image: url(http://distro-static.s3.amazonaws.com/find_networks/rainbow_big.png);
+	background-repeat: no-repeat;
+	background-position: center 0;
+	.field{
+		position: relative;
+		text-align: center;
+		top: 7em;
+		font-size: 1.5em;
+		width: 18.5em;
+		margin: 0 auto;
+		color: black;
+	}
+	input, .grey{
+		font: inherit;
+		text-align: inherit;
+		.border-box;
+		margin: 0;
+		padding: 0.2em;
+		width: 100%;
+	}
+	input{
+		background: transparent;
+		border: none;
+		position: relative;
+		&:focus{
+			outline: none;
+			.box-shadow(#68F 0 0 0.4em);
+		}
+	}
+	.grey{
+		.border-radius(0.15em);
+		background-color: rgb(200, 200, 200);
+		.backgroundGradient(rgb(178, 178, 178), white);
+		color: rgba(0, 0, 0, 0.4);
+		height: 100%;
+		overflow: hidden;
+		position: absolute;
+		white-space: nowrap;
+	}
+	.spacer{
+		visibility: hidden;
+	}
 }
 .tutorialDialog {
 	border: 2px solid #73C5EE;
