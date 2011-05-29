@@ -1232,7 +1232,10 @@ distro.init(function(){
 	
 	distro.router = new distro.Router();
 	distro.library.refresh(function(){
-		Backbone.history.start();
+		// Let the complete callbacks run (e.g. to update the user before starting Backbone.history)
+		setTimeout(function(){
+			Backbone.history.start();
+		}, 0);
 	}, true); // Don't refresh again if user is updated
 	
 	$('#musicTableBodyContainer')
