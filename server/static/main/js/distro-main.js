@@ -1048,9 +1048,6 @@ distro.Router = Backbone.Controller.extend({
 							distro.tutorial.passed('search');
 						}
 						return false;
-					} else if (e.keyCode === 32) {
-						document.execCommand('InsertHTML', false, '_');
-						return false;
 					}
 				});
 				$(window.document).keypress(keypressHandler = function(event){
