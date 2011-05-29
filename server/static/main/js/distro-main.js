@@ -1183,6 +1183,8 @@ distro.init(function(){
 			headContainer.style.display = 'none'; headContainer.clientLeft; headContainer.style.display = '';
 		}
 	})();
+	// font-variant with @font-face is broken in the WebKit in Safari 5.0.5 ()
+	Modernizr.addTest('brokenFontVariant', function() { return (navigator.userAgent.match(/WebKit\/([^.]+)/) || [] )[1] < 534; });
 	// Show a notice to users of old browsers
 	(function(){
 		function showNotice(message){
