@@ -786,14 +786,15 @@ html.js #musicTableBodyContainer{
 	.field{
 		position: relative;
 		text-align: center;
-		top: 7em;
+		top: 120px;
 		font-size: 1.5em;
 		width: 18.5em;
 		margin: 0 auto;
 		color: black;
 	}
-	input, .grey{
+	input, .shadow{
 		font: inherit;
+		font-weight: 200;
 		text-align: inherit;
 		.border-box;
 		margin: 0;
@@ -809,15 +810,17 @@ html.js #musicTableBodyContainer{
 			.box-shadow(#68F 0 0 0.4em);
 		}
 	}
-	.grey{
+	.shadow{
 		.border-radius(0.15em);
 		background-color: rgb(200, 200, 200);
 		.backgroundGradient(rgb(178, 178, 178), white);
-		color: rgba(0, 0, 0, 0.4);
 		height: 100%;
 		overflow: hidden;
 		position: absolute;
 		white-space: nowrap;
+	}
+	.placeholder{
+		color: rgba(0, 0, 0, 0.4);
 	}
 	.spacer{
 		visibility: hidden;

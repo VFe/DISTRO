@@ -1011,7 +1011,7 @@ distro.Router = Backbone.Controller.extend({
 				$content.haj([
 					['%span.close.button', 'x'],
 					['.field',
-						['.grey', '^',
+						['.shadow', '^',
 							['%span.spacer', {$:function(){ $spacer = $(this); }}],
 							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
 						'^'],
