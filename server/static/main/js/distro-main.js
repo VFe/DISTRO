@@ -1006,7 +1006,7 @@ distro.Router = Backbone.Controller.extend({
 			name: "find",
 			longName: "Find a network",
 			show: function($content){
-				var $text, $spacer, $placeholder;
+				var $text, $spacer, $placeholder, liveNetworkJSON;
 				$content.attr('id', 'networkSearch');
 				$content.haj([
 					['%span.close.button', 'x'],
@@ -1016,8 +1016,47 @@ distro.Router = Backbone.Controller.extend({
 							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
 						'^'],
 						['%input', { autocorrect: 'off', autocapitalize: 'off', $:function(){ $text = $(this); }}],
-					]
+					],
+					['#bottomBar', {$:function(){ $bottomBar = $(this); }}, ['%span.lightning', " "], "Live Networks"]
 				]);
+				$bottomBar.click(function(e){
+					// TODO: PLEASE REFACTOR ME!!!1!
+					var $liveNetworkContainer = $('#liveNetworkContainer');
+
+					function showLiveNetworks(liveJSON){
+						$bottomBar.toggleClass('bright');
+						if($liveNetworkContainer[0] !== undefined) {
+							$liveNetworkContainer.toggle();
+						} else {
+							$content.stencil(
+								['#liveNetworkContainer', 
+									['%ul#liveNetworkList', {$key: "livenetworks", $children:[
+										'%li',
+											['%a', {href: { $join: ["#/", {$key: "name"}] }},
+												{$key: "fullname"},
+												['%span.liveNetworkName', {$join: ["^", {$key: "name"}, "^"]}]
+											]
+									]}]
+								], liveJSON
+							);
+						}
+					};
+					
+					if(!liveNetworkJSON){
+						distro.request('livenetworks', 'GET', null, new Hollerback({
+							success: function(data){
+								console.log("success: " + data);
+								liveNetworkJSON = JSON.parse(data);
+								showLiveNetworks(liveNetworkJSON);
+							},
+							complete: function(data){
+								console.log("complete: " + data);
+							}
+						}));
+					} else {
+						showLiveNetworks(liveNetworkJSON);
+					}
+				});
 				distro.tutorial.show('search');
 				function handleInput(){
 					$spacer.text($text[0].value);
