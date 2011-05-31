@@ -139,6 +139,9 @@ global.db.open(function(err, db){
 					successback(returnData);
 				});
 			}));
+			app.get('/livenetworks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				successback('{"livenetworks": [{"name": "waffles", "fullname": "Waffles Team Delta Force"}]}');
+			}));
 			app.get('/networks/:name', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				global.networks.findNetworkByName(req.params.name, { _id: false }, function(err, doc){
 					if(err){

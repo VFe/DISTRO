@@ -53,6 +53,10 @@ Networks.prototype.search = function(name, callback){
 	});
 };
 
+Networks.prototype.liveNetworks = function(callback){
+	
+};
+
 Networks.PRESENCE = [
 	{ name: "email", prefix: "mailto:" },
 	{ name: "homepage" },
