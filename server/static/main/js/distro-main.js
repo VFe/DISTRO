@@ -298,7 +298,13 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'], ['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']]]
+		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } },
+			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }],
+			['.subscriptionControls',
+				['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
+				['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
+			]
+		]
 	],
 	events: {
 		"selectstart": "noselect",
