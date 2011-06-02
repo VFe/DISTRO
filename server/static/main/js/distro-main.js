@@ -1006,58 +1006,60 @@ distro.Router = Backbone.Controller.extend({
 			name: "find",
 			longName: "Find a network",
 			show: function($content){
-				var $field, $text, $placeholder;
+				var $text, $spacer, $placeholder;
 				$content.attr('id', 'networkSearch');
 				$content.haj([
 					['%span.close.button', 'x'],
-					['.search',
-						['.field', {$:function(){ $field = $(this); }}, '^',
-							['%span.text', { contenteditable: 'true', $:function(){ $text = $(this); }}],
+					['.field',
+						['.shadow', '^',
+							['%span.spacer', {$:function(){ $spacer = $(this); }}],
 							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
-						'^' ]
+						'^'],
+						['%input', { autocorrect: 'off', autocapitalize: 'off', $:function(){ $text = $(this); }}],
 					]
 				]);
 				distro.tutorial.show('search');
-				$field.click(function(e){
-					if (e.target != $text[0]) {
-						$text.focus();
-						return false;
-					}
-				});
+				function handleInput(){
+					$spacer.text($text[0].value);
+				}
+				if ('oninput' in $text[0]) {
+					$text.bind('input', handleInput);
+				} else {
+					$text.bind('keypress', function(){ setTimeout(function(){ handleInput(); }, 0); });
+				}
+				$text.bind('valuechange', handleInput);
 				$text.focus(function(){
 					$placeholder.hide();
-					$field.addClass('focus');
 				});
 				$text.blur(function(){
-					if(!$text.text()){
+					if(!$text[0].value){
 						$placeholder.show();
 					}
-					$field.removeClass('focus');
 				});
+				if ($text[0].value) {
+					placeholder.style.display = 'none';
+				}
+				handleInput();
 				$text.keypress(function(e){
 					var search;
 					if (e.keyCode === 13){
-						if ((search = $text.text())) {
-							distro.loadLandingPage($text.text(), function(){});
+						if ((search = $text[0].value)) {
+							distro.loadLandingPage(search, function(){});
 							distro.tutorial.passed('search');
 						}
-						return false;
-					} else if (e.keyCode === 32) {
-						document.execCommand('InsertHTML', false, '_');
 						return false;
 					}
 				});
 				$(window.document).keypress(keypressHandler = function(event){
-					$text.focus(); 
 					if(event.target !== $text[0]){
-						$text.trigger(event);
+						$text.focus();
 					}
 					$('#searchTutDialog').fadeOut(function(){
 						// distro.tutorial.passed('search');
 						$(this).remove();
 					})
 				});
-				$('.text').autocomplete({
+				$text.autocomplete({
 					position:{
 						my: "center top",
 						at: "center bottom",
@@ -1274,7 +1276,7 @@ distro.init(function(){
 		var emptySelection = !distro.library.trackListView.selectedTrack,
 			firstTrack = distro.library.trackListView.collection.models[0],
 			selected;
-		if ($(e.target).is('input, textarea, select, [contenteditable]')) { return; }
+		if ($(e.target).is('input, textarea, select')) { return; }
 
 		if(e.keyCode == 32){
 			if(distro.player.current){
@@ -1300,10 +1302,9 @@ distro.init(function(){
 	(function ($) {
 		var original = $.fn.val;
 		$.fn.val = function() {
-			if ($(this).is('[contenteditable]')) {
-				return $.fn.text.apply(this, arguments);
-			}
-			return original.apply(this, arguments);
+			var ret = original.apply(this, arguments);
+			this.trigger('valuechange');
+			return ret;
 		};
 	})(jQuery);
 	
