@@ -54,8 +54,36 @@ Networks.prototype.search = function(name, callback){
 };
 
 Networks.prototype.liveNetworks = function(callback){
-	
+	global.tracks.collection.mapReduce(mapLiveNetworks, reduceLiveNetworks, {
+		out: { inline: 1 }
+	}, function(err, results){
+		if(err){
+			callback(new Error(err.errmsg + ': ' + err.assertion), null);
+		} else {
+			queryLiveNetworks(results.map(function(thing){
+				return thing.value;
+			}), callback);
+		}
+	});
 };
+
+function mapLiveNetworks(){
+	if(this.network){
+		this.network.forEach(function(networkID) {
+			emit(networkID, networkID);
+		});
+	}
+}
+
+function reduceLiveNetworks(key, networks){
+	return networks[0];
+}
+
+function queryLiveNetworks(ids, callback){
+	global.networks.collection.find({_id: {$in: ids}}, {sort: 'name'}, {fields: {name: 1, fullname: 1, _id: 0}}, function(err, cursor){
+		cursor.toArray(callback);
+	})
+}
 
 Networks.PRESENCE = [
 	{ name: "email", prefix: "mailto:" },

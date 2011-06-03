@@ -1006,7 +1006,7 @@ distro.Router = Backbone.Controller.extend({
 			name: "find",
 			longName: "Find a network",
 			show: function($content){
-				var $text, $spacer, $placeholder, liveNetworkJSON;
+				var $text, $spacer, $placeholder, liveNetworkJSON, liveNetworkHold;
 				$content.attr('id', 'networkSearch');
 				$content.haj([
 					['%span.close.button', 'x'],
@@ -1030,7 +1030,7 @@ distro.Router = Backbone.Controller.extend({
 						} else {
 							$content.stencil(
 								['#liveNetworkContainer', 
-									['%ul#liveNetworkList', {$key: "livenetworks", $children:[
+									['%ul#liveNetworkList', {$key: "", $children:[
 										'%li',
 											['%a', {href: { $join: ["#/", {$key: "name"}] }},
 												{$key: "fullname"},
@@ -1042,15 +1042,19 @@ distro.Router = Backbone.Controller.extend({
 						}
 					};
 					
-					if(!liveNetworkJSON){
+					if(!liveNetworkJSON && !liveNetworkHold){
+						liveNetworkHold = true;
 						distro.request('livenetworks', 'GET', null, new Hollerback({
 							success: function(data){
-								console.log("success: " + data);
-								liveNetworkJSON = JSON.parse(data);
+								liveNetworkJSON = data;
 								showLiveNetworks(liveNetworkJSON);
 							},
-							complete: function(data){
-								console.log("complete: " + data);
+							// complete: function(data){
+							// 								console.log("complete: ");
+							// 								console.log(data);
+							// 							},
+							failure: function(){
+								liveNetworkHold = false;
 							}
 						}));
 					} else {
