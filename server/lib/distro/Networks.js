@@ -80,7 +80,7 @@ function reduceLiveNetworks(key, networks){
 }
 
 function queryLiveNetworks(ids, callback){
-	global.networks.collection.find({_id: {$in: ids}}, {sort: 'name'}, {fields: {name: 1, fullname: 1, _id: 0}}, function(err, cursor){
+	global.networks.collection.find({_id: {$in: ids}}, {fields: {name: 1, fullname: 1, _id: 0}, sort: ['fullname', 'name']}, function(err, cursor){
 		cursor.toArray(callback);
 	})
 }
