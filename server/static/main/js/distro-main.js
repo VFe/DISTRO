@@ -11,7 +11,7 @@ Backbone.sync = function(method, model, success, error){
 
 
 distro.util = {
-	pad: function(input, length, char){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(char || '0') + input : input); },
+	pad: function(input, length, character){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(character || '0') + input : input); },
 	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); }
 };
 distro.SERVER = "/api/";
@@ -1006,7 +1006,7 @@ distro.Router = Backbone.Controller.extend({
 			name: "find",
 			longName: "Find a network",
 			show: function($content){
-				var $text, $spacer, $placeholder;
+				var $text, $spacer, $placeholder, liveNetworkJSON, liveNetworkHold;
 				$content.attr('id', 'networkSearch');
 				$content.haj([
 					['%span.close.button', 'x'],
@@ -1016,8 +1016,51 @@ distro.Router = Backbone.Controller.extend({
 							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
 						'^'],
 						['%input', { autocorrect: 'off', autocapitalize: 'off', $:function(){ $text = $(this); }}],
-					]
+					],
+					['#bottomBar', {$:function(){ $bottomBar = $(this); }}, ['%span.lightning', " "], "Live Networks"]
 				]);
+				$bottomBar.click(function(e){
+					// TODO: PLEASE REFACTOR ME!!!1!
+					var $liveNetworkContainer = $('#liveNetworkContainer');
+
+					function showLiveNetworks(liveJSON){
+						$bottomBar.toggleClass('bright');
+						if($liveNetworkContainer[0] !== undefined) {
+							$liveNetworkContainer.toggle();
+						} else {
+							$content.stencil(
+								['#liveNetworkContainer', 
+									['%ul#liveNetworkList', {$key: "", $children:[
+										'%li',
+											['%a', {href: { $join: ["#/", {$key: "name"}] }},
+												{$key: "fullname"},
+												['%span.liveNetworkName', {$join: ["^", {$key: "name"}, "^"]}]
+											]
+									]}]
+								], liveJSON
+							);
+						}
+					};
+					
+					if(!liveNetworkJSON && !liveNetworkHold){
+						liveNetworkHold = true;
+						distro.request('livenetworks', 'GET', null, new Hollerback({
+							success: function(data){
+								liveNetworkJSON = data;
+								showLiveNetworks(liveNetworkJSON);
+							},
+							// complete: function(data){
+							// 								console.log("complete: ");
+							// 								console.log(data);
+							// 							},
+							failure: function(){
+								liveNetworkHold = false;
+							}
+						}));
+					} else {
+						showLiveNetworks(liveNetworkJSON);
+					}
+				});
 				distro.tutorial.show('search');
 				function handleInput(){
 					$spacer.text($text[0].value);
