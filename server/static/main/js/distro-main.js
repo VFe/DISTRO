@@ -508,7 +508,7 @@ distro.Slider = function (element, callback){
 	
 	this.setPosition = function(position, actuated){
 		this.position = Math.min(Math.max(position, 0), 1);
-		$backing.width(this.position * 100 + '%');
+		$backing[0].style.width = this.position * 100 + '%';
 		if (actuated === true) {
 			callback.call(this, this.position);
 		}
@@ -752,8 +752,8 @@ distro.player = new (function(){
 					onpause: onpause,
 					onstop: onstop,
 					onfinish: onfinish,
-					whileplaying: onwhileplaying,
-					whileloading: onwhileloading,
+					whileplaying: _.throttle(onwhileplaying, 500),
+					whileloading: _.throttle(onwhileloading, 500),
 					onload: function(success){
 						if (success) {
 							this.loaded = true;
