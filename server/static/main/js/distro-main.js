@@ -1020,7 +1020,6 @@ distro.Router = Backbone.Controller.extend({
 					['#bottomBar', {$:function(){ $bottomBar = $(this); }}, ['%span.lightning', " "], "Live Networks"]
 				]);
 				$bottomBar.click(function(e){
-					// TODO: PLEASE REFACTOR ME!!!1!
 					var $liveNetworkContainer = $('#liveNetworkContainer');
 
 					function showLiveNetworks(liveJSON){
