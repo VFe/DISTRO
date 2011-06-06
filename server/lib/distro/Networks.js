@@ -54,15 +54,19 @@ Networks.prototype.search = function(name, callback){
 };
 
 Networks.prototype.liveNetworks = function(callback){
+	var self = this;
 	global.tracks.collection.mapReduce(mapLiveNetworks, reduceLiveNetworks, {
 		out: { inline: 1 }
 	}, function(err, results){
 		if(err){
 			callback(new Error(err.errmsg + ': ' + err.assertion), null);
 		} else {
-			queryLiveNetworks(results.map(function(thing){
-				return thing.value;
-			}), callback);
+			self.collection.find({ _id: { $in: results.map(function(result){ return result.value; }) } },
+				{ fields: {name: 1, fullname: 1, _id: 0}, sort: ['fullname', 'name'] },
+				function(err, cursor){
+					cursor.toArray(callback);
+				}
+			);
 		}
 	});
 };
@@ -77,12 +81,6 @@ function mapLiveNetworks(){
 
 function reduceLiveNetworks(key, networks){
 	return networks[0];
-}
-
-function queryLiveNetworks(ids, callback){
-	global.networks.collection.find({_id: {$in: ids}}, {fields: {name: 1, fullname: 1, _id: 0}, sort: ['fullname', 'name']}, function(err, cursor){
-		cursor.toArray(callback);
-	})
 }
 
 Networks.PRESENCE = [
