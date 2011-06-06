@@ -301,6 +301,7 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'], ['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']]]
 	],
 	events: {
+		"mousedown": "noselect",
 		"click .mute": "mute",
 		"click .solo": "solo"
 	},
@@ -312,6 +313,9 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	render: function(){
 		$(this.el).empty().stencil(this.template, this.model.toJSON());
+	},
+	noselect: function(){
+		return false;
 	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
