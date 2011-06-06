@@ -1049,10 +1049,6 @@ distro.Router = Backbone.Controller.extend({
 								liveNetworkJSON = data;
 								showLiveNetworks(liveNetworkJSON);
 							},
-							// complete: function(data){
-							// 								console.log("complete: ");
-							// 								console.log(data);
-							// 							},
 							failure: function(){
 								liveNetworkHold = false;
 							}
@@ -1060,7 +1056,7 @@ distro.Router = Backbone.Controller.extend({
 					} else {
 						showLiveNetworks(liveNetworkJSON);
 					}
-				});
+				}).mousedown(function(e){e.preventDefault();});
 				distro.tutorial.show('search');
 				function handleInput(){
 					$spacer.text($text[0].value);
