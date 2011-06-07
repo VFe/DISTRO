@@ -63,7 +63,7 @@ Networks.prototype.liveNetworks = function(callback){
 		} else {
 			console.log(results);
 			self.collection.find({ _id: { $in: results.map(function(result){ return result.value.id; }) } },
-				{ fields: {name: 1, fullname: 1, _id: 0}, sort: ['fullname', 'name'] },
+				{ fields: {name: 1, fullname: 1, _id: 0}, sort: ['lfullname', 'lname'] },
 				function(err, cursor){
 					cursor.toArray(callback);
 				}
