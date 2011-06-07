@@ -5,6 +5,7 @@ var util = require('util'),
 	mongoDB = require('mongodb'),
 	url = require('url'),
 	connect = require('connect'),
+	form = require('connect-form'),
 	distro = require('distro'),
 	port = process.env.PRODUCTION ? 8085 : 3000;
 
@@ -24,14 +25,48 @@ global.db.open(function(err, db){
 			connect.cookieParser(),
 			connect.bodyParser(),
 			connect.static(__dirname + '/static/main'),
-			connect.static(__dirname + '/static/common')
+			connect.static(__dirname + '/static/common'),
+			form({ keepExtensions: true })
 		)
 		.use('/api/', connect.router(function(app) {
 			function methodNotAllowed(req, res, params){
 				res.writeHead(405);
 				res.end("Method Not Allowed");
 			}
-
+			app.post('/upload', function(req, res, next){
+				var deferred = {
+					args: null,
+					cb: null,
+					wait: function(cb){
+						if (this.args) {
+							cb.apply(undefined, this.args);
+						} else {
+							this.cb = cb;
+						}
+					}
+				};
+				
+				if (req.form) {
+		            req.form.complete(function(){
+						if (deferred.cb) {
+							deferred.cb.apply(undefined, arguments);
+						} else {
+							deferred.args = arguments;
+						}
+					});
+					distro.request.handleRequest(false, function(session, req, res, successback, errback){
+						deferred.wait(function(err, fields, files){
+							successback({
+								err: err,
+								fields: fields,
+								files: files
+							});
+						});
+					})(req, res);
+				} else {
+					errback(new distro.error.ClientError);
+				}
+			});
 			app.get('/login', methodNotAllowed);
 			app.post('/login', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				var login = req.body;
