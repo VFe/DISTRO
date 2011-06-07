@@ -61,7 +61,8 @@ Networks.prototype.liveNetworks = function(callback){
 		if(err){
 			callback(new Error(err.errmsg + ': ' + err.assertion), null);
 		} else {
-			self.collection.find({ _id: { $in: results.map(function(result){ return result.value; }) } },
+			console.log(results);
+			self.collection.find({ _id: { $in: results.map(function(result){ return result.value.id; }) } },
 				{ fields: {name: 1, fullname: 1, _id: 0}, sort: ['fullname', 'name'] },
 				function(err, cursor){
 					cursor.toArray(callback);
@@ -74,7 +75,7 @@ Networks.prototype.liveNetworks = function(callback){
 function mapLiveNetworks(){
 	if(this.network){
 		this.network.forEach(function(networkID) {
-			emit(networkID, networkID);
+			emit(networkID, { id: networkID });
 		});
 	}
 }
