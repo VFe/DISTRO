@@ -1343,9 +1343,11 @@ distro.init(function(){
 	});	
 	(function ($) {
 		var original = $.fn.val;
-		$.fn.val = function() {
+		$.fn.val = function(newValue) {
 			var ret = original.apply(this, arguments);
-			this.trigger('valuechange');
+			if (newValue) {
+				this.trigger('valuechange');
+			}
 			return ret;
 		};
 	})(jQuery);
