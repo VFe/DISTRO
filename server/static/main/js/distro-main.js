@@ -301,7 +301,7 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'], ['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']]]
 	],
 	events: {
-		"mousedown": "noselect",
+		"selectstart": "noselect",
 		"click .mute": "mute",
 		"click .solo": "solo"
 	},
@@ -314,8 +314,8 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	render: function(){
 		$(this.el).empty().stencil(this.template, this.model.toJSON());
 	},
-	noselect: function(){
-		return false;
+	noselect: function(e){
+		e.preventDefault();
 	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
@@ -332,7 +332,7 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 		this.currentSort = {$el:this.$el.find('th[data-sort=date]')};
 		this.lastSorts = {};
 		this.model.bind('change', this.render);
-		this.$el.mousedown(function(e){
+		this.$el.bind('selectstart', function(e){
 			e.preventDefault();
 		});
 		this.$el.delegate('th', 'click', this.handle);
@@ -1059,7 +1059,7 @@ distro.Router = Backbone.Controller.extend({
 					} else {
 						showLiveNetworks(liveNetworkJSON);
 					}
-				}).mousedown(function(e){e.preventDefault();});
+				}).bind('selectstart', function(e){e.preventDefault();});
 				distro.tutorial.show('search');
 				function handleInput(){
 					$spacer.text($text[0].value);
@@ -1270,7 +1270,7 @@ distro.init(function(){
 	});
 
 	// Miscellaneous UI
-	$('.button').live('mousedown', function(e){
+	$('.button').live('selectstart', function(e){
 		e.preventDefault();
 	});
 	
