@@ -53,6 +53,36 @@ Networks.prototype.search = function(name, callback){
 	});
 };
 
+Networks.prototype.liveNetworks = function(callback){
+	var self = this;
+	global.tracks.collection.mapReduce(mapLiveNetworks, reduceLiveNetworks, {
+		out: { inline: 1 }
+	}, function(err, results){
+		if(err){
+			callback(new Error(err.errmsg + ': ' + err.assertion), null);
+		} else {
+			self.collection.find({ _id: { $in: results.map(function(result){ return result.value.id; }) } },
+				{ fields: {name: 1, fullname: 1, _id: 0}, sort: ['lfullname', 'lname'] },
+				function(err, cursor){
+					cursor.toArray(callback);
+				}
+			);
+		}
+	});
+};
+
+function mapLiveNetworks(){
+	if(this.network){
+		this.network.forEach(function(networkID) {
+			emit(networkID, { id: networkID });
+		});
+	}
+}
+
+function reduceLiveNetworks(key, networks){
+	return networks[0];
+}
+
 Networks.PRESENCE = [
 	{ name: "email", prefix: "mailto:" },
 	{ name: "homepage" },
@@ -101,9 +131,6 @@ Networks.Proxy.prototype.resolve = function(networkDetails){
 		if (this.key instanceof Array) {
 			this.data = {};
 			this.key.forEach(function(key){
-				if (key === 'location.citystate') {
-					console.log(networkDetails);
-				}
 				set(key);
 			});
 		} else {

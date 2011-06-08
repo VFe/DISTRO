@@ -139,6 +139,15 @@ global.db.open(function(err, db){
 					successback(returnData);
 				});
 			}));
+			app.get('/livenetworks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				global.networks.liveNetworks(function(err, results){
+					if (err) {
+						errback(err);
+					} else {
+						successback(results);
+					}
+				});
+			}));
 			app.get('/networks/:name', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				global.networks.findNetworkByName(req.params.name, { _id: false }, function(err, doc){
 					if(err){

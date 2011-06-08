@@ -11,7 +11,7 @@ Backbone.sync = function(method, model, success, error){
 
 
 distro.util = {
-	pad: function(input, length, char){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(char || '0') + input : input); },
+	pad: function(input, length, character){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(character || '0') + input : input); },
 	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); }
 };
 distro.SERVER = "/api/";
@@ -301,6 +301,7 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'], ['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']]]
 	],
 	events: {
+		"selectstart": "noselect",
 		"click .mute": "mute",
 		"click .solo": "solo"
 	},
@@ -312,6 +313,9 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	render: function(){
 		$(this.el).empty().stencil(this.template, this.model.toJSON());
+	},
+	noselect: function(e){
+		e.preventDefault();
 	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
@@ -328,7 +332,7 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 		this.currentSort = {$el:this.$el.find('th[data-sort=date]')};
 		this.lastSorts = {};
 		this.model.bind('change', this.render);
-		this.$el.mousedown(function(e){
+		this.$el.bind('selectstart', function(e){
 			e.preventDefault();
 		});
 		this.$el.delegate('th', 'click', this.handle);
@@ -1006,7 +1010,7 @@ distro.Router = Backbone.Controller.extend({
 			name: "find",
 			longName: "Find a network",
 			show: function($content){
-				var $text, $spacer, $placeholder;
+				var $text, $spacer, $placeholder, liveNetworkJSON, liveNetworkHold;
 				$content.attr('id', 'networkSearch');
 				$content.haj([
 					['%span.close.button', 'x'],
@@ -1016,11 +1020,53 @@ distro.Router = Backbone.Controller.extend({
 							['%span.placeholder', {$:function(){ $placeholder = $(this); }}, distro.loc.str('findNetworks.placeholder')],
 						'^'],
 						['%input', { autocorrect: 'off', autocapitalize: 'off', $:function(){ $text = $(this); }}],
-					]
+					],
+					['#bottomBar', {$:function(){ $bottomBar = $(this); }}, ['%span.lightning', " "], "Live Networks"]
 				]);
+				$bottomBar.click(function(e){
+					var $liveNetworkContainer = $('#liveNetworkContainer');
+
+					function showLiveNetworks(liveJSON){
+						$bottomBar.toggleClass('bright');
+						if($liveNetworkContainer[0] !== undefined) {
+							$liveNetworkContainer.toggle();
+						} else {
+							$content.stencil(
+								['#liveNetworkContainer', 
+									['%ul#liveNetworkList', {$key: "", $children:[
+										'%li',
+											['%a', {href: { $join: ["#/", {$key: "name"}] }},
+												{$key: "fullname"},
+												['%span.liveNetworkName', {$join: ["^", {$key: "name"}, "^"]}]
+											]
+									]}]
+								], liveJSON
+							);
+						}
+					};
+					
+					if(!liveNetworkJSON && !liveNetworkHold){
+						liveNetworkHold = true;
+						distro.request('livenetworks', 'GET', null, new Hollerback({
+							success: function(data){
+								liveNetworkJSON = data;
+								showLiveNetworks(liveNetworkJSON);
+							},
+							failure: function(){
+								liveNetworkHold = false;
+							}
+						}));
+					} else {
+						showLiveNetworks(liveNetworkJSON);
+					}
+				}).bind('selectstart', function(e){e.preventDefault();});
 				distro.tutorial.show('search');
 				function handleInput(){
 					$spacer.text($text[0].value);
+					if ($bottomBar.hasClass('bright')) {
+						$bottomBar.removeClass('bright');
+						$('#liveNetworkContainer').hide();
+					}
 				}
 				if ('oninput' in $text[0]) {
 					$text.bind('input', handleInput);
@@ -1228,7 +1274,7 @@ distro.init(function(){
 	});
 
 	// Miscellaneous UI
-	$('.button').live('mousedown', function(e){
+	$('.button').live('selectstart', function(e){
 		e.preventDefault();
 	});
 	
@@ -1301,9 +1347,11 @@ distro.init(function(){
 	});	
 	(function ($) {
 		var original = $.fn.val;
-		$.fn.val = function() {
+		$.fn.val = function(newValue) {
 			var ret = original.apply(this, arguments);
-			this.trigger('valuechange');
+			if (newValue) {
+				this.trigger('valuechange');
+			}
 			return ret;
 		};
 	})(jQuery);
