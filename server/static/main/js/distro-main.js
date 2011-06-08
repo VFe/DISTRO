@@ -1063,6 +1063,10 @@ distro.Router = Backbone.Controller.extend({
 				distro.tutorial.show('search');
 				function handleInput(){
 					$spacer.text($text[0].value);
+					if ($bottomBar.hasClass('bright')) {
+						$bottomBar.removeClass('bright');
+						$('#liveNetworkContainer').hide();
+					}
 				}
 				if ('oninput' in $text[0]) {
 					$text.bind('input', handleInput);
