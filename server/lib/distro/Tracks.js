@@ -17,13 +17,13 @@ function mapSubscriptions(){
 			continue;
 		}
 		for (j = networkSubscriptions.length - 1; (subscription = networkSubscriptions[j]), j >= 0; j--){
-			if (this.release > subscription.start && (!subscription.end || (this.release < subscription.end))) {
+			if (this.release > subscription.start && (!subscription.end || (this.release < subscription.end)) && this.release < now) {
 				this.date = this.release;
 				emit(this._id, this);
 				return;
 			} else if (this.onDeck) {
 				for (k = this.onDeck.length - 1; (onDeckPeriod = this.onDeck[k]), k >= 0; k--){
-					if (onDeckPeriod.start < subscription.start && (!onDeckPeriod.end || onDeckPeriod.end > subscription.start)) {
+					if (onDeckPeriod.start < subscription.start && (!onDeckPeriod.end || onDeckPeriod.end > subscription.start) && onDeckPeriod.start < now) {
 						this.date = subscription.start;
 						emit(this._id, this);
 						return;
@@ -54,7 +54,7 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 	this.collection.mapReduce(mapSubscriptions, reduceSubscriptions, {
 		query: { network: { $in: subscribedNetworks } },
 		out: { inline: 1 },
-		scope: { subscriptions: subscriptionsByNetwork }
+		scope: { subscriptions: subscriptionsByNetwork, now: new Date }
 	}, function(err, results){
 		if (err) {
 			callback(new Error(err.errmsg + ': ' + err.assertion), null);
