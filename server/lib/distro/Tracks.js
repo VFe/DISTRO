@@ -23,7 +23,7 @@ function mapSubscriptions(){
 				return;
 			} else if (this.onDeck) {
 				for (k = this.onDeck.length - 1; (onDeckPeriod = this.onDeck[k]), k >= 0; k--){
-					if (onDeckPeriod.start < subscription.start && (!onDeckPeriod.end || onDeckPeriod.end > subscription.end)) {
+					if (onDeckPeriod.start < subscription.start && (!onDeckPeriod.end || onDeckPeriod.end > subscription.start)) {
 						this.date = subscription.start;
 						emit(this._id, this);
 						return;
