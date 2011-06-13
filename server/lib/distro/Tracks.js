@@ -1,4 +1,5 @@
 var CollectionManager = require('./lib/CollectionManager'),
+	ClientError = require('./error').ClientError,
 	Networks = require('./Networks'),
 	mongodb = require('mongodb');
 
@@ -8,6 +9,34 @@ Tracks.prototype = new CollectionManager();
 Tracks.prototype.constructor = Tracks;
 Tracks.collectionName = 'tracks';
 Tracks.publicKeys = [ 'name', 'release', 'date', 'network', 'filename', 'artist', 'artistNetwork', 'performance', 'time' ];
+
+Tracks.prototype.prepareForOutput = function(tracks, subscribedNetworkIds, callback){
+	var networkProxies = new Networks.ProxySet;
+	tracks = tracks.map(function(inTrack) {
+		var track = {};
+		Tracks.publicKeys.forEach(function(key){
+			if (key in inTrack) {
+				track[key] = inTrack[key];
+			}
+		});
+		track.networkWithFile = networkProxies.create(track.network[0]);
+		track.network = track.network.filter(function(network){ return subscribedNetworkIds.indexOf(network.id) != -1; }).map(function(network){ return networkProxies.create(network); });
+		if (track.artistNetwork) {
+			track.artistNetwork = networkProxies.create(track.artistNetwork);
+		}
+		if (track.performance && track.performance.venue) {
+			track.performance.venue = networkProxies.create(track.performance.venue, ['name', 'fullname', {name: 'citystate', key: 'location.citystate'}]);
+		}
+		return track;
+	});
+	networkProxies.resolve(function(err){
+		if (err) {
+			callback(err, null);
+		} else {
+			callback(null, tracks);
+		}
+	});
+}
 
 function mapSubscriptions(){
 	var i, networksLength, networkSubscriptions, subscription, j, onDeckPeriod, k;
@@ -39,7 +68,7 @@ function reduceSubscriptions(k, vals){
 }
 
 Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
-	var subscriptionsByNetwork = {}, subscribedNetworkMap = {}, subscribedNetworks = [], subscribedNetworkIds = [];
+	var self = this, subscriptionsByNetwork = {}, subscribedNetworkMap = {}, subscribedNetworks = [], subscribedNetworkIds = [];
 	subscriptions.forEach(function(subscription){
 		var networkHex = subscription.network.toHexString();
 		(subscriptionsByNetwork[networkHex] || (subscriptionsByNetwork[networkHex] = [])).push(subscription);
@@ -59,32 +88,53 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 		if (err) {
 			callback(new Error(err.errmsg + ': ' + err.assertion), null);
 		} else {
-			var tracks = results.map(function(r){ return r.value; }).sort(function(docA, docB){ var a = docA.date, b = docB.date; return a > b ? 1 : a < b ? -1 : 0; }),
-				networkProxies = new Networks.ProxySet;
-			tracks = tracks.map(function(inTrack) {
-				var track = {};
-				Tracks.publicKeys.forEach(function(key){
-					if (key in inTrack) {
-						track[key] = inTrack[key];
-					}
-				});
-				track.networkWithFile = networkProxies.create(track.network[0]);
-				track.network = track.network.filter(function(network){ return subscribedNetworkIds.indexOf(network.id) != -1; }).map(function(network){ return networkProxies.create(network); });
-				if (track.artistNetwork) {
-					track.artistNetwork = networkProxies.create(track.artistNetwork);
-				}
-				if (track.performance && track.performance.venue) {
-					track.performance.venue = networkProxies.create(track.performance.venue, ['name', 'fullname', {name: 'citystate', key: 'location.citystate'}]);
-				}
-				return track;
-			});
-			networkProxies.resolve(function(err){
-				if (err) {
-					callback(err, null);
-				} else {
-					callback(null, tracks);
-				}
-			});
+			var tracks = results.map(function(r){ return r.value; }).sort(function(docA, docB){ var a = docA.date, b = docB.date; return a > b ? 1 : a < b ? -1 : 0; });
+			self.prepareForOutput(tracks, subscribedNetworkIds, callback);
 		}
 	});
 };
+
+Tracks.prototype.createTrack = function(inTrack, user, callback){
+	var self = this, track = {};
+	if (inTrack && inTrack.network && inTrack.network.name) {
+		global.networks.findNetworkByName(inTrack.network.name, function(err, result){
+			if (err) {
+				callback(err);
+			} else if ( ! result) {
+				callback(new ClientError('noNetwork'));
+			} else {
+				track.network = [ result._id ];
+				track.name = inTrack.name;
+				track.artist = inTrack.artist;
+				if (inTrack.release) {
+					track.release = new Date(inTrack.release);
+				}
+				if (inTrack.onDeck && inTrack.onDeck.length) {
+					track.onDeck = inTrack.onDeck.map(function(inOnDeck){
+						var onDeck = {};
+						if (inOnDeck.start) {
+							onDeck.start = new Date(inOnDeck.start);
+						}
+						if (inOnDeck.end) {
+							onDeck.end = new Date(inOnDeck.end);
+						}
+						return onDeck;
+					});
+				}
+				console.log(track);
+				self.collection.insert(track, function(err, docs){
+					if (err) {
+						callback(err);
+					} else {
+						var subscribedNetworkIds = user.subscriptions && user.subscriptions.map(function(s){ return s.network.id; }) || [];
+						self.prepareForOutput(docs, subscribedNetworkIds, function(err, networks){
+							callback(err, networks && networks[0]);
+						});
+					}
+				});
+			}
+		});
+	} else {
+		callback(new ClientError);
+	}
+}

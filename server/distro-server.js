@@ -114,6 +114,15 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
+			app.post('/library/tracks', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+				global.tracks.createTrack(req.body, session.user, function(err, doc){
+					if (err) {
+						errback(err);
+					} else {
+						successback(doc);
+					}
+				})
+			}));
 			app.post('/library/subscriptions', distro.request.handleRequest('ondemand', function(session, req, res, successback, errback){
 				if (!req.body || !req.body.name) {
 					errback(new distro.error.ClientError("networks.errors.noNetwork"));

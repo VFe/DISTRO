@@ -12,7 +12,38 @@ Backbone.sync = function(method, model, success, error){
 
 distro.util = {
 	pad: function(input, length, character){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(character || '0') + input : input); },
-	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); }
+	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); },
+	parseDate: (function(){
+		// Based on <http://stackoverflow.com/questions/141348/>
+		var dateRegExp = /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/i;
+		return function(str){
+			try {
+				var match = str.match(dateRegExp);
+				if (match[1] && match[2] && match[3]) {
+					return {
+						m: +match[1],
+						d: +match[2],
+						y: +match[3]
+					}
+				}
+			} catch(e) {}
+			return null;
+		}
+	})(),
+	parseTime: (function(){
+		// Based on <http://stackoverflow.com/questions/141348/>
+		var timeRexExp = /^(\d+)(?::(\d\d))?\s*(?:(p)m?|am?)?$/i;
+		return function(str){
+			try {
+				var match = str.match(timeRexExp);
+				return {
+					h: (+match[1] + (match[3] ? 12 : 0)),
+					m: +match[2] || 0
+				}
+			} catch(e) {}
+			return null;
+		}
+	})()
 };
 distro.SERVER = "/api/";
 distro.TITLE = "DISTRO";
@@ -176,9 +207,11 @@ distro.library = {
 		model: Backbone.Model.extend({
 			initialize: function(){
 				var self = this;
-				this.bind('change', function (){
+				function rebuild(){
 					distro.library.filteredTracks.rebuild();
-				});
+				}
+				this.bind('change:muted', rebuild);
+				this.bind('change:soloed', rebuild);
 			}
 		}),
 		comparator: function(model){
@@ -192,10 +225,10 @@ distro.library = {
 		url: 'library/tracks',
 		model: Backbone.Model.extend({
 			validate: function(attributes){
-				if (!(attributes.release instanceof Date)) {
+				if (attributes.release && ! (attributes.release instanceof Date)) {
 					attributes.release = new Date(attributes.release);
 				}
-				if (!(attributes.date instanceof Date)) {
+				if (attributes.date && !(attributes.date instanceof Date)) {
 					attributes.date = new Date(attributes.date);
 				}
 				if (attributes.performance && attributes.performance.date && !(attributes.performance.date instanceof Date)) {
@@ -298,21 +331,54 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } },
+		['.subscription', { 'class': { $join: [
+			{ $test: { $key: 'uploading' }, $if: 'uploading' },
+			{ $test: { $key: 'muted' }, $if: 'muted' },
+			{ $test: { $key: 'soloed' }, $if: 'soloed' }
+		], $separator: ' ' } },
 			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }],
 			['.subscriptionControls',
+				['.upload', {title: distro.loc.stencil('chrome.hover.upload')}, 'U'],
 				['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
 				['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
 			]
-		]
+		],
+		{ $test: { $key: 'uploading' }, $if: ["%form#uploadSong",
+			["%h1", "Upload Song"],
+			["%ul",
+				["%li",
+					["#uploadFile",
+						["%input", {"type": "file", "name": "trackFile"}],
+						["%div", "Browse"]
+					],
+					["%h2", "Locate Audio"]
+				],
+				["%li", ["%h2", "Enter Track Information"],
+					["%input", {"type": "text", "name": "name", "placeholder": "Track Name"}],
+					["%input", {"type": "text", "name": "artist", "placeholder": "Artist Name"}]
+				],
+				["%li", ["%h2", "Select Broadcast Option"],
+					['%input#broadcastNow', { type: "radio", "name": "broadcastType", value: "now", checked: 'checked' }], ['%label', { for: "broadcastNow"}, "Broadcast now"],
+					['%input#onDeck', { type: "checkbox", "name": "onDeck" }], ['%label', { for: "onDeck"}, "On Deck"], ['%br'],
+					['%input#broadcastLater', { type: "radio", "name": "broadcastType", value: "later" }], ['%label', { for: "broadcastLater"}, "Broadcast later"], ['%br'],
+					["%input#broadcastDate", {"type": "text", "name": "broadcastDate", "placeholder": "MM/DD/YYYY", disabled: 'disabled' }], ' ',
+					["%input#broadcastTime", {"type": "text", "name": "broadcastTime", "placeholder": "HH:MM pm", disabled: 'disabled' }]
+				],
+				["%li", ["%h2", "Tag w/ Event"]]
+			],
+			["%button#uploadButton", {"type": "submit"}, "Upload"]
+		]}
 	],
 	events: {
-		"selectstart": "noselect",
+		"selectstart .subscriptionControls": "noselect",
+		"click .upload": "toggleAddTrack",
 		"click .mute": "mute",
-		"click .solo": "solo"
+		"click .solo": "solo",
+		"submit": "addTrack",
+		"change #broadcastNow, #broadcastLater": "enableTimes"
 	},
 	initialize: function() {
-		_.bindAll(this, 'render', 'mute', 'solo');
+		_.bindAll(this, 'render', 'toggleAddTrack', 'mute', 'solo', 'addTrack');
 		this.model.bind('change', this.render);
 		this.model.view = this;
 		this.render();
@@ -323,11 +389,58 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	noselect: function(e){
 		e.preventDefault();
 	},
+	toggleAddTrack: function(){
+		this.model.set({ uploading: ! this.model.attributes.uploading });
+	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
 	},
 	solo: function(){
 		this.model.set({ soloed: ! this.model.attributes.soloed });
+	},
+	addTrack: function(e){
+		var form = e.target, elements = form.elements, broadcast, broadcastDate, broadcastTime;
+			newTrack = new distro.library.tracks.model({
+				name: elements.name.value,
+				artist: elements.artist.value,
+				network: { name: this.model.get('name') },
+			});
+		if (elements.broadcastLater.checked) {
+			if ( ! (broadcastDate = distro.util.parseDate(elements.broadcastDate.value))) {
+				alert('I don\'t understand that date.');
+				elements.broadcastDate.focus();
+				return false;
+			}
+			if ( ! (broadcastTime = distro.util.parseTime(elements.broadcastTime.value))) {
+				alert('I don\'t understand that time.');
+				elements.broadcastTime.focus();
+				return false;
+			}
+			broadcast = new Date(broadcastDate.y, broadcastDate.m, broadcastDate.d, broadcastTime.h, broadcastTime.m);
+		} else {
+			broadcast = new Date;
+		}
+		newTrack.set({ release: broadcast });
+		if (elements.onDeck.checked) {
+			newTrack.set({ onDeck: [ { start: broadcast } ] });
+		}
+		distro.library.tracks.create(newTrack, {
+			success: function(model){
+				debugger;
+				alert('success');
+			},
+			error: function(model, err){
+				alert('error: ' + err.errorMessage);
+			}
+		})
+		return false;
+	},
+	enableTimes: function(e){
+		if ($('#broadcastLater')[0].checked) {
+			$('#broadcastDate, #broadcastTime').removeAttr('disabled');
+		} else {
+			$('#broadcastDate, #broadcastTime').attr('disabled', 'disabled');
+		}
 	}
 });
 distro.library.trackListHeaderView = new (Backbone.View.extend({
@@ -504,6 +617,12 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	moveSelection: function(){
 		this.setSelected(distro.library.trackListView.relativeSelection(1));
+	},
+	show: function(highlight){
+		$.scrollIntoView(this.el, document.getElementById('musicTableBodyContainer'));
+		if (highlight) {
+			$(this.el).css('backgroundColor', '#F6FF98').delay(200).queue(function(n){ $(this).css('backgroundColor', ''); n(); });
+		}
 	}
 });
 
@@ -1313,7 +1432,7 @@ distro.init(function(){
 			}
 			if(newSelection){ 
 				distro.library.trackListView.setSelected(newSelection);
-				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
+				distro.library.trackListView.relativeSelection(0).view.show();
 			}
 			e.preventDefault();
 		} else if(e.keyCode == 13){ // enter
