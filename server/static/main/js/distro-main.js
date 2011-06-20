@@ -936,7 +936,7 @@ distro.loadAboutPage =function(pageName, data){
 				],
 				[".contentBox",
 					[".content.leftContent",
-						["%img.photo",{src: "http://distro-static.s3.amazonaws.com/TRDD/TRDD.jpg", width:"510", height:"450"}]
+						["%img.photo",{src: "http://distro-static.s3.amazonaws.com/TRDD/TRDD.png", width:"510", height:"450"}]
 					],
 					[".rightContent",
 						["%ul.aboutIcons",
