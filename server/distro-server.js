@@ -14,6 +14,7 @@ global.users = new distro.Users();
 global.sessions = new distro.Sessions();
 global.tracks = new distro.Tracks();
 global.networks = new distro.Networks();
+global.uploads = new distro.Uploads();
 
 global.db.open(function(err, db){
 	if (err){
@@ -33,40 +34,6 @@ global.db.open(function(err, db){
 				res.writeHead(405);
 				res.end("Method Not Allowed");
 			}
-			app.post('/upload', function(req, res, next){
-				var deferred = {
-					args: null,
-					cb: null,
-					wait: function(cb){
-						if (this.args) {
-							cb.apply(undefined, this.args);
-						} else {
-							this.cb = cb;
-						}
-					}
-				};
-				
-				if (req.form) {
-		            req.form.complete(function(){
-						if (deferred.cb) {
-							deferred.cb.apply(undefined, arguments);
-						} else {
-							deferred.args = arguments;
-						}
-					});
-					distro.request.handleRequest(false, function(session, req, res, successback, errback){
-						deferred.wait(function(err, fields, files){
-							successback({
-								err: err,
-								fields: fields,
-								files: files
-							});
-						});
-					})(req, res);
-				} else {
-					errback(new distro.error.ClientError);
-				}
-			});
 			app.get('/login', methodNotAllowed);
 			app.post('/login', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				var login = req.body;
@@ -210,6 +177,34 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
+			app.post('/upload', function(req, res, next){
+				var deferred = global.uploads.deferred;
+				
+				if (req.form) {
+		            req.form.complete(function(){
+						if (deferred.cb) {
+							deferred.cb.apply(undefined, arguments);
+						} else {
+							deferred.args = arguments;
+						}
+					});
+					//FIXME: Possible undefined behavior here if the user isn't logged in
+					distro.request.handleRequest(true, function(session, req, res, successback, errback){
+						deferred.wait(function(err, fields, files){
+							global.uploads.pushFile(files.upload, function(err, res){
+								if(err){
+									errback(err);
+								} else {
+									successback(res);
+								}
+							});
+							
+						});
+					})(req, res);
+				} else {
+					errback(new distro.error.ClientError);
+				}
+			});
 		}))
 		.use('/', connect.router(function(app){
 			app.get('/:network', function(req, res){
