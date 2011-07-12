@@ -200,7 +200,39 @@ distro.FlexiComparator.comparator = function (modelA, modelB){
 		return 0;
 	}
 }
-
+distro.Track = Backbone.Model.extend({
+	validate: function(attributes){
+		if (attributes.release && ! (attributes.release instanceof Date)) {
+			attributes.release = new Date(attributes.release);
+		}
+		if (attributes.date && !(attributes.date instanceof Date)) {
+			attributes.date = new Date(attributes.date);
+		}
+		if (attributes.performance && attributes.performance.date && !(attributes.performance.date instanceof Date)) {
+			attributes.performance.date = new Date(attributes.performance.date);
+		}
+	},
+	initialize: function(){
+		this.validate(this.attributes);
+	},
+	getForComparison: function(key){
+		var now;
+		switch (key) {
+		case 'artist':
+			return this.attributes.artistNetwork ? this.attributes.artistNetwork.fullname : this.attributes.artist;
+			break;
+		case 'network':
+			return this.attributes.network[0].fullname;
+			break;
+		case 'performance':
+			now = new Date;
+			return (this.attributes.performance && this.attributes.performance.date > now) ? now - this.attributes.performance.date : -Number.MAX_VALUE;
+			break;
+		default:
+			return this.attributes[key];
+		}
+	}
+});
 distro.library = {
 	subscriptions: new (Backbone.Collection.extend({
 		url: 'library/subscriptions',
@@ -221,42 +253,10 @@ distro.library = {
 			return this.any(function(subscription){ return subscription.attributes.name === networkName; });
 		}
 	})),
-	tracks: new (Backbone.Collection.extend({
+	tracks: new Backbone.Collection({
 		url: 'library/tracks',
-		model: Backbone.Model.extend({
-			validate: function(attributes){
-				if (attributes.release && ! (attributes.release instanceof Date)) {
-					attributes.release = new Date(attributes.release);
-				}
-				if (attributes.date && !(attributes.date instanceof Date)) {
-					attributes.date = new Date(attributes.date);
-				}
-				if (attributes.performance && attributes.performance.date && !(attributes.performance.date instanceof Date)) {
-					attributes.performance.date = new Date(attributes.performance.date);
-				}
-			},
-			initialize: function(){
-				this.validate(this.attributes);
-			},
-			getForComparison: function(key){
-				var now;
-				switch (key) {
-				case 'artist':
-					return this.attributes.artistNetwork ? this.attributes.artistNetwork.fullname : this.attributes.artist;
-					break;
-				case 'network':
-					return this.attributes.network[0].fullname;
-					break;
-				case 'performance':
-					now = new Date;
-					return (this.attributes.performance && this.attributes.performance.date > now) ? now - this.attributes.performance.date : -Number.MAX_VALUE;
-					break;
-				default:
-					return this.attributes[key];
-				}
-			}
-		})
-	})),
+		model: distro.Track
+	}),
 	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
 			success: function(data){
@@ -400,7 +400,7 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	addTrack: function(e){
 		var form = e.target, elements = form.elements, broadcast, broadcastDate, broadcastTime;
-			newTrack = new distro.library.tracks.model({
+			newTrack = new distro.Track({
 				name: elements.name.value,
 				artist: elements.artist.value,
 				network: { name: this.model.get('name') },
