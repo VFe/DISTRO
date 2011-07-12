@@ -29,7 +29,7 @@ exports.handleRequest = function(requireAuthentication, callback){
 			} else {
 				status = 500;
 				if (exports.logToConsole){
-					util.error(err.stack);
+					util.error(err);
 				}
 				if (exports.logToResponse){
 					responseContent.rawError = error;
