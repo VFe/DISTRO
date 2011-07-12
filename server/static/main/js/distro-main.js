@@ -279,18 +279,7 @@ distro.DependentCollection = Backbone.Collection.extend({
 		this.refresh(this.parentCollection.models, options);
 	}
 });
-distro.library.filteredTracks = new (distro.DependentCollection.extend({
-	_add: function(track, options){
-		if (_.any(track.attributes.network, function(n){
-			var subscription = distro.library.subscriptions.get(n.name);
-			return ! subscription.get('muted')
-				&& ( ! distro.library.subscriptions.any(function(subscription){ return subscription.get('soloed'); }) || subscription.get('soloed') );
-		})) {
-			Backbone.Collection.prototype._add.call(this, track, options);
-		}
-	}
-}))([], { parentCollection: distro.library.tracks });
-distro.library.sortedTracks = new (distro.DependentCollection.extend({
+distro.LibraryCollection = distro.DependentCollection.extend({
 	initialize: function(models, options){
 		var self = this;
 		distro.DependentCollection.prototype.initialize.call(this, models, options);
@@ -310,7 +299,19 @@ distro.library.sortedTracks = new (distro.DependentCollection.extend({
 	sortBy: function(comparator){
 		return this.models.sort(comparator);
 	}
-}))([], { parentCollection: distro.library.filteredTracks });
+});
+distro.library.filteredTracks = new (distro.DependentCollection.extend({
+	_add: function(track, options){
+		if (_.any(track.attributes.network, function(n){
+			var subscription = distro.library.subscriptions.get(n.name);
+			return ! subscription.get('muted')
+				&& ( ! distro.library.subscriptions.any(function(subscription){ return subscription.get('soloed'); }) || subscription.get('soloed') );
+		})) {
+			Backbone.Collection.prototype._add.call(this, track, options);
+		}
+	}
+}))([], { parentCollection: distro.library.tracks });
+distro.library.sortedTracks = new distro.LibraryCollection([], { parentCollection: distro.library.filteredTracks });
 distro.library.subscriptionListView = new (Backbone.View.extend({
 	el: $('#subscriptionsTable>tbody')[0],
 	initialize: function() {
@@ -332,15 +333,17 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
 		['.subscription', { 'class': { $join: [
-			{ $test: { $key: 'uploading' }, $if: 'uploading' },
+			{ $test: { $key: 'administrating' }, $if: 'administrating' },
 			{ $test: { $key: 'muted' }, $if: 'muted' },
 			{ $test: { $key: 'soloed' }, $if: 'soloed' }
 		], $separator: ' ' } },
 			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }],
 			['.subscriptionControls',
-				['.upload', {title: distro.loc.stencil('chrome.hover.upload')}, 'U'],
-				['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
-				['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
+				['.admin', {title: distro.loc.stencil('chrome.hover.admin')}, '\u266a'],
+				{ $test: { $key: 'administrating' }, $else: [
+					['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
+					['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
+				] }
 			]
 		],
 		{ $test: { $key: 'uploading' }, $if: ["%form#uploadSong",
@@ -371,14 +374,14 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	],
 	events: {
 		"selectstart .subscriptionControls": "noselect",
-		"click .upload": "toggleAddTrack",
+		"click .admin": "toggleAdmin",
 		"click .mute": "mute",
 		"click .solo": "solo",
 		"submit": "addTrack",
 		"change #broadcastNow, #broadcastLater": "enableTimes"
 	},
 	initialize: function() {
-		_.bindAll(this, 'render', 'toggleAddTrack', 'mute', 'solo', 'addTrack');
+		_.bindAll(this, 'render', 'toggleAdmin', 'mute', 'solo', 'addTrack');
 		this.model.bind('change', this.render);
 		this.model.view = this;
 		this.render();
@@ -389,8 +392,12 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	noselect: function(e){
 		e.preventDefault();
 	},
-	toggleAddTrack: function(){
-		this.model.set({ uploading: ! this.model.attributes.uploading });
+	toggleAdmin: function(){
+		if (this.model.attributes.administrating) {
+			distro.tml.hide();
+		} else {
+			distro.tml.show(this.model);
+		}
 	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
@@ -476,65 +483,6 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 		 .addClass(this.model.attributes.order ? 'ascending' : 'descending');
 	}
 }))({ model: distro.library.sortedTracks.comparator.sort });
-distro.library.trackListView = new (Backbone.View.extend({
-	el: $('#musicTableBody>tbody')[0],
-	initialize: function() {
-		var self = this;
-		this.viewCache = {};
-		_.bindAll(this, 'add', 'render');
-		this.$el = $(this.el);
-		this.$foot = this.$el.children('.filler:first');
-		this.collection.bind('refresh', function(){
-			self.oldViewCache = self.viewCache;
-			self.viewCache = {};
-			self.render();
-			delete self.oldViewCache;
-		});
-		distro.library.subscriptions.bind('add', function(){
-			distro.library.tracks.fetch();
-		});
-	},
-	add: function(track){
-		var view;
-		if (this.oldViewCache && (view = this.oldViewCache[track.cid])) {
-			view.delegateEvents(); 	
-		} else {
-			view = (new distro.library.TrackView({ model: track, parent: this }));
-		}
-		this.viewCache[track.cid] = view;
-		this.$foot.before(view.el);
-	},
-	render: function(){
-		this.$el.empty().append(this.$foot);
-		this.collection.each(this.add);
-	},
-	setPlaying: function(track){
-		if (this.playingTrack) {
-			this.playingTrack.view.setPlaying(false);
-		}
-		if (track) {
-			track.view.setPlaying(true);
-		}
-		this.playingTrack = track;
-	},
-	setSelected: function(track){
-		this.prevSelect = this.selectedTrack;
-		if(this.selectedTrack){
-			this.selectedTrack.view.setSelected(false);
-		}
-		if(track) {
-			track.view.setSelected(true);
-		}
-		this.selectedTrack = track;
-	},
-	relativeTrack: function(shift){
-		return this.playingTrack && this.collection.models[this.collection.indexOf(this.playingTrack) + shift];
-	},
-	relativeSelection: function(shift){
-		return this.selectedTrack && this.collection.models[this.collection.indexOf(this.selectedTrack) + shift];
-	}
-}))({ collection: distro.library.sortedTracks });
-
 distro.library.TrackView = Backbone.View.extend({
 	tagName: 'tr',
 	template: [
@@ -624,6 +572,68 @@ distro.library.TrackView = Backbone.View.extend({
 			$(this.el).css('backgroundColor', '#F6FF98').delay(200).queue(function(n){ $(this).css('backgroundColor', ''); n(); });
 		}
 	}
+});
+distro.LibraryView = Backbone.View.extend({
+	TrackView: distro.library.TrackView,
+	initialize: function() {
+		var self = this;
+		this.viewCache = {};
+		_.bindAll(this, 'add', 'render');
+		this.$el = $(this.el);
+		this.$foot = this.$el.children('.filler:first');
+		this.collection.bind('refresh', function(){
+			self.oldViewCache = self.viewCache;
+			self.viewCache = {};
+			self.render();
+			delete self.oldViewCache;
+		});
+		distro.library.subscriptions.bind('add', function(){
+			distro.library.tracks.fetch();
+		});
+	},
+	add: function(track){
+		var view;
+		if (this.oldViewCache && (view = this.oldViewCache[track.cid])) {
+			view.delegateEvents(); 	
+		} else {
+			view = (new this.TrackView({ model: track, parent: this }));
+		}
+		this.viewCache[track.cid] = view;
+		this.$foot.before(view.el);
+	},
+	render: function(){
+		this.$el.empty().append(this.$foot);
+		this.collection.each(this.add);
+	},
+	setPlaying: function(track){
+		if (this.playingTrack) {
+			this.playingTrack.view.setPlaying(false);
+		}
+		if (track) {
+			track.view.setPlaying(true);
+		}
+		this.playingTrack = track;
+	},
+	setSelected: function(track){
+		this.prevSelect = this.selectedTrack;
+		if(this.selectedTrack){
+			this.selectedTrack.view.setSelected(false);
+		}
+		if(track) {
+			track.view.setSelected(true);
+		}
+		this.selectedTrack = track;
+	},
+	relativeTrack: function(shift){
+		return this.playingTrack && this.collection.models[this.collection.indexOf(this.playingTrack) + shift];
+	},
+	relativeSelection: function(shift){
+		return this.selectedTrack && this.collection.models[this.collection.indexOf(this.selectedTrack) + shift];
+	}
+});
+distro.library.trackListView = new distro.LibraryView({
+	el: $('#musicTableBody>tbody')[0],
+	collection: distro.library.sortedTracks
 });
 
 distro.Slider = function (element, callback){
@@ -785,6 +795,76 @@ distro.lightbox = new (function(){
 	};
 	return Lightbox;
 }())();
+
+distro.tml = {
+	TrackView: distro.library.TrackView.extend({
+		template: [
+			['%td', { $key: 'name' }],
+			['%td', { $key: 'time', $handler: function(time){
+				if (!time) { return ''; }
+				var seconds = time % 60;
+				return Math.floor(time / 60) + ':' + (seconds < 10 ? '0' : '') + seconds;
+			} }],
+			['%td', { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }] }, $else: { $key: 'artist' } }],
+			{ $test: { $key: 'performance' }, $if: { $test: { $handler: function(track){ return track.performance.date > new Date; } }, $if:
+			{ $key: 'performance', $template: ['%td', { 'class': 'event' }, ['%div', { 'class': { $join: ['event', { $key: 'date', $handler: function(date){
+				var diff = date - (new Date);
+				if (diff < 0) {
+					return '';
+				} else if (diff < 86400000) { // 24h
+					return 'soonest';
+				} else if (diff < 172800000) { // 48h
+					return 'sooner';
+				} else if (diff < 604800000) { // 1w
+					return 'soon';
+				} else {
+					return 'someday';
+				}
+			} }], $separator: ' ' } },
+				['.eventDetails', 
+					['.perfDate', {$key:'date', $handler:
+						function(data){
+							if(!data) { return null; }
+							return (data.toLocaleDateString() + '\n' + data.toLocaleTimeString());
+						}
+					}], ['.perfVenue', {$key:'venue', $template:[
+						['%a', {href: {$join:['#/', {$key:'name'}]}, title:{$key:'fullname'}}, '^', {$key:'name'}, '^ '],
+						['%span.cityState', {$key:'citystate'}]
+					]}]
+				],
+				{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
+			]] }, $else: ['%td'] }, $else: ['%td'] },
+			['%td', ['%ul.inlineList', { $key: 'network', $children: ['%li', ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]]}]]
+		],
+	}),
+	tracks: new Backbone.Collection({ model: distro }),
+	$subscriptionContainer: $('#tmlSubscriptionContainer'),
+	show: function(network){
+		this.reset();
+		this.tracks.url = 'networks/' + encodeURIComponent(network.get('name')) + '/tracks';
+		this.tracks.fetch();
+		network.set({ administrating: true });
+		this.network = network;
+		$(document.body).addClass('TML');
+		this.$subscriptionContainer.append(new distro.library.SubscriptionView({ model: network }).el);
+	},
+	hide: function(){
+		this.reset();
+		$(document.body).removeClass('TML');
+		if (this.network) {
+			this.network.set({ administrating: false });
+			delete this.network;
+		}
+	},
+	reset: function(){
+		this.$subscriptionContainer.empty();
+		this.tracks.refresh([]);
+	}
+};
+distro.tml.libraryView = new (distro.LibraryView.extend({ TrackView: distro.tml.TrackView }))({
+	el: $('#tmlBody>tbody')[0],
+	collection: new distro.LibraryCollection([], { parentCollection: distro.tml.tracks })
+});
 
 // Login/registration lightbox
 (function(){
