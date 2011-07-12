@@ -53,6 +53,9 @@
 		"event": "Event",
 		"artist": "Artist"
 	},
+	"tml": {
+		"status": "Status"
+	},
 	"registration": {
 		"emailAddressQuery": "What's your email address?",
 		"passwordQuery": "What's your DISTRO password?",

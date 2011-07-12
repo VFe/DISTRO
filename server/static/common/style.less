@@ -439,7 +439,7 @@ thead.sortable th.descending{
 	background-repeat: no-repeat;
 	background-position: right center;
 }
-#musicTableHead, #subscriptionsTableHead, #musicTableBody, #subscriptionsTableBody{
+#musicTableHead, #tmlHead, #subscriptionsTableHead, #musicTableBody, #tmlBody, #subscriptionsTableBody{
 	.border-box;
 	width:100%;
 	table-layout: fixed;
@@ -447,24 +447,26 @@ thead.sortable th.descending{
 #musicTableBodyContainer:focus{
 	outline: none;
 }
-#musicTableBody .filler:nth-child(even){
-	.zebra(rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.8), 2em);
-}
-#musicTableBody .filler:nth-child(odd){
-	.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8), 2em);
-}
-#musicTableBody tr:not(.filler){
-	cursor: default;
-	.button;
-	&:nth-child(odd){
-		background-color: rgba(255, 255, 255, 0.8);
+#musicTableBodyContainer {
+	.filler:nth-child(even),{
+		.zebra(rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.8), 2em);
 	}
-	&:nth-child(even){
-		background-color: rgba(240, 240, 240, 0.8);
+	.filler:nth-child(odd){
+		.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8), 2em);
 	}
-}
-#musicTableBody tr.playing td:not(.event){
-	font-weight: bold;
+	tr:not(.filler){
+		cursor: default;
+		.button;
+		&:nth-child(odd){
+			background-color: rgba(255, 255, 255, 0.8);
+		}
+		&:nth-child(even){
+			background-color: rgba(240, 240, 240, 0.8);
+		}
+	}
+	tr.playing td:not(.event){
+		font-weight: bold;
+	}
 }
 #musicTableBodyContainer tr.selected{
 	background-color: #ccc;
@@ -473,96 +475,104 @@ thead.sortable th.descending{
 	background-color: #999;
 	color: white;
 }
-#musicTableBody td.new{
-	background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #3e6a97), color-stop(0.5, rgba(0, 0, 0, 0)));
-	background-image: -moz-linear-gradient(45deg, #3e6a97 50%, rgba(0, 0, 0, 0) 50%);
-}
-#musicTableBody td.event{
-	overflow: visible;
-	padding: 0;
-}
-#musicTableBody td.event div.event{
-	display: block;
-	width: 100%;
-	height: 100%;
-	position: relative;
-	background-position: center;
-	background-repeat: no-repeat;
-	&.someday{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/black.png');
+#musicTableBody, #tmlBody{
+	td.new{
+		background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #3e6a97), color-stop(0.5, rgba(0, 0, 0, 0)));
+		background-image: -moz-linear-gradient(45deg, #3e6a97 50%, rgba(0, 0, 0, 0) 50%);
 	}
-	&.soon{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/yellow.png');
+	td.event{
+		overflow: visible;
+		padding: 0;
 	}
-	&.sooner{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/orange.png');
+	td.event div.event{
+		display: block;
+		width: 100%;
+		height: 100%;
+		position: relative;
+		background-position: center;
+		background-repeat: no-repeat;
+		&.someday{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/black.png');
+		}
+		&.soon{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/yellow.png');
+		}
+		&.sooner{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/orange.png');
+		}
+		&.soonest{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/red.png');
+		}
 	}
-	&.soonest{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/red.png');
+	td.fresh div.fresh{
+		display: block;
+		width: 100%;
+		height: 100%;
+		position: relative;
+		background-position: center;
+		background-repeat: no-repeat;
+		&.blue{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/blue.png');
+		}
+		&.indigo{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/indigo.png');
+		}
+		&.violet{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/violet.png');
+		}
+	}
+	td.event div.event:not(:hover) .eventDetails{
+		display: none;
+	}
+	td.event div.event:hover{
+		background-color: #222;
+	}
+	td.event div.event div.eventDetails{
+		position: absolute;
+		right: 100%;
+		background: #222;
+		color: white;
+		.border-radius(0.5em 0 0 0.5em);
+		padding: 0.5em 1em;
+	}
+	td.event div.eventDetails a{
+		color: @brightBlue;
+		font-size: 1.3em;
+		font-weight: 500;
+	}
+	td.event a.eventLink{
+		display:block;
+		height: 100%;
+	}
+	td.event span.cityState{
+		padding-left: 0.3em;
+		color: #999;
+	}
+	a, #subscriptionsTable a, .subscription a {
+		text-decoration: none;
+	}
+	a {
+		color: #3B698A;
 	}
 }
-#musicTableBody td.fresh div.fresh{
-	display: block;
-	width: 100%;
-	height: 100%;
-	position: relative;
-	background-position: center;
-	background-repeat: no-repeat;
-	&.blue{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/blue.png');
-	}
-	&.indigo{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/indigo.png');
-	}
-	&.violet{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/violet.png');
+#musicTableBody, #tmlBody, #subscriptionsTable, #tmlSubscriptionContainer{
+	a {
+		text-decoration: none;
 	}
 }
-#musicTableBody td.event div.event:not(:hover) .eventDetails{
-	display: none;
-}
-#musicTableBody td.event div.event:hover{
-	background-color: #222;
-}
-#musicTableBody td.event div.event div.eventDetails{
-	position: absolute;
-	right: 100%;
-	background: #222;
-	color: white;
-	.border-radius(0.5em 0 0 0.5em);
-	padding: 0.5em 1em;
-}
-#musicTableBody td.event div.eventDetails a{
-	color: @brightBlue;
-	font-size: 1.3em;
-	font-weight: 500;
-}
-#musicTableBody td.event a.eventLink{
-	display:block;
-	height: 100%;
-}
-#musicTableBody td.event span.cityState{
-	padding-left: 0.3em;
-	color: #999;
-}
-#musicTableBody a, #subscriptionsTable a {
-	text-decoration: none;
-}
-#musicTableBody a {
-	color: #3B698A;
-}
-#subscriptionsTable a {
+
+.subscription a {
 	color: inherit;
 }
 
-#musicTableBodyContainer td, #subscriptionsTable td{
+#musicTableBodyContainer td, #subscriptionsTable td, #tmlSidebar .subscription{
 	line-height: 2em;
 	height: 2em;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-#musicTableHead th, #musicTableBody td{
+#musicTableHead th, #tmlHead th, #musicTableBody td, #tmlBody td{
 	padding: 0 0.5em;
 }
 #freshHead {
@@ -573,7 +583,7 @@ thead.sortable th.descending{
 th.descending #freshHead, th.ascending #freshHead{
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAATtJREFUeNqckz1Ow0AQhePFRUrnBHFJmQMEBU6Ab4Bzg9AlVUJF6FzSkdzAJV2M5APkCM4JWDrKzFqf0cjymsCTRrvefTP75sfBwIPlchXJMuGz2m6fqy6eGfjhnA9Y6iP1BbgIQYf0RJYHsaR1lYvtJZVcOE7RTPbzoJXzG44u372Y5XosdktaBXuHnU7hgHMGaS12j/OCYE+qsDVCXt9wkVGwSHG+WBsFjygt6hSQ/unkQIqVs1PygZoGFq5TNTKqWLbl7EOkVCUGJ9uS/RtmqItDDo6e12PViS6MQ0UsPAH60joZeu5Ipz+kcKTglWHCmmGpLnDWKeVXZVl+T6c3AW1x7bkWG/YEeGVWXmQO3utJlM0GWQsUddWjYBJTlGY/kwjumLCUYJnqd9O6NQ/M5VH7779RH54FGAAHC1xQvuNSggAAAABJRU5ErkJggg==);
 } 
-#musicTableHead th {
+#musicTableHead th, #tmlHead th {
 	border-left: 1px solid @lightBorder;
 }
 #musicTableHeadContainer, #subscriptions thead tr{
@@ -581,7 +591,7 @@ th.descending #freshHead, th.ascending #freshHead{
 	background-color: rgb(40, 40, 40);
 	.commonGradient;
 }
-#musicTableHead th, #subscriptions th{
+#musicTableHead th, #tmlHead th, #subscriptions th{
 	text-align: left;
 	color: #888;
 	font-weight: 200;
@@ -591,14 +601,14 @@ th.descending #freshHead, th.ascending #freshHead{
 	text-transform: uppercase;
 }
 html.fontface.no-brokenfontvariant{
-	#musicTableHead th, #subscriptions th{
+	#musicTableHead th, #tmlHead th, #subscriptions th{
 		text-transform: lowercase;
 		font-variant: small-caps;
 		font-size: 1.2em;
 		line-height: 28px;
 	}
 }
-#musicTableBodyContainer, #subscriptionsTableBodyContainer{
+#musicTableBodyContainer, #subscriptionsTableBodyContainer, #tmlSidebar{
 	overflow-y: auto;
 	bottom: 0;
 	right: 0;
@@ -612,7 +622,7 @@ html.js #musicTableBodyContainer{
 #musicTableBodyContainer{
 	top: 2.4em;
 }
-#subscriptionsTableBodyContainer{
+#subscriptionsTableBodyContainer, #tmlSidebar{
 	top: 5.2em;
 }
 #musicTableBodyContainer table, #subscriptionsTable{
@@ -624,14 +634,14 @@ html.js #musicTableBodyContainer{
 	top: 0;
 	bottom: 0;
 }
-#subscriptionsTable{
+#subscriptionsTable, #tmlSidebar{
 	background-color: rgb(40, 40, 40);
 	.backgroundGradientVertical(#373737, #222);
 }
 #subscriptionsTable tr:not(.filler) {
 	border-bottom: 1px solid @lightBorder;
 }
-#subscriptionsTable div.subscription{
+#subscriptionsTable .subscription, #tmlSidebar .subscription{
 	overflow: hidden;
 	text-overflow: ellipsis;
 	padding: 0 0.8em;
@@ -655,8 +665,8 @@ html.js #musicTableBodyContainer{
 			top: 0;
 			.border-radius(0.4em);
 			cursor: pointer;
-			&.upload{
-				background: #333;
+			&.admin{
+				background: #F00;
 				right: 4.3em;
 			}
 			&.mute{
@@ -679,13 +689,13 @@ html.js #musicTableBodyContainer{
 			display: block;
 		}
 	}
-	&.uploading{
-		&:not(:hover) .subscriptionControls div.upload{
+	&.administrating{
+		&:not(:hover) .subscriptionControls div.admin{
 			display: block;
-			color: #FFF;
+			color: #F00;
 			background: none;
 		}
-		&:hover .subscriptionControls div.upload{
+		&:hover .subscriptionControls div.admin{
 			.box-shadow(0px 0px 0.7em #FFF);
 		}
 	}
@@ -711,6 +721,57 @@ html.js #musicTableBodyContainer{
 	}
 }
 
+/* Track management library */
+body.TML{
+	#musicTableHead { display: none; }
+	#musicTableBody { display: none; }
+	#subscriptionsTableBodyContainer { display: none; }
+}
+body:not(.TML){
+	#tmlHead { display: none; }
+	#tmlBody { display: none; }
+	#tmlSidebar { display: none; }
+}
+#tmlSubscriptionContainer{
+	width: 100%;
+}
+#tmlSidebar .subscription{
+	background: rgba(220, 220, 220, 0.2);
+	.subscriptionControls div{
+		display: block;
+	}
+	.subscriptionControls{
+		div{
+			&.admin{
+				right: 2.4em;
+			}
+			&.edit{
+				right: 0.5em;
+			}
+		}
+	}
+/*	&.administrating{
+		&:not(:hover) .subscriptionControls div.admin{
+			display: block;
+			color: #F00;
+			background: none;
+		}
+		&:hover .subscriptionControls div.admin{
+			.box-shadow(0px 0px 0.7em #FFF);
+		}
+	}*/
+}
+
+#infoBox{
+	margin: 0;
+	position: absolute;
+	top: 2em;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+/* Lightbox */
 #lightbox{
 	background: rgba(0, 0, 0, 0.7);
 	height: 100%;
