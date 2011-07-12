@@ -10,8 +10,9 @@ Tracks.prototype.constructor = Tracks;
 Tracks.collectionName = 'tracks';
 Tracks.publicKeys = [ 'name', 'release', 'date', 'network', 'filename', 'artist', 'artistNetwork', 'performance', 'time' ];
 
-Tracks.prototype.prepareForOutput = function(tracks, subscribedNetworkIds, callback){
+Tracks.prototype.prepareForOutput = function(tracks, options, callback){
 	var networkProxies = new Networks.ProxySet;
+	if ( ! options) { options = {}; }
 	tracks = tracks.map(function(inTrack) {
 		var track = {};
 		Tracks.publicKeys.forEach(function(key){
@@ -19,8 +20,14 @@ Tracks.prototype.prepareForOutput = function(tracks, subscribedNetworkIds, callb
 				track[key] = inTrack[key];
 			}
 		});
+		if (options.id) {
+			track.id = inTrack._id;
+		}
 		track.networkWithFile = networkProxies.create(track.network[0]);
-		track.network = track.network.filter(function(network){ return subscribedNetworkIds.indexOf(network.id) != -1; }).map(function(network){ return networkProxies.create(network); });
+		if (options.subscribedNetworkIds) {
+			track.network = track.network.filter(function(network){ return options.subscribedNetworkIds.indexOf(network.id) != -1; });
+		}
+		track.network = track.network.map(function(network){ return networkProxies.create(network); });
 		if (track.artistNetwork) {
 			track.artistNetwork = networkProxies.create(track.artistNetwork);
 		}
@@ -89,7 +96,23 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 			callback(new Error(err.errmsg + ': ' + err.assertion), null);
 		} else {
 			var tracks = results.map(function(r){ return r.value; }).sort(function(docA, docB){ var a = docA.date, b = docB.date; return a > b ? 1 : a < b ? -1 : 0; });
-			self.prepareForOutput(tracks, subscribedNetworkIds, callback);
+			self.prepareForOutput(tracks, { subscribedNetworkIds: subscribedNetworkIds }, callback);
+		}
+	});
+};
+Tracks.prototype.tracksForNetwork = function(network, callback){
+	var self = this;
+	this.collection.find({ network: network }, function(err, cursor){
+		if (err) {
+			callback(err);
+		} else {
+			cursor.toArray(function(err, tracks){
+				if (err) {
+					callback(err);
+				} else {
+					self.prepareForOutput(tracks, { id: true }, callback);
+				}
+			});
 		}
 	});
 };
@@ -127,7 +150,7 @@ Tracks.prototype.createTrack = function(inTrack, user, callback){
 						callback(err);
 					} else {
 						var subscribedNetworkIds = user.subscriptions && user.subscriptions.map(function(s){ return s.network.id; }) || [];
-						self.prepareForOutput(docs, subscribedNetworkIds, function(err, networks){
+						self.prepareForOutput(docs, { subscribedNetworkIds: subscribedNetworkIds }, function(err, networks){
 							callback(err, networks && networks[0]);
 						});
 					}

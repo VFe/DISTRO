@@ -184,6 +184,23 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
+			app.get('/networks/:name/tracks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				global.networks.findNetworkByName(req.params.name, function(err, doc){
+					if(err){
+						errback(err);
+					} else if(doc){
+						global.tracks.tracksForNetwork(doc._id, function(err, tracks){
+							if (err) {
+								errback(err);
+							} else {
+								successback(tracks);
+							}
+						});
+					} else {
+						errback(new distro.error.ClientError("networks.errors.noNetwork"));
+					}
+				});
+			}));
 		}))
 		.use('/', connect.router(function(app){
 			app.get('/:network', function(req, res){
