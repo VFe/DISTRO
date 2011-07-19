@@ -97,7 +97,7 @@ Users.prototype.subscriptions = function(user, callback){
 	user.subscriptions.forEach(function(subscription) {
 		var idString = subscription.network.toHexString();
 		if ( ! (idString in subscriptionNetworks)) {
-			networkProxies.create(subscription.network, [{name: 'id', key: 'name'}, 'name', 'fullname']);
+			networkProxies.create(subscription.network, [{name: 'id', key: 'name'}, 'name', 'fullname', 'owner']);
 			subscriptionNetworks[idString] = true;
 		}
 	});
@@ -105,6 +105,14 @@ Users.prototype.subscriptions = function(user, callback){
 		if (err) {
 			callback(err, null);
 		} else {
+			networkProxies.proxies.forEach(function(network){
+				if (network.data) {
+					if (network.data && network.data.owner && user._id.equals(network.data.owner)) {
+						network.data.admin = true;
+					}
+					delete network.data.owner;
+				}
+			});
 			callback(null, networkProxies.proxies);
 		}
 	});

@@ -178,6 +178,10 @@ global.db.open(function(err, db){
 								}
 							});
 						}
+						if (session && session.user && doc.owner && session.user._id.equals(doc.owner)) {
+							doc.admin = true;
+						}
+						delete doc.owner;
 						successback(doc);
 					} else {
 						errback(new distro.error.ClientError("networks.errors.noNetwork"));
