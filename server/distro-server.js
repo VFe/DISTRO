@@ -2,6 +2,7 @@ require.paths.unshift(__dirname + "/lib");
 
 var util = require('util'),
 	fs = require('fs'),
+	path = require('path'),
 	mongoDB = require('mongodb'),
 	url = require('url'),
 	connect = require('connect'),
@@ -25,8 +26,8 @@ global.db.open(function(err, db){
 			connect.logger(),
 			connect.cookieParser(),
 			connect.bodyParser(),
-			connect.static(__dirname + '/static/main'),
-			connect.static(__dirname + '/static/common'),
+			connect['static'](__dirname + '/static/main'),
+			connect['static'](__dirname + '/static/common'),
 			form({ keepExtensions: true })
 		)
 		.use('/api/', connect.router(function(app) {
@@ -179,9 +180,8 @@ global.db.open(function(err, db){
 			}));
 			app.post('/upload', function(req, res, next){
 				var deferred = global.uploads.deferred;
-				
 				if (req.form) {
-		            req.form.complete(function(){
+					req.form.complete(function(){
 						if (deferred.cb) {
 							deferred.cb.apply(undefined, arguments);
 						} else {
@@ -189,7 +189,7 @@ global.db.open(function(err, db){
 						}
 					});
 					//FIXME: Possible undefined behavior here if the user isn't logged in
-					distro.request.handleRequest(true, function(session, req, res, successback, errback){
+					distro.request.handleRequest(false, function(session, req, res, successback, errback){
 						deferred.wait(function(err, fields, files){
 							global.uploads.pushFile(files.upload, function(err, res){
 								if(err){
@@ -201,8 +201,61 @@ global.db.open(function(err, db){
 							
 						});
 					})(req, res);
+				} else if(req.headers['content-type'] == "application/octet-stream" ){
+					function uploadPath(filename) {
+						var name = '';
+						for (var i = 0; i < 32; i++) {
+							name += Math.floor(Math.random() * 16).toString(16);
+						}
+
+						name += path.extname(filename);
+
+						return path.join('/tmp', name);
+					}
+					function pause(){
+						try{
+							req.pause();
+						}catch(err){
+							//TODO need error handling
+							throw err;
+						}
+						
+					}
+					function resume(){
+						try {
+							req.resume();
+						} catch (err) {
+							//TODO need error handling
+							throw err;
+						}
+					}
+					uploadPath = uploadPath(req.headers['x-file-name']);
+					var writeStream = new fs. WriteStream(uploadPath);
+					req
+						.on('error', function(err) {
+							self._error(err);
+						})
+						.on('aborted', function() {
+							self.emit('aborted');
+						})
+						.on('data', function(buffer) {
+							pause();
+							writeStream.write(buffer, function(){
+								resume();
+							});
+						})
+						.on('end', function() {
+							writeStream.end(function(){
+								res.writeHead(200);
+								res.end('{"success":true}');
+							});
+						});
+					debugger;
+					
 				} else {
-					errback(new distro.error.ClientError);
+					//errback(new distro.error.ClientError);
+					res.writeHead(500);
+					res.end("Bad Things!");
 				}
 			});
 		}))

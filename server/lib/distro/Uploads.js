@@ -30,13 +30,15 @@ Uploads.prototype.transcode = function(file, callback){
 	try {
 		var inputFile = file.path.match(/^(.*)\.(wav|mp3)$/),
 			inputFilePath = inputFile[0],
-			outputFilePath = inputFile[1] + '.mp3'
+			outputFilePath = inputFile[1] + '.mp3',
+			isWav = inputFile[2].toLowerCase() == '.wav' ? true : false;
 	} catch(e) {
 		callback(new distro.error.ClientError('File didn\'t match regex'), null);
 		return;
 	}
 
-	var child = exec('/bin/perl/', ['./lib/lameid3.pl', inputFilePath, , outputFilePath, '-V3'],
+	var child = exec('/bin/sh', ['./transcode.sh'], 
+		{env: {INPUTFILE: inputFilePath, OUTPUTFILE: outputFilePath, ISWAV: isWav}},
 		function (error, stdout, stderr) {
 		console.log('stdout: ' + stdout);
 		console.log('stderr: ' + stderr);
