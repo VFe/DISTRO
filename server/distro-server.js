@@ -178,7 +178,7 @@ global.db.open(function(err, db){
 								}
 							});
 						}
-						if (session && session.user && doc.owner && session.user._id.equals(doc.owner)) {
+						if (distro.Networks.isAdmin(session, doc)) {
 							doc.admin = true;
 						}
 						delete doc.owner;
@@ -193,13 +193,17 @@ global.db.open(function(err, db){
 					if(err){
 						errback(err);
 					} else if(doc){
-						global.tracks.tracksForNetwork(doc._id, function(err, tracks){
-							if (err) {
-								errback(err);
-							} else {
-								successback(tracks);
-							}
-						});
+						if (distro.Networks.isAdmin(session, doc)) {
+							global.tracks.tracksForNetwork(doc._id, function(err, tracks){
+								if (err) {
+									errback(err);
+								} else {
+									successback(tracks);
+								}
+							});
+						} else {
+							errback(new distro.error.ClientError("404"));
+						}
 					} else {
 						errback(new distro.error.ClientError("networks.errors.noNetwork"));
 					}

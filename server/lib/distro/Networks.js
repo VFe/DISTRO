@@ -174,3 +174,7 @@ Networks.ProxySet.prototype.resolve = function(callback){
 		}
 	});
 }
+
+Networks.isAdmin = function(session, network){
+	return session && session.user && network.owner && session.user._id.equals(network.owner);
+}
