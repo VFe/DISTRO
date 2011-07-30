@@ -333,13 +333,14 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
 		['.subscription', { 'class': { $join: [
+			{ $test: { $key: 'admin' }, $if: 'admin' },
 			{ $test: { $key: 'administrating' }, $if: 'administrating' },
 			{ $test: { $key: 'muted' }, $if: 'muted' },
 			{ $test: { $key: 'soloed' }, $if: 'soloed' }
 		], $separator: ' ' } },
 			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }],
 			['.subscriptionControls',
-				['.admin', {title: distro.loc.stencil('chrome.hover.admin')}, '\u266a'],
+				{ $test: { $key: 'admin' }, $if: ['.admin', {title: distro.loc.stencil('chrome.hover.admin')}, '\u266a'] },
 				{ $test: { $key: 'administrating' }, $else: [
 					['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
 					['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
@@ -374,9 +375,9 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	],
 	events: {
 		"selectstart .subscriptionControls": "noselect",
-		"click .admin": "toggleAdmin",
-		"click .mute": "mute",
-		"click .solo": "solo",
+		"click .subscriptionControls>.admin": "toggleAdmin",
+		"click .subscriptionControls>.mute": "mute",
+		"click .subscriptionControls>.solo": "solo",
 		"submit": "addTrack",
 		"change #broadcastNow, #broadcastLater": "enableTimes"
 	},
