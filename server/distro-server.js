@@ -205,7 +205,7 @@ global.db.open(function(err, db){
 							errback(new distro.error.ClientError("404"));
 						}
 					} else {
-						errback(new distro.error.ClientError("networks.errors.noNetwork"));
+						errback(new distro.error.ClientError("404"));
 					}
 				});
 			}));
