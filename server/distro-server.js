@@ -90,7 +90,7 @@ global.db.open(function(err, db){
 			}));
 			app.get('/library', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				var user = distro.Users.userOrGeneric(session && session.user);
-				global.users.subscriptions(user, function(err, subscriptions){
+				global.users.subscriptions(session || { user: user }, function(err, subscriptions){
 					if (err) {
 						errback(err);
 					} else {

@@ -92,8 +92,8 @@ Users.prototype.subscribeToNetwork = function(user, networkID, callback){
 		callback(err);
 	});
 };
-Users.prototype.subscriptions = function(user, callback){
-	var networkProxies = new Networks.ProxySet, subscriptionNetworks = {};
+Users.prototype.subscriptions = function(session, callback){
+	var user = session && session.user, networkProxies = new Networks.ProxySet, subscriptionNetworks = {};
 	user.subscriptions.forEach(function(subscription) {
 		var idString = subscription.network.toHexString();
 		if ( ! (idString in subscriptionNetworks)) {
@@ -107,7 +107,7 @@ Users.prototype.subscriptions = function(user, callback){
 		} else {
 			networkProxies.proxies.forEach(function(network){
 				if (network.data) {
-					if (network.data && network.data.owner && user._id.equals(network.data.owner)) {
+					if (Networks.isAdmin(session, network.data)) {
 						network.data.admin = true;
 					}
 					delete network.data.owner;
