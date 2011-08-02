@@ -253,10 +253,10 @@ distro.library = {
 			return this.any(function(subscription){ return subscription.attributes.name === networkName; });
 		}
 	})),
-	tracks: new Backbone.Collection({
+	tracks: new (Backbone.Collection.extend({
 		url: 'library/tracks',
 		model: distro.Track
-	}),
+	})),
 	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
 			success: function(data){
