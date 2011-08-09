@@ -835,7 +835,7 @@ distro.tml = {
 				],
 				{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 			]] }, $else: ['%td'] }, $else: ['%td'] },
-			['%td', ['%ul.inlineList', { $key: 'network', $children: ['%li', ['%a', { href: { $join: ['#/', { $key: 'name' } ] } }, { $key: 'fullname' } ]]}]]
+			['%td', "STATUS"]
 		],
 	}),
 	tracks: new Backbone.Collection({ model: distro }),
