@@ -340,7 +340,10 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		], $separator: ' ' } },
 			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }],
 			['.subscriptionControls',
-				{ $test: { $key: 'admin' }, $if: ['.admin', {title: distro.loc.stencil('chrome.hover.admin')}, '\u266a'] },
+				{ $test: { $key: 'admin' }, $if: ['%a.admin', {
+					title: distro.loc.stencil('chrome.hover.admin'),
+					href: { $test: { $key: 'administrating' }, $if: '#', $else: { $join: [ '#/manage/', { $key: 'id', $handler: encodeURIComponent } ] } }
+				}, '\u266a'] },
 				{ $test: { $key: 'administrating' }, $else: [
 					['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
 					['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
@@ -375,14 +378,13 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	],
 	events: {
 		"selectstart .subscriptionControls": "noselect",
-		"click .subscriptionControls>.admin": "toggleAdmin",
 		"click .subscriptionControls>.mute": "mute",
 		"click .subscriptionControls>.solo": "solo",
 		"submit": "addTrack",
 		"change #broadcastNow, #broadcastLater": "enableTimes"
 	},
 	initialize: function() {
-		_.bindAll(this, 'render', 'toggleAdmin', 'mute', 'solo', 'addTrack');
+		_.bindAll(this, 'render', 'mute', 'solo', 'addTrack');
 		this.model.bind('change', this.render);
 		this.model.view = this;
 		this.render();
@@ -392,13 +394,6 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	noselect: function(e){
 		e.preventDefault();
-	},
-	toggleAdmin: function(){
-		if (this.model.attributes.administrating) {
-			distro.tml.hide();
-		} else {
-			distro.tml.show(this.model);
-		}
 	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
@@ -781,7 +776,7 @@ distro.lightbox = new (function(){
 				this.$contentWrapper.fadeOut(200, function(){
 					self.hideContent(old);
 				});
-				Backbone.history.saveLocation('');
+				Backbone.history.saveLocation(distro.topPath || '');
 				document.title = distro.TITLE;
 				distro.tutorial.show('findNetwork', { after: true });
 			}
@@ -1179,12 +1174,16 @@ distro.Router = Backbone.Controller.extend({
 		"/find": "find",
 		"/login": "login",
 		"/about/:page": "about",
+		"/manage": "fourOhFour",
+		"/manage/:network": "manage",
 		"/:network": "network",
 		"/*target": "fourOhFour",
 		"*target": "bounce"
 	},
 	blank: function(){
 		distro.lightbox.hide();
+		distro.tml.hide();
+		distro.topPath = '';
 		distro.tutorial.show('findNetwork');
 	},
 	network: function(name){
@@ -1419,6 +1418,15 @@ distro.Router = Backbone.Controller.extend({
 	bounce: function(target){
 		if (target) {
 			window.location.hash = '#/' + target;
+		}
+	},
+	manage: function(target){
+		var network = distro.library.subscriptions.get(target);
+		if (network && network.attributes.admin) {
+			distro.topPath = document.location.hash;
+			distro.tml.show(network);
+		} else {
+			this.fourOhFour();
 		}
 	}
 });

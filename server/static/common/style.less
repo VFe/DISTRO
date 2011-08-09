@@ -654,7 +654,7 @@ html.js #musicTableBodyContainer{
 		top: 0;
 		left: 0;
 		width: 100%;
-		div{
+		div, a{
 			display: none;
 			line-height: 1.5em;
 			margin: 0.3em 0;
@@ -685,20 +685,22 @@ html.js #musicTableBodyContainer{
 	&:hover{
 		padding-right: 4em;
 		background: rgba(220, 220, 220, 0.2);
-		.subscriptionControls div{
-			display: block;
+		.subscriptionControls{
+			div, a{
+				display: block;
+			}
 		}
 	}
 	&.admin:hover{
 		padding-right: 6em;
 	}
 	&.administrating{
-		&:not(:hover) .subscriptionControls div.admin{
+		&:not(:hover) .subscriptionControls .admin{
 			display: block;
 			color: #F00;
 			background: none;
 		}
-		&:hover .subscriptionControls div.admin{
+		&:hover .subscriptionControls a.admin{
 			.box-shadow(0px 0px 0.7em #FFF);
 		}
 	}
@@ -744,7 +746,7 @@ body:not(.TML){
 		display: block;
 	}
 	.subscriptionControls{
-		div{
+		div, a{
 			&.admin{
 				right: 2.4em;
 			}
