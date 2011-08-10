@@ -1,14 +1,14 @@
 #!/bin/bash
 
-if [[$ISWAV && $INPUT_FILE && $OUTPUT_FILE]]
+if [[ $IS_WAV && $INPUT_FILE && $OUTPUT_FILE ]]
 then
-	lame -V3 "$INPUT_FILE" "$OUTPUT_FILE"
-elif [[$INPUT_FILE && $OUTPUT_FILE]]
+	lame -V3 "$INPUT_FILE" "$OUTPUT_FILE" || exit $?
+elif [[ $INPUT_FILE && $OUTPUT_FILE ]]
 then
-	lame -V3 "$INPUT_FILE" "$OUTPUT_FILE"
-	id3cp -wn "$INPUT_FILE" "$OUTPUT_FILE"
+	lame -V3 "$INPUT_FILE" "$OUTPUT_FILE" || exit $?
+#	id3cp -wn "$INPUT_FILE" "$OUTPUT_FILE" || exit $?
 else
-	return 1
+	exit 1
 fi
 
 echo "Input: $INPUT_FILE"

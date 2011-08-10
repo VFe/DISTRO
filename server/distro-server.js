@@ -179,84 +179,30 @@ global.db.open(function(err, db){
 				});
 			}));
 			app.post('/upload', function(req, res, next){
-				var deferred = global.uploads.deferred;
-				if (req.form) {
-					req.form.complete(function(){
-						if (deferred.cb) {
-							deferred.cb.apply(undefined, arguments);
+				var upload = new distro.FileUpload(req);
+
+				distro.request.handleRequest(false, function(session, req, res, successback, errback){
+					upload.complete(function(err, file){
+						if (err) {
+							errback(err);
 						} else {
-							deferred.args = arguments;
-						}
-					});
-					//FIXME: Possible undefined behavior here if the user isn't logged in
-					distro.request.handleRequest(false, function(session, req, res, successback, errback){
-						deferred.wait(function(err, fields, files){
-							global.uploads.pushFile(files.upload, function(err, res){
-								if(err){
+							distro.transcode(file, function(err, outputFile){
+								if (err) {
 									errback(err);
 								} else {
-									successback(res);
+									console.log("starting to push to S3");
+									global.uploads.pushFile(outputFile, path.basename(outputFile), function(err){
+										if (err) {
+											errback(err);
+										} else {
+											successback(null, { success: true });
+										}
+									});
 								}
 							});
-							
-						});
-					})(req, res);
-				} else if(req.headers['content-type'] == "application/octet-stream" ){
-					function uploadPath(filename) {
-						var name = '';
-						for (var i = 0; i < 32; i++) {
-							name += Math.floor(Math.random() * 16).toString(16);
 						}
-
-						name += path.extname(filename);
-
-						return path.join('/tmp', name);
-					}
-					function pause(){
-						try{
-							req.pause();
-						}catch(err){
-							//TODO need error handling
-							throw err;
-						}
-						
-					}
-					function resume(){
-						try {
-							req.resume();
-						} catch (err) {
-							//TODO need error handling
-							throw err;
-						}
-					}
-					uploadPath = uploadPath(req.headers['x-file-name']);
-					var writeStream = new fs. WriteStream(uploadPath);
-					req
-						.on('error', function(err) {
-							self._error(err);
-						})
-						.on('aborted', function() {
-							self.emit('aborted');
-						})
-						.on('data', function(buffer) {
-							pause();
-							writeStream.write(buffer, function(){
-								resume();
-							});
-						})
-						.on('end', function() {
-							writeStream.end(function(){
-								res.writeHead(200);
-								res.end('{"success":true}');
-							});
-						});
-					debugger;
-					
-				} else {
-					//errback(new distro.error.ClientError);
-					res.writeHead(500);
-					res.end("Bad Things!");
-				}
+					});
+				})(req, res);
 			});
 		}))
 		.use('/', connect.router(function(app){
