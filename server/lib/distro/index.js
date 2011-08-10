@@ -6,7 +6,7 @@
 	'Tracks',
 	'Networks',
 	'Uploads',
-	'init',
+	'init'
 ].forEach(function(component){
 	exports[component] = require('./' + component);
 });
