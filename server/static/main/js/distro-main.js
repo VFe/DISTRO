@@ -618,6 +618,7 @@ distro.LibraryView = Backbone.View.extend({
 		}
 		if(track) {
 			track.view.setSelected(true);
+			track.view.show();
 		}
 		this.selectedTrack = track;
 	},
@@ -1525,7 +1526,6 @@ distro.init(function(){
 			}
 			if(newSelection){ 
 				distro.library.trackListView.setSelected(newSelection);
-				distro.library.trackListView.relativeSelection(0).view.show();
 			}
 			e.preventDefault();
 		} else if(e.keyCode == 13){ // enter
