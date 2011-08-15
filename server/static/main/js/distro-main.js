@@ -536,11 +536,12 @@ distro.library.TrackView = Backbone.View.extend({
 		"dblclick": "play",
 		"mousedown": "select"
 	},
-	initialize: function() {
+	initialize: function(options) {
 		_.bindAll(this, 'render', 'setPlaying', 'play');
 		this.model.bind('change', this.render);
 		this.model.view = this;
 		this.$el = $(this.el);
+		this.parent = options.parent;
 		this.render();
 	},
 	render: function(){
@@ -557,7 +558,7 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	select: function(e){
 		if (e.target.tagName === 'A') { return; }
-		distro.library.trackListView.setSelected((e.metaKey && distro.library.trackListView.selectedTrack === this.model) ? null : this.model);
+		this.parent.setSelected((e.metaKey && this.parent.selectedTrack === this.model) ? null : this.model);
 		e.preventDefault();
 	},
 	show: function(highlight){
