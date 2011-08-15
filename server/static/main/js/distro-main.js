@@ -1083,7 +1083,10 @@ distro.loadLandingPage = function(name, callback){
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
 								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
 							]
-						]
+						],
+						{ $test: { $key: 'admin' }, $if: [".ownerbox",
+							['%h1', 'You own this network! ', [ '%a', { href: "mailto:hello@distro.fm" }, 'Contact us' ], ' to make changes to its landing page.'],
+						] }
 					], model.attributes);
 					if ( ! subscribed) {
 						distro.tutorial.show('subscribe', model);
