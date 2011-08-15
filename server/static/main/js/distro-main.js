@@ -505,7 +505,7 @@ distro.library.TrackView = Backbone.View.extend({
 				return 'someday';
 			}
 		} }], $separator: ' ' } },
-			['.eventDetails', 
+			['.eventDetails',
 				['.perfDate', {$key:'date', $handler:
 					function(data){
 						if(!data) { return null; }
@@ -591,7 +591,7 @@ distro.LibraryView = Backbone.View.extend({
 	add: function(track){
 		var view;
 		if (this.oldViewCache && (view = this.oldViewCache[track.cid])) {
-			view.delegateEvents(); 	
+			view.delegateEvents();
 		} else {
 			view = (new this.TrackView({ model: track, parent: this }));
 		}
@@ -819,7 +819,7 @@ distro.tml = {
 					return 'someday';
 				}
 			} }], $separator: ' ' } },
-				['.eventDetails', 
+				['.eventDetails',
 					['.perfDate', {$key:'date', $handler:
 						function(data){
 							if(!data) { return null; }
@@ -1064,7 +1064,7 @@ distro.loadLandingPage = function(name, callback){
 										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { $key: "streetAddress"}],
 										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0.25em; margin-left: 0em;"}, { $key: "citystate"}, " ", {$key:"zip"}],
 										{$test: {$key:"country"}, $if:["%p",{style:"margin-top:0px;"}, { $key: "country"}]}
-									]}, 
+									]},
 									{$test: {$key:"map"}, $if:["%a#mapLink", {target:"_blank", href:{$key:"map"}}, "MAP"]}]
 								],
 								["%span#artist",{style:"font-size:36px;"},
@@ -1074,8 +1074,8 @@ distro.loadLandingPage = function(name, callback){
 							[".rightContent",
 								{$test: {$or: [{$key: 'presence'}, {$key:'email'}]}, $if: [".presence",
 									["%ul.presence", {$test: {$key: "email"}, $if:["%li.email", ["%a", {target:"_blank"}],
-										["%ul.emailList", {style:"display:none; position: absolute; padding: 0 .5em; background-color: white; list-style:none;"}, {$key: "email", $children: 
-											["%li", {'class': {$key:"."}, style:"margin: 0px 1em;"}, 
+										["%ul.emailList", {style:"display:none; position: absolute; padding: 0 .5em; background-color: white; list-style:none;"}, {$key: "email", $children:
+											["%li", {'class': {$key:"."}, style:"margin: 0px 1em;"},
 												["%a", {href: {$join: ["mailto:",{$key:""}]}, title:{$key:""}}, {$key:"."}]]}]]}, { $key: 'presence', $children: [
 										['%li', { 'class': { $key: 'name' } }, ['%a', { target:"_blank", href: { $key: 'url' } }]]
 									] }]
@@ -1242,7 +1242,7 @@ distro.Router = Backbone.Router.extend({
 							$liveNetworkContainer.toggle();
 						} else {
 							$content.stencil(
-								['#liveNetworkContainer', 
+								['#liveNetworkContainer',
 									['%ul#liveNetworkList', {$key: "", $children:[
 										'%li',
 											['%a', {href: { $join: ["#/", {$key: "name"}] }},
@@ -1524,17 +1524,17 @@ distro.init(function(){
 					? distro.library.trackListView.collection.models[0]
 					: distro.library.trackListView.relativeSelection(1);
 			}
-			if(newSelection){ 
+			if(newSelection){
 				distro.library.trackListView.setSelected(newSelection);
 			}
 			e.preventDefault();
 		} else if(e.keyCode == 13){ // enter
-			if ((selected = distro.library.trackListView.selectedTrack)){ 
+			if ((selected = distro.library.trackListView.selectedTrack)){
 				distro.player.play(selected);
 			}
 		}
 	})
-	.focus(); // Give initial focus to the music table 
+	.focus(); // Give initial focus to the music table
 	$(document).keydown(function(e){
 		// { up:38, down:40, left:37, right:39, space:32, enter:13 }
 		var emptySelection = !distro.library.trackListView.selectedTrack,
@@ -1560,9 +1560,9 @@ distro.init(function(){
 		} else if(e.keyCode == 39){
 			if (distro.player.current) {
 				distro.player.next();
-			}	
+			}
 		}
-	});	
+	});
 	(function ($) {
 		var original = $.fn.val;
 		$.fn.val = function(newValue) {
@@ -1577,7 +1577,7 @@ distro.init(function(){
 	//credit: Abhijit Rao (http://stackoverflow.com/questions/1805808)
 	$.scrollIntoView = function(element, container) {
 		var containerTop = $(container).scrollTop(),
-			containerBottom = containerTop + $(container).height(), 
+			containerBottom = containerTop + $(container).height(),
 			elemTop = element.offsetTop,
 			elemBottom = elemTop + $(element).height();
 		if (elemTop < containerTop) {
