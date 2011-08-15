@@ -560,9 +560,6 @@ distro.library.TrackView = Backbone.View.extend({
 		distro.library.trackListView.setSelected((e.metaKey && distro.library.trackListView.selectedTrack === this.model) ? null : this.model);
 		e.preventDefault();
 	},
-	moveSelection: function(){
-		this.setSelected(distro.library.trackListView.relativeSelection(1));
-	},
 	show: function(highlight){
 		$.scrollIntoView(this.el, document.getElementById('musicTableBodyContainer'));
 		if (highlight) {
