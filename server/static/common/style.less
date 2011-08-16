@@ -454,7 +454,7 @@ thead.sortable th.descending{
 	.filler:nth-child(odd){
 		.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8), 2em);
 	}
-	tr:not(.filler){
+	tr:not(.filler):not(.selected){
 		cursor: default;
 		.button;
 		&:nth-child(odd){
