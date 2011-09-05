@@ -378,7 +378,6 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		]}
 	],
 	events: {
-		"selectstart .subscriptionControls": "noselect",
 		"click .subscriptionControls>.mute": "mute",
 		"click .subscriptionControls>.solo": "solo",
 		"submit": "addTrack",
@@ -392,9 +391,6 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	render: function(){
 		$(this.el).empty().stencil(this.template, this.model.toJSON());
-	},
-	noselect: function(e){
-		e.preventDefault();
 	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
