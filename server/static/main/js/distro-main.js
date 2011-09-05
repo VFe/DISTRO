@@ -341,14 +341,14 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		], $separator: ' ' } },
 			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }],
 			['.subscriptionControls',
-				{ $test: { $key: 'admin' }, $if: ['%a.admin', {
-					title: distro.loc.stencil('chrome.hover.admin'),
-					href: { $test: { $key: 'administrating' }, $if: '#', $else: { $join: [ '#/manage/', { $key: 'id', $handler: encodeURIComponent } ] } }
-				}, '\u266a'] },
 				{ $test: { $key: 'administrating' }, $else: [
 					['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
 					['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
 				] }
+				{ $test: { $key: 'admin' }, $if: ['%a.admin', {
+					title: distro.loc.stencil('chrome.hover.admin'),
+					href: { $test: { $key: 'administrating' }, $if: '#', $else: { $join: [ '#/manage/', { $key: 'id', $handler: encodeURIComponent } ] } }
+				}, '\u266a'] },
 			]
 		],
 		{ $test: { $key: 'uploading' }, $if: ["%form#uploadSong",

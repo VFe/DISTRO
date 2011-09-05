@@ -566,6 +566,7 @@ thead.sortable th.descending{
 }
 
 #musicTableBodyContainer td, #subscriptionsTable td, #tmlSidebar .subscription{
+	padding: 0;
 	line-height: 2em;
 	height: 2em;
 	white-space: nowrap;
@@ -650,54 +651,45 @@ html.js #musicTableBodyContainer{
 	.border-box;
 	.subscriptionControls{
 		.button;
+		z-index: 1;
+		position: relative;
 		font-family: "Helvetica Neue", Helvetica, sans-serif;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
+		float: right;
 		div, a{
-			display: none;
 			line-height: 1.5em;
-			margin: 0.3em 0;
+			margin: 0.3em 0 0.3em 0.4em;
 			width: 1.5em;
 			height: 1.5em;
 			text-align: center;
-			position: absolute;
-			top: 0;
+			float: left;
 			.border-radius(0.4em);
 			cursor: pointer;
 			&.admin{
+				display: none;
 				background: #F00;
-				right: 4.3em;
 			}
 			&.mute{
+				visibility: hidden;
 				background: #F88017;
-				right: 2.4em;
 			}
 			&.solo{
+				visibility: hidden;
 				background: #87AFC7;
-				right: 0.5em;
 			}
 		}
 	}
-	&.soloed{
-		padding-right: 2em;
-	}
 	&:hover{
-		padding-right: 4em;
 		background: rgba(220, 220, 220, 0.2);
 		.subscriptionControls{
 			div, a{
+				visibility: visible;
 				display: block;
 			}
 		}
 	}
-	&.admin:hover{
-		padding-right: 6em;
-	}
 	&.administrating{
 		&:not(:hover) .subscriptionControls .admin{
-			display: block;
+			visibility: visible;
 			color: #F00;
 			background: none;
 		}
@@ -707,7 +699,7 @@ html.js #musicTableBodyContainer{
 	}
 	&.muted{
 		&:not(:hover) .subscriptionControls div.mute{
-			display: block;
+			visibility: visible;
 			color: #F88017;
 			background: none;
 		}
@@ -717,7 +709,7 @@ html.js #musicTableBodyContainer{
 	}
 	&.soloed{
 		&:not(:hover) .subscriptionControls div.solo{
-			display: block;
+			visibility: visible;
 			color: #87AFC7;
 			background: none;
 		}
