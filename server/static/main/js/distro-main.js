@@ -335,57 +335,26 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	template: ['%td',
 		['.subscription', { 'class': { $join: [
 			{ $test: { $key: 'admin' }, $if: 'admin' },
-			{ $test: { $key: 'administrating' }, $if: 'administrating' },
 			{ $test: { $key: 'muted' }, $if: 'muted' },
 			{ $test: { $key: 'soloed' }, $if: 'soloed' }
 		], $separator: ' ' } },
-			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }],
 			['.subscriptionControls',
-				{ $test: { $key: 'administrating' }, $else: [
-					['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
-					['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
-				] }
 				{ $test: { $key: 'admin' }, $if: ['%a.admin', {
 					title: distro.loc.stencil('chrome.hover.admin'),
-					href: { $test: { $key: 'administrating' }, $if: '#', $else: { $join: [ '#/manage/', { $key: 'id', $handler: encodeURIComponent } ] } }
+					href: { $join: [ '#/manage/', { $key: 'id', $handler: encodeURIComponent } ] }
 				}, '\u266a'] },
-			]
-		],
-		{ $test: { $key: 'uploading' }, $if: ["%form#uploadSong",
-			["%h1", "Upload Song"],
-			["%ul",
-				["%li",
-					["#uploadFile",
-						["%input", {"type": "file", "name": "trackFile"}],
-						["%div", "Browse"]
-					],
-					["%h2", "Locate Audio"]
-				],
-				["%li", ["%h2", "Enter Track Information"],
-					["%input", {"type": "text", "name": "name", "placeholder": "Track Name"}],
-					["%input", {"type": "text", "name": "artist", "placeholder": "Artist Name"}]
-				],
-				["%li", ["%h2", "Select Broadcast Option"],
-					['%input#broadcastNow', { type: "radio", "name": "broadcastType", value: "now", checked: 'checked' }], ['%label', { for: "broadcastNow"}, "Broadcast now"],
-					['%input#onDeck', { type: "checkbox", "name": "onDeck" }], ['%label', { for: "onDeck"}, "On Deck"], ['%br'],
-					['%input#broadcastLater', { type: "radio", "name": "broadcastType", value: "later" }], ['%label', { for: "broadcastLater"}, "Broadcast later"], ['%br'],
-					["%input#broadcastDate", {"type": "text", "name": "broadcastDate", "placeholder": "MM/DD/YYYY", disabled: 'disabled' }], ' ',
-					["%input#broadcastTime", {"type": "text", "name": "broadcastTime", "placeholder": "HH:MM pm", disabled: 'disabled' }]
-				],
-				["%li", ["%h2", "Tag w/ Event"]]
+				['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
+				['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
 			],
-			["%button#uploadButton", {"type": "submit"}, "Upload"]
-		]}
+			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }]
+		]
 	],
 	events: {
 		"click .subscriptionControls>.mute": "mute",
 		"click .subscriptionControls>.solo": "solo",
-		"submit": "addTrack",
-		"change #broadcastNow, #broadcastLater": "enableTimes"
 	},
 	initialize: function() {
-		_.bindAll(this, 'render', 'mute', 'solo', 'addTrack');
-		this.model.bind('change', this.render);
+		this.model.bind('change', this.render, this);
 		this.model.view = this;
 		this.render();
 	},
@@ -397,6 +366,34 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	},
 	solo: function(){
 		this.model.set({ soloed: ! this.model.attributes.soloed });
+	}
+});
+distro.library.SubscriptionAdminView = Backbone.View.extend({
+	tagName: 'tr',
+	template: ['%td',
+		['.subscription.admin.administrating',
+			['.subscriptionControls',
+				['%a.admin', {
+					title: distro.loc.stencil('chrome.hover.admin'),
+					href: '#'
+				}, '\u266a']
+			],
+			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }]
+		]
+	],
+	events: {
+		"submit": "addTrack",
+		"change #broadcastNow, #broadcastLater": "enableTimes"
+	},
+	initialize: function() {
+		this.model.bind('change', this.render, this);
+		this.render();
+	},
+	destroy: function(){
+		this.model.unbind('change', this.render);
+	},
+	render: function(){
+		$(this.el).empty().stencil(this.template, this.model.toJSON());
 	},
 	addTrack: function(e){
 		var form = e.target, elements = form.elements, broadcast, broadcastDate, broadcastTime;
@@ -535,13 +532,14 @@ distro.library.TrackView = Backbone.View.extend({
 	initialize: function(options) {
 		_.bindAll(this, 'render', 'setPlaying', 'play');
 		this.model.bind('change', this.render);
+		this.model.bind('reset', this.render);
 		this.model.view = this;
 		this.$el = $(this.el);
 		this.parent = options.parent;
 		this.render();
 	},
 	render: function(){
-		this.$el.stencil(this.template, this.model.toJSON());
+		this.$el.empty().stencil(this.template, this.model.toJSON());
 	},
 	setPlaying: function(playing){
 		this.$el[playing ? 'addClass' : 'removeClass']('playing');
@@ -564,6 +562,45 @@ distro.library.TrackView = Backbone.View.extend({
 		}
 	}
 });
+distro.TrackEditView = Backbone.View.extend({
+	template: ["%form#editTrack",
+		["%h1", "Edit Track"],
+		["%ul",
+			// ["%li",
+			// 	["#uploadFile",
+			// 		["%input", {"type": "file", "name": "trackFile"}],
+			// 		["%div", "Browse"]
+			// 	],
+			// 	["%h2", "Locate Audio"]
+			// ],
+			["%li", ["%h2", "Enter Track Information"],
+				["%input", {"type": "text", "name": "name", "placeholder": "Track Name", value: { $key: 'name' } }],
+				["%input", {"type": "text", "name": "artist", "placeholder": "Artist Name", value: { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: { $key: 'fullname' } }, $else: { $key: 'artist' } }, }]
+			],
+			// ["%li", ["%h2", "Select Broadcast Option"],
+			// 	['%input#broadcastNow', { type: "radio", "name": "broadcastType", value: "now", checked: 'checked' }], ['%label', { for: "broadcastNow"}, "Broadcast now"],
+			// 	['%input#onDeck', { type: "checkbox", "name": "onDeck" }], ['%label', { for: "onDeck"}, "On Deck"], ['%br'],
+			// 	['%input#broadcastLater', { type: "radio", "name": "broadcastType", value: "later" }], ['%label', { for: "broadcastLater"}, "Broadcast later"], ['%br'],
+			// 	["%input#broadcastDate", {"type": "text", "name": "broadcastDate", "placeholder": "MM/DD/YYYY", disabled: 'disabled' }], ' ',
+			// 	["%input#broadcastTime", {"type": "text", "name": "broadcastTime", "placeholder": "HH:MM pm", disabled: 'disabled' }]
+			// ],
+			// ["%li", ["%h2", "Tag w/ Event"]]
+		],
+		["%button#editTrackSaveButton", {"type": "submit"}, "Save"]
+	],
+	initialize: function(){
+		var self = this,
+			el = this.el = haj(stencil(this.template, this.model.attributes)),
+			formElements = el.elements;
+		$(el).submit(function(e){
+			e.preventDefault();
+			self.trigger('save', { name: formElements.name.value, artist: formElements.artist.value });
+		})
+	},
+	destroy: function(){
+		$(this.el).remove();
+	}
+});
 distro.LibraryView = Backbone.View.extend({
 	TrackView: distro.library.TrackView,
 	initialize: function() {
@@ -577,6 +614,9 @@ distro.LibraryView = Backbone.View.extend({
 			self.viewCache = {};
 			self.render();
 			delete self.oldViewCache;
+			if (self.selectedTrack && ! self.collection.getByCid(self.selectedTrack.cid)) {
+				self.setSelected(null);
+			}
 		});
 		distro.library.subscriptions.bind('add', function(){
 			distro.library.tracks.fetch();
@@ -838,7 +878,7 @@ distro.tml = {
 		network.set({ administrating: true });
 		this.network = network;
 		$(document.body).addClass('TML');
-		this.$subscriptionContainer.append(new distro.library.SubscriptionView({ model: network }).el);
+		this.$subscriptionContainer.append((this.subscriptionView = new distro.library.SubscriptionAdminView({ model: network })).el);
 	},
 	hide: function(){
 		this.reset();
@@ -846,6 +886,8 @@ distro.tml = {
 		if (this.network) {
 			this.network.set({ administrating: false });
 			delete this.network;
+			this.subscriptionView.destroy();
+			delete this.subscriptionView;
 		}
 	},
 	reset: function(){
@@ -853,7 +895,35 @@ distro.tml = {
 		this.tracks.reset([]);
 	}
 };
-distro.tml.libraryView = new (distro.LibraryView.extend({ TrackView: distro.tml.TrackView }))({
+distro.tml.libraryView = new (distro.LibraryView.extend({
+	TrackView: distro.tml.TrackView,
+	setSelected: function(track){
+		var trackEditor;
+		distro.LibraryView.prototype.setSelected.call(this, track);
+		if (distro.tml.trackEditor) {
+			distro.tml.trackEditor.destroy();
+			delete distro.tml.trackEditor;
+		}
+		if (track) {
+			trackEditor = new distro.TrackEditView({ model: track });
+			trackEditor.bind('save', function(attributes){
+				track.save(attributes, {
+					success: function(){
+						var libraryTrack = distro.library.tracks.get(track.id);
+						if (libraryTrack) {
+							libraryTrack.set(track.toJSON());
+						}
+					},
+					error: function(error){
+						alert(distro.loc.str("tml.saveError"));
+					}
+				});
+			});
+			$('#infoBox').append(trackEditor.el);
+			distro.tml.trackEditor = trackEditor;
+		}
+	}
+}))({
 	el: $('#tmlBody>tbody')[0],
 	collection: new distro.LibraryCollection([], { parentCollection: distro.tml.tracks })
 });

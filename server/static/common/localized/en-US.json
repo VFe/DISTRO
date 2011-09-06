@@ -55,7 +55,8 @@
 		"artist": "Artist"
 	},
 	"tml": {
-		"status": "Status"
+		"status": "Status",
+		"saveError": "There was an error saving this track. Try again, and get in touch with us if you keep having trouble."
 	},
 	"registration": {
 		"emailAddressQuery": "What's your email address?",

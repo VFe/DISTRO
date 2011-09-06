@@ -6,7 +6,8 @@ var util = require('util'),
 	url = require('url'),
 	connect = require('connect'),
 	distro = require('distro'),
-	port = process.env.PRODUCTION ? 8085 : 3000;
+	port = process.env.PRODUCTION ? 8085 : 3000,
+	async = require('async');
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
 global.users = new distro.Users();
@@ -199,6 +200,75 @@ global.db.open(function(err, db){
 									errback(err);
 								} else {
 									successback(tracks);
+								}
+							});
+						} else {
+							errback(new distro.error.ClientError("404"));
+						}
+					} else {
+						errback(new distro.error.ClientError("404"));
+					}
+				});
+			}));
+			app.put('/networks/:name/tracks/:track', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+				global.networks.findNetworkByName(req.params.name, function(err, doc){
+					if(err){
+						errback(err);
+					} else if(doc){
+						if (distro.Networks.isAdmin(session, doc)) {
+							var requestedTrack;
+							try{
+								requestedTrack = mongoDB.BSONNative.ObjectID.createFromHexString(req.params.track);
+							}catch(e){
+								errback(new distro.error.ClientError("404"));
+								return;
+							}
+							global.tracks.getTrack(mongoDB.BSONNative.ObjectID.createFromHexString(req.params.track), function(err, track){
+								if (track && track.network[0].equals(doc._id)) {
+									var changes = req.body, update = { $set: {}, $unset: {} };
+									async.parallel([
+										function(cb){
+											if ('name' in changes) {
+												update.$set.name = changes.name;
+											}
+											cb();
+										},
+										function(cb){
+											if ('artist' in changes) {
+												// Fuck it, access the collection directly. If you want to fix this, be my guest.
+												var lowercase = changes.artist.toLowerCase();
+												global.networks.collection.findOne({ $or: [ { lname: lowercase }, { lfullname: lowercase } ] }, function(err, network){
+													if (network) {
+														update.$unset.artist = 1;
+														update.$set.artistNetwork = network._id;
+													} else {
+														update.$unset.artistNetwork = 1;
+														update.$set.artist = changes.artist;
+													}
+													cb();
+												});
+											} else {
+												cb();
+											}
+										}
+									], function(){
+										// Fuck it.
+										global.tracks.collection.findAndModify({ _id: track._id }, [], update, { 'new': true }, function(err, doc){
+											if (err) {
+												errback(err);
+											} else {
+												global.tracks.prepareForOutput([doc], { id: true }, function(err, tracks){
+													if (err) {
+														errback(err);
+													} else {
+														successback(tracks[0]);
+													}
+												});
+											}
+										})
+									});
+								} else {
+									errback(new distro.error.ClientError('bad shit'));
 								}
 							});
 						} else {

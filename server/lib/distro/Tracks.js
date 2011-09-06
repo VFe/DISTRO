@@ -96,7 +96,7 @@ Tracks.prototype.tracksForSubscriptions = function(subscriptions, callback){
 			callback(new Error(err.errmsg + ': ' + err.assertion), null);
 		} else {
 			var tracks = results.map(function(r){ return r.value; }).sort(function(docA, docB){ var a = docA.date, b = docB.date; return a > b ? 1 : a < b ? -1 : 0; });
-			self.prepareForOutput(tracks, { subscribedNetworkIds: subscribedNetworkIds }, callback);
+			self.prepareForOutput(tracks, { id: true, subscribedNetworkIds: subscribedNetworkIds }, callback);
 		}
 	});
 };
@@ -116,7 +116,9 @@ Tracks.prototype.tracksForNetwork = function(network, callback){
 		}
 	});
 };
-
+Tracks.prototype.getTrack = function(id, callback){
+	this.collection.findOne({ _id: id }, callback);
+};
 Tracks.prototype.createTrack = function(inTrack, user, callback){
 	var self = this, track = {};
 	if (inTrack && inTrack.network && inTrack.network.name) {

@@ -748,25 +748,34 @@ body:not(.TML){
 			}
 		}
 	}
-/*	&.administrating{
-		&:not(:hover) .subscriptionControls div.admin{
-			display: block;
-			color: #F00;
-			background: none;
-		}
-		&:hover .subscriptionControls div.admin{
-			.box-shadow(0px 0px 0.7em #FFF);
-		}
-	}*/
 }
-
+#createTrackButton{
+	background: @helloGreen;
+	border-radius: 0.3em;
+	cursor: pointer;
+	display: block;
+	line-height: 2em;
+	margin: 1em;
+	text-align: center;
+}
 #infoBox{
 	margin: 0;
 	position: absolute;
-	top: 2em;
+	top: 6em;
+	border-top: 0.2em solid @lightBorder;
 	bottom: 0;
 	left: 0;
 	right: 0;
+	overflow: auto;
+}
+#infoBoxPlaceholder{
+	font-size: 1.5em;
+	text-align: center;
+	color: #888;
+	margin: 1em 0;
+	&:nth-last-child(n+2){
+		display: none;
+	}
 }
 
 /* Lightbox */
@@ -1435,7 +1444,7 @@ ul.aboutIcons{
 	padding: 0 0.25em;
 	.border-radius(0.25em);
 }
-#lightboxWrapper #loginRegisterBox, #uploadSong{
+#lightboxWrapper #loginRegisterBox, #editTrack{
 	input[type='text'], input[type='email'], input[type='password']{
 		display: block;
 		.border-box;
@@ -1552,7 +1561,7 @@ ul.aboutIcons{
 	text-align: center;
 }
 
-#uploadSong{
+#editTrack{
 	line-height: normal;
 	>h1{
 		line-height: 2em;
@@ -1620,17 +1629,17 @@ ul.aboutIcons{
 		left: 0;
 		background: green;
 	}
-	#uploadButton{
+	#editTrackSaveButton{
 		display: block;
 		font-weight: bold;
 		margin: 1em;
 		width: auto;
 		padding: 0.3em 0.7em;
 	}
-	#uploadButton:enabled{
+	#editTrackSaveButton:enabled{
 		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(20, 20, 20, 0)), to(rgba(20, 20, 20, 0.9)));
 	}
-	#uploadButton:enabled:active{
+	#editTrackSaveButton:enabled:active{
 		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(20, 20, 20, 0.7)), to(rgba(20, 20, 20, 0.2)));
 	}
 	#onDeck{
