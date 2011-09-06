@@ -1,8 +1,7 @@
 var CollectionManager = require('./lib/CollectionManager'),
     crypto = require('crypto'),
     error = require('./error'),
-    Networks = require('./Networks'),
-    BSON = require('mongodb').BSONNative;
+    Networks = require('./Networks');
 
 function Users(){ require('./init').add(this); }
 module.exports = Users;
@@ -48,7 +47,7 @@ Users.prototype.userWithUserID = function(userID, callback){
 };
 Users.prototype.registerUser = function(email, password, callback){
 	var self = this,
-		user = { subscriptions: [ { network: BSON.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ] },
+		user = { subscriptions: [ { network: this.collection.db.bson_serializer.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ] },
 		salt = Math.floor(Math.random() * 0x100000000).toString(16);
 	function createUser(){
 		self.collection.insert(user, function(err, doc){
@@ -117,11 +116,11 @@ Users.prototype.subscriptions = function(session, callback){
 		}
 	});
 }
-Users.userOrGeneric = function(user){
+Users.prototype.userOrGeneric = function(user){
 	// Non-logged-in users have a subscription to ^DISTRO^.
 	return (
 		user && user.subscriptions && user.subscriptions.length
 			? user
-			: { subscriptions: [ { network: BSON.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ] }
+			: { subscriptions: [ { network: this.collection.db.bson_serializer.ObjectID.createFromHexString("4d6ae34f6a801b4b8bbafa95"), start: new Date } ] }
 	);
 }

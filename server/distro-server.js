@@ -9,7 +9,7 @@ var util = require('util'),
 	port = process.env.PRODUCTION ? 8085 : 3000,
 	async = require('async');
 
-global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
+global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser: 'BSONNative' in mongoDB});
 global.users = new distro.Users();
 global.sessions = new distro.Sessions();
 global.tracks = new distro.Tracks();
@@ -90,7 +90,7 @@ global.db.open(function(err, db){
 				}
 			}));
 			app.get('/library', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				var user = distro.Users.userOrGeneric(session && session.user);
+				var user = global.users.userOrGeneric(session && session.user);
 				global.users.subscriptions(session || { user: user }, function(err, subscriptions){
 					if (err) {
 						errback(err);
@@ -106,7 +106,7 @@ global.db.open(function(err, db){
 				});
 			}));
 			app.get('/library/tracks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				var user = distro.Users.userOrGeneric(session && session.user);
+				var user = global.users.userOrGeneric(session && session.user);
 				global.tracks.tracksForSubscriptions(user.subscriptions, function(err, tracks){
 					if (err) {
 						errback(err);
@@ -218,12 +218,12 @@ global.db.open(function(err, db){
 						if (distro.Networks.isAdmin(session, doc)) {
 							var requestedTrack;
 							try{
-								requestedTrack = mongoDB.BSONNative.ObjectID.createFromHexString(req.params.track);
+								requestedTrack = global.db.bson_serializer.ObjectID.createFromHexString(req.params.track);
 							}catch(e){
 								errback(new distro.error.ClientError("404"));
 								return;
 							}
-							global.tracks.getTrack(mongoDB.BSONNative.ObjectID.createFromHexString(req.params.track), function(err, track){
+							global.tracks.getTrack(global.db.bson_serializer.ObjectID.createFromHexString(req.params.track), function(err, track){
 								if (track && track.network[0].equals(doc._id)) {
 									var changes = req.body, update = { $set: {}, $unset: {} };
 									async.parallel([
