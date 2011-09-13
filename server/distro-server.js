@@ -210,6 +210,22 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
+			app.post('/networks/:name/tracks', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+				global.networks.findNetworkByName(req.params.name, function(err, doc){
+					if(err){
+						errback(err);
+					} else if(doc && distro.Networks.isAdmin(session, doc)){
+						// Fuck it.
+						global.tracks.collection.save({ network: [ doc._id ], timestamp: new Date }, function(err, doc){
+							global.tracks.prepareForOutput([doc], { id: true }, function(err, tracks){
+								successback(tracks[0]);
+							});
+						});
+					} else {
+						errback(new distro.error.ClientError("404"));
+					}
+				});
+			}));
 			app.put('/networks/:name/tracks/:track', distro.request.handleRequest(true, function(session, req, res, successback, errback){
 				global.networks.findNetworkByName(req.params.name, function(err, doc){
 					if(err){

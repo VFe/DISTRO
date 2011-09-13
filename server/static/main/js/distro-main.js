@@ -927,6 +927,11 @@ distro.tml.libraryView = new (distro.LibraryView.extend({
 	el: $('#tmlBody>tbody')[0],
 	collection: new distro.LibraryCollection([], { parentCollection: distro.tml.tracks })
 });
+$('#createTrackButton').click(function(){
+	distro.tml.tracks.create({}, { success: function(track){
+		distro.tml.libraryView.setSelected(track);
+	}});
+});
 
 // Login/registration lightbox
 (function(){
