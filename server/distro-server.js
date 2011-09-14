@@ -16,7 +16,6 @@ global.users = new distro.Users();
 global.sessions = new distro.Sessions();
 global.tracks = new distro.Tracks();
 global.networks = new distro.Networks();
-global.uploads = new distro.Uploads();
 
 global.db.open(function(err, db){
 	if (err){
@@ -205,7 +204,7 @@ global.db.open(function(err, db){
 									errback(err);
 								} else {
 									console.log("starting to push to S3");
-									global.uploads.pushFile(outputFile, path.basename(outputFile), function(err){
+									distro.S3.pushFile(outputFile, path.basename(outputFile), function(err){
 										if (err) {
 											errback(err);
 										} else {

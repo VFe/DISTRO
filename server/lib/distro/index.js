@@ -5,7 +5,7 @@
 	'Sessions',
 	'Tracks',
 	'Networks',
-	'Uploads',
+	'S3',
 	'FileUpload',
 	'transcode',
 	'init'
