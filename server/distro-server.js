@@ -8,7 +8,8 @@ var util = require('util'),
 	connect = require('connect'),
 	form = require('connect-form'),
 	distro = require('distro'),
-	port = process.env.PRODUCTION ? 8085 : 3000;
+	port = process.env.PRODUCTION ? 8085 : 3000,
+	async = require('async');
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser: 'BSONNative' in mongoDB});
 global.users = new distro.Users();
@@ -93,7 +94,7 @@ global.db.open(function(err, db){
 			}));
 			app.get('/library', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				var user = global.users.userOrGeneric(session && session.user);
-				global.users.subscriptions(user, function(err, subscriptions){
+				global.users.subscriptions(session || { user: user }, function(err, subscriptions){
 					if (err) {
 						errback(err);
 					} else {
@@ -116,6 +117,15 @@ global.db.open(function(err, db){
 						successback(tracks);
 					}
 				});
+			}));
+			app.post('/library/tracks', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+				global.tracks.createTrack(req.body, session.user, function(err, doc){
+					if (err) {
+						errback(err);
+					} else {
+						successback(doc);
+					}
+				})
 			}));
 			app.post('/library/subscriptions', distro.request.handleRequest('ondemand', function(session, req, res, successback, errback){
 				if (!req.body || !req.body.name) {
@@ -172,6 +182,10 @@ global.db.open(function(err, db){
 								}
 							});
 						}
+						if (distro.Networks.isAdmin(session, doc)) {
+							doc.admin = true;
+						}
+						delete doc.owner;
 						successback(doc);
 					} else {
 						errback(new distro.error.ClientError("networks.errors.noNetwork"));
@@ -204,6 +218,112 @@ global.db.open(function(err, db){
 					});
 				})(req, res);
 			});
+			app.get('/networks/:name/tracks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+				global.networks.findNetworkByName(req.params.name, function(err, doc){
+					if(err){
+						errback(err);
+					} else if(doc){
+						if (distro.Networks.isAdmin(session, doc)) {
+							global.tracks.tracksForNetwork(doc._id, function(err, tracks){
+								if (err) {
+									errback(err);
+								} else {
+									successback(tracks);
+								}
+							});
+						} else {
+							errback(new distro.error.ClientError("404"));
+						}
+					} else {
+						errback(new distro.error.ClientError("404"));
+					}
+				});
+			}));
+			app.post('/networks/:name/tracks', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+				global.networks.findNetworkByName(req.params.name, function(err, doc){
+					if(err){
+						errback(err);
+					} else if(doc && distro.Networks.isAdmin(session, doc)){
+						// Fuck it.
+						global.tracks.collection.save({ network: [ doc._id ], timestamp: new Date }, function(err, doc){
+							global.tracks.prepareForOutput([doc], { id: true }, function(err, tracks){
+								successback(tracks[0]);
+							});
+						});
+					} else {
+						errback(new distro.error.ClientError("404"));
+					}
+				});
+			}));
+			app.put('/networks/:name/tracks/:track', distro.request.handleRequest(true, function(session, req, res, successback, errback){
+				global.networks.findNetworkByName(req.params.name, function(err, doc){
+					if(err){
+						errback(err);
+					} else if(doc){
+						if (distro.Networks.isAdmin(session, doc)) {
+							var requestedTrack;
+							try{
+								requestedTrack = global.db.bson_serializer.ObjectID.createFromHexString(req.params.track);
+							}catch(e){
+								errback(new distro.error.ClientError("404"));
+								return;
+							}
+							global.tracks.getTrack(global.db.bson_serializer.ObjectID.createFromHexString(req.params.track), function(err, track){
+								if (track && track.network[0].equals(doc._id)) {
+									var changes = req.body, update = { $set: {}, $unset: {} };
+									async.parallel([
+										function(cb){
+											if ('name' in changes) {
+												update.$set.name = changes.name;
+											}
+											cb();
+										},
+										function(cb){
+											if ('artist' in changes) {
+												// Fuck it, access the collection directly. If you want to fix this, be my guest.
+												var lowercase = changes.artist.toLowerCase();
+												global.networks.collection.findOne({ $or: [ { lname: lowercase }, { lfullname: lowercase } ] }, function(err, network){
+													if (network) {
+														update.$unset.artist = 1;
+														update.$set.artistNetwork = network._id;
+													} else {
+														update.$unset.artistNetwork = 1;
+														update.$set.artist = changes.artist;
+													}
+													cb();
+												});
+											} else {
+												cb();
+											}
+										}
+									], function(){
+										// Fuck it.
+										global.tracks.collection.findAndModify({ _id: track._id }, [], update, { 'new': true }, function(err, doc){
+											if (err) {
+												errback(err);
+											} else {
+												global.tracks.prepareForOutput([doc], { id: true }, function(err, tracks){
+													if (err) {
+														errback(err);
+													} else {
+														successback(tracks[0]);
+													}
+												});
+											}
+										})
+									});
+								} else {
+									errback(new distro.error.ClientError('bad shit'));
+								}
+							});
+						} else {
+							errback(new distro.error.ClientError("404"));
+						}
+					} else {
+						errback(new distro.error.ClientError("404"));
+					}
+				});
+			}));
 		}))
 		.use('/', connect.router(function(app){
 			app.get('/:network', function(req, res){

@@ -26,6 +26,7 @@
 			"login": "Log in or sign up to keep track of your DISTRO subscriptions",
 			"event": "Sort by the date of upcoming events",
 			"freshness": "Freshness – Sort by date added to your music library",
+			"admin": "Admin – Manage and broadcast music on this network: you own it!",
 			"mute": "Mute – Hide songs from this network",
 			"solo": "Solo – Only show songs from this network"
 		}
@@ -52,6 +53,10 @@
 		"time": "Time",
 		"event": "Event",
 		"artist": "Artist"
+	},
+	"tml": {
+		"status": "Status",
+		"saveError": "There was an error saving this track. Try again, and get in touch with us if you keep having trouble."
 	},
 	"registration": {
 		"emailAddressQuery": "What's your email address?",

@@ -91,12 +91,12 @@ Users.prototype.subscribeToNetwork = function(user, networkID, callback){
 		callback(err);
 	});
 };
-Users.prototype.subscriptions = function(user, callback){
-	var networkProxies = new Networks.ProxySet, subscriptionNetworks = {};
+Users.prototype.subscriptions = function(session, callback){
+	var user = session && session.user, networkProxies = new Networks.ProxySet, subscriptionNetworks = {};
 	user.subscriptions.forEach(function(subscription) {
 		var idString = subscription.network.toHexString();
 		if ( ! (idString in subscriptionNetworks)) {
-			networkProxies.create(subscription.network, [{name: 'id', key: 'name'}, 'name', 'fullname']);
+			networkProxies.create(subscription.network, [{name: 'id', key: 'name'}, 'name', 'fullname', 'owner']);
 			subscriptionNetworks[idString] = true;
 		}
 	});
@@ -104,6 +104,14 @@ Users.prototype.subscriptions = function(user, callback){
 		if (err) {
 			callback(err, null);
 		} else {
+			networkProxies.proxies.forEach(function(network){
+				if (network.data) {
+					if (Networks.isAdmin(session, network.data)) {
+						network.data.admin = true;
+					}
+					delete network.data.owner;
+				}
+			});
 			callback(null, networkProxies.proxies);
 		}
 	});

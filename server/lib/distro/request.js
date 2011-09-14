@@ -11,7 +11,7 @@ function endResponse(res, status, headers, body){
 }
 
 exports.handleRequest = function(requireAuthentication, callback){
-	return function(req, res) {
+	return function(req, res, next) {
 		var responseContent = {};
 		function successback(data, topData){
 			if (data) {
@@ -24,12 +24,16 @@ exports.handleRequest = function(requireAuthentication, callback){
 			var status;
 			responseContent.status = "error";
 			if (err instanceof error.ClientError) {
+				if (err.message === '404') {
+					next();
+					return;
+				}
 				status = 403;
 				responseContent.errorMessage = err.message;
 			} else {
 				status = 500;
 				if (exports.logToConsole){
-					util.error(err.stack);
+					util.error(err);
 				}
 				if (exports.logToResponse){
 					responseContent.rawError = error;

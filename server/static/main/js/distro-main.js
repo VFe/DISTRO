@@ -13,7 +13,38 @@ Backbone.sync = function(method, model, options){
 
 distro.util = {
 	pad: function(input, length, character){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(character || '0') + input : input); },
-	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); }
+	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); },
+	parseDate: (function(){
+		// Based on <http://stackoverflow.com/questions/141348/>
+		var dateRegExp = /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/i;
+		return function(str){
+			try {
+				var match = str.match(dateRegExp);
+				if (match[1] && match[2] && match[3]) {
+					return {
+						m: +match[1],
+						d: +match[2],
+						y: +match[3]
+					}
+				}
+			} catch(e) {}
+			return null;
+		}
+	})(),
+	parseTime: (function(){
+		// Based on <http://stackoverflow.com/questions/141348/>
+		var timeRexExp = /^(\d+)(?::(\d\d))?\s*(?:(p)m?|am?)?$/i;
+		return function(str){
+			try {
+				var match = str.match(timeRexExp);
+				return {
+					h: (+match[1] + (match[3] ? 12 : 0)),
+					m: +match[2] || 0
+				}
+			} catch(e) {}
+			return null;
+		}
+	})()
 };
 distro.SERVER = "/api/";
 distro.TITLE = "DISTRO";
@@ -170,16 +201,50 @@ distro.FlexiComparator.comparator = function (modelA, modelB){
 		return 0;
 	}
 }
-
+distro.Track = Backbone.Model.extend({
+	validate: function(attributes){
+		if (attributes.release && ! (attributes.release instanceof Date)) {
+			attributes.release = new Date(attributes.release);
+		}
+		if (attributes.date && !(attributes.date instanceof Date)) {
+			attributes.date = new Date(attributes.date);
+		}
+		if (attributes.performance && attributes.performance.date && !(attributes.performance.date instanceof Date)) {
+			attributes.performance.date = new Date(attributes.performance.date);
+		}
+	},
+	initialize: function(){
+		this.validate(this.attributes);
+	},
+	getForComparison: function(key){
+		var now;
+		switch (key) {
+		case 'artist':
+			return this.attributes.artistNetwork ? this.attributes.artistNetwork.fullname : this.attributes.artist;
+			break;
+		case 'network':
+			return this.attributes.network[0].fullname;
+			break;
+		case 'performance':
+			now = new Date;
+			return (this.attributes.performance && this.attributes.performance.date > now) ? now - this.attributes.performance.date : -Number.MAX_VALUE;
+			break;
+		default:
+			return this.attributes[key];
+		}
+	}
+});
 distro.library = {
 	subscriptions: new (Backbone.Collection.extend({
 		url: 'library/subscriptions',
 		model: Backbone.Model.extend({
 			initialize: function(){
 				var self = this;
-				this.bind('change', function (){
+				function rebuild(){
 					distro.library.filteredTracks.rebuild();
-				});
+				}
+				this.bind('change:muted', rebuild);
+				this.bind('change:soloed', rebuild);
 			}
 		}),
 		comparator: function(model){
@@ -191,39 +256,7 @@ distro.library = {
 	})),
 	tracks: new (Backbone.Collection.extend({
 		url: 'library/tracks',
-		model: Backbone.Model.extend({
-			validate: function(attributes){
-				if (!(attributes.release instanceof Date)) {
-					attributes.release = new Date(attributes.release);
-				}
-				if (!(attributes.date instanceof Date)) {
-					attributes.date = new Date(attributes.date);
-				}
-				if (attributes.performance && attributes.performance.date && !(attributes.performance.date instanceof Date)) {
-					attributes.performance.date = new Date(attributes.performance.date);
-				}
-			},
-			initialize: function(){
-				this.validate(this.attributes);
-			},
-			getForComparison: function(key){
-				var now;
-				switch (key) {
-				case 'artist':
-					return this.attributes.artistNetwork ? this.attributes.artistNetwork.fullname : this.attributes.artist;
-					break;
-				case 'network':
-					return this.attributes.network[0].fullname;
-					break;
-				case 'performance':
-					now = new Date;
-					return (this.attributes.performance && this.attributes.performance.date > now) ? now - this.attributes.performance.date : -Number.MAX_VALUE;
-					break;
-				default:
-					return this.attributes[key];
-				}
-			}
-		})
+		model: distro.Track
 	})),
 	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
@@ -247,18 +280,7 @@ distro.DependentCollection = Backbone.Collection.extend({
 		this.reset(this.parentCollection.models, options);
 	}
 });
-distro.library.filteredTracks = new (distro.DependentCollection.extend({
-	_add: function(track, options){
-		if (_.any(track.attributes.network, function(n){
-			var subscription = distro.library.subscriptions.get(n.name);
-			return ! subscription.get('muted')
-				&& ( ! distro.library.subscriptions.any(function(subscription){ return subscription.get('soloed'); }) || subscription.get('soloed') );
-		})) {
-			Backbone.Collection.prototype._add.call(this, track, options);
-		}
-	}
-}))([], { parentCollection: distro.library.tracks });
-distro.library.sortedTracks = new (distro.DependentCollection.extend({
+distro.LibraryCollection = distro.DependentCollection.extend({
 	initialize: function(models, options){
 		var self = this;
 		distro.DependentCollection.prototype.initialize.call(this, models, options);
@@ -278,7 +300,19 @@ distro.library.sortedTracks = new (distro.DependentCollection.extend({
 	sortBy: function(comparator){
 		return this.models.sort(comparator);
 	}
-}))([], { parentCollection: distro.library.filteredTracks });
+});
+distro.library.filteredTracks = new (distro.DependentCollection.extend({
+	_add: function(track, options){
+		if (_.any(track.attributes.network, function(n){
+			var subscription = distro.library.subscriptions.get(n.name);
+			return ! subscription.get('muted')
+				&& ( ! distro.library.subscriptions.any(function(subscription){ return subscription.get('soloed'); }) || subscription.get('soloed') );
+		})) {
+			Backbone.Collection.prototype._add.call(this, track, options);
+		}
+	}
+}))([], { parentCollection: distro.library.tracks });
+distro.library.sortedTracks = new distro.LibraryCollection([], { parentCollection: distro.library.filteredTracks });
 distro.library.subscriptionListView = new (Backbone.View.extend({
 	el: $('#subscriptionsTable>tbody')[0],
 	initialize: function() {
@@ -299,30 +333,111 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 distro.library.SubscriptionView = Backbone.View.extend({
 	tagName: 'tr',
 	template: ['%td',
-		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'], ['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']]]
+		['.subscription', { 'class': { $join: [
+			{ $test: { $key: 'admin' }, $if: 'admin' },
+			{ $test: { $key: 'muted' }, $if: 'muted' },
+			{ $test: { $key: 'soloed' }, $if: 'soloed' }
+		], $separator: ' ' } },
+			['.subscriptionControls',
+				{ $test: { $key: 'admin' }, $if: ['%a.admin', {
+					title: distro.loc.stencil('chrome.hover.admin'),
+					href: { $join: [ '#/manage/', { $key: 'id', $handler: encodeURIComponent } ] }
+				}, '\u266a'] },
+				['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'],
+				['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']
+			],
+			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }]
+		]
 	],
 	events: {
-		"selectstart": "noselect",
-		"click .mute": "mute",
-		"click .solo": "solo"
+		"click .subscriptionControls>.mute": "mute",
+		"click .subscriptionControls>.solo": "solo",
 	},
 	initialize: function() {
-		_.bindAll(this, 'render', 'mute', 'solo');
-		this.model.bind('change', this.render);
+		this.model.bind('change', this.render, this);
 		this.model.view = this;
 		this.render();
 	},
 	render: function(){
 		$(this.el).empty().stencil(this.template, this.model.toJSON());
 	},
-	noselect: function(e){
-		e.preventDefault();
-	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
 	},
 	solo: function(){
 		this.model.set({ soloed: ! this.model.attributes.soloed });
+	}
+});
+distro.library.SubscriptionAdminView = Backbone.View.extend({
+	tagName: 'tr',
+	template: ['%td',
+		['.subscription.admin.administrating',
+			['.subscriptionControls',
+				['%a.admin', {
+					title: distro.loc.stencil('chrome.hover.admin'),
+					href: '#'
+				}, '\u266a']
+			],
+			['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }]
+		]
+	],
+	events: {
+		"submit": "addTrack",
+		"change #broadcastNow, #broadcastLater": "enableTimes"
+	},
+	initialize: function() {
+		this.model.bind('change', this.render, this);
+		this.render();
+	},
+	destroy: function(){
+		this.model.unbind('change', this.render);
+	},
+	render: function(){
+		$(this.el).empty().stencil(this.template, this.model.toJSON());
+	},
+	addTrack: function(e){
+		var form = e.target, elements = form.elements, broadcast, broadcastDate, broadcastTime;
+			newTrack = new distro.Track({
+				name: elements.name.value,
+				artist: elements.artist.value,
+				network: { name: this.model.get('name') },
+			});
+		if (elements.broadcastLater.checked) {
+			if ( ! (broadcastDate = distro.util.parseDate(elements.broadcastDate.value))) {
+				alert('I don\'t understand that date.');
+				elements.broadcastDate.focus();
+				return false;
+			}
+			if ( ! (broadcastTime = distro.util.parseTime(elements.broadcastTime.value))) {
+				alert('I don\'t understand that time.');
+				elements.broadcastTime.focus();
+				return false;
+			}
+			broadcast = new Date(broadcastDate.y, broadcastDate.m, broadcastDate.d, broadcastTime.h, broadcastTime.m);
+		} else {
+			broadcast = new Date;
+		}
+		newTrack.set({ release: broadcast });
+		if (elements.onDeck.checked) {
+			newTrack.set({ onDeck: [ { start: broadcast } ] });
+		}
+		distro.library.tracks.create(newTrack, {
+			success: function(model){
+				debugger;
+				alert('success');
+			},
+			error: function(model, err){
+				alert('error: ' + err.errorMessage);
+			}
+		})
+		return false;
+	},
+	enableTimes: function(e){
+		if ($('#broadcastLater')[0].checked) {
+			$('#broadcastDate, #broadcastTime').removeAttr('disabled');
+		} else {
+			$('#broadcastDate, #broadcastTime').attr('disabled', 'disabled');
+		}
 	}
 });
 distro.library.trackListHeaderView = new (Backbone.View.extend({
@@ -358,65 +473,6 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 		 .addClass(this.model.attributes.order ? 'ascending' : 'descending');
 	}
 }))({ model: distro.library.sortedTracks.comparator.sort });
-distro.library.trackListView = new (Backbone.View.extend({
-	el: $('#musicTableBody>tbody')[0],
-	initialize: function() {
-		var self = this;
-		this.viewCache = {};
-		_.bindAll(this, 'add', 'render');
-		this.$el = $(this.el);
-		this.$foot = this.$el.children('.filler:first');
-		this.collection.bind('reset', function(){
-			self.oldViewCache = self.viewCache;
-			self.viewCache = {};
-			self.render();
-			delete self.oldViewCache;
-		});
-		distro.library.subscriptions.bind('add', function(){
-			distro.library.tracks.fetch();
-		});
-	},
-	add: function(track){
-		var view;
-		if (this.oldViewCache && (view = this.oldViewCache[track.cid])) {
-			view.delegateEvents(); 	
-		} else {
-			view = (new distro.library.TrackView({ model: track, parent: this }));
-		}
-		this.viewCache[track.cid] = view;
-		this.$foot.before(view.el);
-	},
-	render: function(){
-		this.$el.empty().append(this.$foot);
-		this.collection.each(this.add);
-	},
-	setPlaying: function(track){
-		if (this.playingTrack) {
-			this.playingTrack.view.setPlaying(false);
-		}
-		if (track) {
-			track.view.setPlaying(true);
-		}
-		this.playingTrack = track;
-	},
-	setSelected: function(track){
-		this.prevSelect = this.selectedTrack;
-		if(this.selectedTrack){
-			this.selectedTrack.view.setSelected(false);
-		}
-		if(track) {
-			track.view.setSelected(true);
-		}
-		this.selectedTrack = track;
-	},
-	relativeTrack: function(shift){
-		return this.playingTrack && this.collection.models[this.collection.indexOf(this.playingTrack) + shift];
-	},
-	relativeSelection: function(shift){
-		return this.selectedTrack && this.collection.models[this.collection.indexOf(this.selectedTrack) + shift];
-	}
-}))({ collection: distro.library.sortedTracks });
-
 distro.library.TrackView = Backbone.View.extend({
 	tagName: 'tr',
 	template: [
@@ -442,7 +498,7 @@ distro.library.TrackView = Backbone.View.extend({
 				return 'someday';
 			}
 		} }], $separator: ' ' } },
-			['.eventDetails', 
+			['.eventDetails',
 				['.perfDate', {$key:'date', $handler:
 					function(data){
 						if(!data) { return null; }
@@ -473,15 +529,17 @@ distro.library.TrackView = Backbone.View.extend({
 		"dblclick": "play",
 		"mousedown": "select"
 	},
-	initialize: function() {
+	initialize: function(options) {
 		_.bindAll(this, 'render', 'setPlaying', 'play');
 		this.model.bind('change', this.render);
+		this.model.bind('reset', this.render);
 		this.model.view = this;
 		this.$el = $(this.el);
+		this.parent = options.parent;
 		this.render();
 	},
 	render: function(){
-		this.$el.stencil(this.template, this.model.toJSON());
+		this.$el.empty().stencil(this.template, this.model.toJSON());
 	},
 	setPlaying: function(playing){
 		this.$el[playing ? 'addClass' : 'removeClass']('playing');
@@ -494,12 +552,120 @@ distro.library.TrackView = Backbone.View.extend({
 	},
 	select: function(e){
 		if (e.target.tagName === 'A') { return; }
-		distro.library.trackListView.setSelected((e.metaKey && distro.library.trackListView.selectedTrack === this.model) ? null : this.model);
+		this.parent.setSelected((e.metaKey && this.parent.selectedTrack === this.model) ? null : this.model);
 		e.preventDefault();
 	},
-	moveSelection: function(){
-		this.setSelected(distro.library.trackListView.relativeSelection(1));
+	show: function(highlight){
+		$.scrollIntoView(this.el, document.getElementById('musicTableBodyContainer'));
+		if (highlight) {
+			$(this.el).css('backgroundColor', '#F6FF98').delay(200).queue(function(n){ $(this).css('backgroundColor', ''); n(); });
+		}
 	}
+});
+distro.TrackEditView = Backbone.View.extend({
+	template: ["%form#editTrack",
+		["%h1", "Edit Track"],
+		["%ul",
+			// ["%li",
+			// 	["#uploadFile",
+			// 		["%input", {"type": "file", "name": "trackFile"}],
+			// 		["%div", "Browse"]
+			// 	],
+			// 	["%h2", "Locate Audio"]
+			// ],
+			["%li", ["%h2", "Enter Track Information"],
+				["%input", {"type": "text", "name": "name", "placeholder": "Track Name", value: { $key: 'name' } }],
+				["%input", {"type": "text", "name": "artist", "placeholder": "Artist Name", value: { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: { $key: 'fullname' } }, $else: { $key: 'artist' } }, }]
+			],
+			// ["%li", ["%h2", "Select Broadcast Option"],
+			// 	['%input#broadcastNow', { type: "radio", "name": "broadcastType", value: "now", checked: 'checked' }], ['%label', { for: "broadcastNow"}, "Broadcast now"],
+			// 	['%input#onDeck', { type: "checkbox", "name": "onDeck" }], ['%label', { for: "onDeck"}, "On Deck"], ['%br'],
+			// 	['%input#broadcastLater', { type: "radio", "name": "broadcastType", value: "later" }], ['%label', { for: "broadcastLater"}, "Broadcast later"], ['%br'],
+			// 	["%input#broadcastDate", {"type": "text", "name": "broadcastDate", "placeholder": "MM/DD/YYYY", disabled: 'disabled' }], ' ',
+			// 	["%input#broadcastTime", {"type": "text", "name": "broadcastTime", "placeholder": "HH:MM pm", disabled: 'disabled' }]
+			// ],
+			// ["%li", ["%h2", "Tag w/ Event"]]
+		],
+		["%button#editTrackSaveButton", {"type": "submit"}, "Save"]
+	],
+	initialize: function(){
+		var self = this,
+			el = this.el = haj(stencil(this.template, this.model.attributes)),
+			formElements = el.elements;
+		$(el).submit(function(e){
+			e.preventDefault();
+			self.trigger('save', { name: formElements.name.value, artist: formElements.artist.value });
+		})
+	},
+	destroy: function(){
+		$(this.el).remove();
+	}
+});
+distro.LibraryView = Backbone.View.extend({
+	TrackView: distro.library.TrackView,
+	initialize: function() {
+		var self = this;
+		this.viewCache = {};
+		_.bindAll(this, 'add', 'render');
+		this.$el = $(this.el);
+		this.$foot = this.$el.children('.filler:first');
+		this.collection.bind('reset', function(){
+			self.oldViewCache = self.viewCache;
+			self.viewCache = {};
+			self.render();
+			delete self.oldViewCache;
+			if (self.selectedTrack && ! self.collection.getByCid(self.selectedTrack.cid)) {
+				self.setSelected(null);
+			}
+		});
+		distro.library.subscriptions.bind('add', function(){
+			distro.library.tracks.fetch();
+		});
+	},
+	add: function(track){
+		var view;
+		if (this.oldViewCache && (view = this.oldViewCache[track.cid])) {
+			view.delegateEvents();
+		} else {
+			view = (new this.TrackView({ model: track, parent: this }));
+		}
+		this.viewCache[track.cid] = view;
+		this.$foot.before(view.el);
+	},
+	render: function(){
+		this.$el.empty().append(this.$foot);
+		this.collection.each(this.add);
+	},
+	setPlaying: function(track){
+		if (this.playingTrack) {
+			this.playingTrack.view.setPlaying(false);
+		}
+		if (track) {
+			track.view.setPlaying(true);
+		}
+		this.playingTrack = track;
+	},
+	setSelected: function(track){
+		this.prevSelect = this.selectedTrack;
+		if(this.selectedTrack){
+			this.selectedTrack.view.setSelected(false);
+		}
+		if(track) {
+			track.view.setSelected(true);
+			track.view.show();
+		}
+		this.selectedTrack = track;
+	},
+	relativeTrack: function(shift){
+		return this.playingTrack && this.collection.models[this.collection.indexOf(this.playingTrack) + shift];
+	},
+	relativeSelection: function(shift){
+		return this.selectedTrack && this.collection.models[this.collection.indexOf(this.selectedTrack) + shift];
+	}
+});
+distro.library.trackListView = new distro.LibraryView({
+	el: $('#musicTableBody>tbody')[0],
+	collection: distro.library.sortedTracks
 });
 
 distro.Slider = function (element, callback){
@@ -646,7 +812,7 @@ distro.lightbox = new (function(){
 				this.$contentWrapper.fadeOut(200, function(){
 					self.hideContent(old);
 				});
-				Backbone.history.navigate('');
+				Backbone.history.navigate(distro.topPath || '');
 				document.title = distro.TITLE;
 				distro.tutorial.show('findNetwork', { after: true });
 			}
@@ -661,6 +827,111 @@ distro.lightbox = new (function(){
 	};
 	return Lightbox;
 }())();
+
+distro.tml = {
+	TrackView: distro.library.TrackView.extend({
+		template: [
+			['%td', { $key: 'name' }],
+			['%td', { $key: 'time', $handler: function(time){
+				if (!time) { return ''; }
+				var seconds = time % 60;
+				return Math.floor(time / 60) + ':' + (seconds < 10 ? '0' : '') + seconds;
+			} }],
+			['%td', { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }] }, $else: { $key: 'artist' } }],
+			{ $test: { $key: 'performance' }, $if: { $test: { $handler: function(track){ return track.performance.date > new Date; } }, $if:
+			{ $key: 'performance', $template: ['%td', { 'class': 'event' }, ['%div', { 'class': { $join: ['event', { $key: 'date', $handler: function(date){
+				var diff = date - (new Date);
+				if (diff < 0) {
+					return '';
+				} else if (diff < 86400000) { // 24h
+					return 'soonest';
+				} else if (diff < 172800000) { // 48h
+					return 'sooner';
+				} else if (diff < 604800000) { // 1w
+					return 'soon';
+				} else {
+					return 'someday';
+				}
+			} }], $separator: ' ' } },
+				['.eventDetails',
+					['.perfDate', {$key:'date', $handler:
+						function(data){
+							if(!data) { return null; }
+							return (data.toLocaleDateString() + '\n' + data.toLocaleTimeString());
+						}
+					}], ['.perfVenue', {$key:'venue', $template:[
+						['%a', {href: {$join:['#/', {$key:'name'}]}, title:{$key:'fullname'}}, '^', {$key:'name'}, '^ '],
+						['%span.cityState', {$key:'citystate'}]
+					]}]
+				],
+				{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
+			]] }, $else: ['%td'] }, $else: ['%td'] },
+			['%td', "STATUS"]
+		],
+	}),
+	tracks: new Backbone.Collection({ model: distro }),
+	$subscriptionContainer: $('#tmlSubscriptionContainer'),
+	show: function(network){
+		this.reset();
+		this.tracks.url = 'networks/' + encodeURIComponent(network.get('name')) + '/tracks';
+		this.tracks.fetch();
+		network.set({ administrating: true });
+		this.network = network;
+		$(document.body).addClass('TML');
+		this.$subscriptionContainer.append((this.subscriptionView = new distro.library.SubscriptionAdminView({ model: network })).el);
+	},
+	hide: function(){
+		this.reset();
+		$(document.body).removeClass('TML');
+		if (this.network) {
+			this.network.set({ administrating: false });
+			delete this.network;
+			this.subscriptionView.destroy();
+			delete this.subscriptionView;
+		}
+	},
+	reset: function(){
+		this.$subscriptionContainer.empty();
+		this.tracks.reset([]);
+	}
+};
+distro.tml.libraryView = new (distro.LibraryView.extend({
+	TrackView: distro.tml.TrackView,
+	setSelected: function(track){
+		var trackEditor;
+		distro.LibraryView.prototype.setSelected.call(this, track);
+		if (distro.tml.trackEditor) {
+			distro.tml.trackEditor.destroy();
+			delete distro.tml.trackEditor;
+		}
+		if (track) {
+			trackEditor = new distro.TrackEditView({ model: track });
+			trackEditor.bind('save', function(attributes){
+				track.save(attributes, {
+					success: function(){
+						var libraryTrack = distro.library.tracks.get(track.id);
+						if (libraryTrack) {
+							libraryTrack.set(track.toJSON());
+						}
+					},
+					error: function(error){
+						alert(distro.loc.str("tml.saveError"));
+					}
+				});
+			});
+			$('#infoBox').append(trackEditor.el);
+			distro.tml.trackEditor = trackEditor;
+		}
+	}
+}))({
+	el: $('#tmlBody>tbody')[0],
+	collection: new distro.LibraryCollection([], { parentCollection: distro.tml.tracks })
+});
+$('#createTrackButton').click(function(){
+	distro.tml.tracks.create({}, { success: function(track){
+		distro.tml.libraryView.setSelected(track);
+	}});
+});
 
 // Login/registration lightbox
 (function(){
@@ -862,7 +1133,7 @@ distro.loadLandingPage = function(name, callback){
 										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0em; margin-left: 0em;"}, { $key: "streetAddress"}],
 										["%p",{style:"margin-top: 0.25em; margin-right: 0em; margin-bottom: 0.25em; margin-left: 0em;"}, { $key: "citystate"}, " ", {$key:"zip"}],
 										{$test: {$key:"country"}, $if:["%p",{style:"margin-top:0px;"}, { $key: "country"}]}
-									]}, 
+									]},
 									{$test: {$key:"map"}, $if:["%a#mapLink", {target:"_blank", href:{$key:"map"}}, "MAP"]}]
 								],
 								["%span#artist",{style:"font-size:36px;"},
@@ -872,8 +1143,8 @@ distro.loadLandingPage = function(name, callback){
 							[".rightContent",
 								{$test: {$or: [{$key: 'presence'}, {$key:'email'}]}, $if: [".presence",
 									["%ul.presence", {$test: {$key: "email"}, $if:["%li.email", ["%a", {target:"_blank"}],
-										["%ul.emailList", {style:"display:none; position: absolute; padding: 0 .5em; background-color: white; list-style:none;"}, {$key: "email", $children: 
-											["%li", {'class': {$key:"."}, style:"margin: 0px 1em;"}, 
+										["%ul.emailList", {style:"display:none; position: absolute; padding: 0 .5em; background-color: white; list-style:none;"}, {$key: "email", $children:
+											["%li", {'class': {$key:"."}, style:"margin: 0px 1em;"},
 												["%a", {href: {$join: ["mailto:",{$key:""}]}, title:{$key:""}}, {$key:"."}]]}]]}, { $key: 'presence', $children: [
 										['%li', { 'class': { $key: 'name' } }, ['%a', { target:"_blank", href: { $key: 'url' } }]]
 									] }]
@@ -882,7 +1153,10 @@ distro.loadLandingPage = function(name, callback){
 								[".content", {$test: {$key: "calendarGoogle"}, $if:["%iframe#calFrame", {frameborder: "0", src: {$join: ["http://google.com/",{$key:"calendarGoogle"},"&showTitle=0&&showNav=0&&showDate=0&&showPrint=0&&showTabs=0&&showCalendars=0&&showTz=0&&mode=AGENDA&&height=300&&wkst=1&&bgcolor=%23ffffff&&color=%23000000"]}}]}],
 								[".subscribeButton", { 'class': { $key:'', $handler: function(){ return subscribed ? 'disabled' : ''; } }, $:function(){ $subscribeButton = $(this) }}, [".icon"], [".label", distro.loc.str('networks.subscribe')]]
 							]
-						]
+						],
+						{ $test: { $key: 'admin' }, $if: [".ownerbox",
+							['%h1', 'You own this network! ', [ '%a', { href: "mailto:hello@distro.fm" }, 'Contact us' ], ' to make changes to its landing page.'],
+						] }
 					], model.attributes);
 					if ( ! subscribed) {
 						distro.tutorial.show('subscribe', model);
@@ -974,12 +1248,16 @@ distro.Router = Backbone.Router.extend({
 		"/find": "find",
 		"/login": "login",
 		"/about/:page": "about",
+		"/manage": "fourOhFour",
+		"/manage/:network": "manage",
 		"/:network": "network",
 		"/*target": "fourOhFour",
 		"*target": "bounce"
 	},
 	blank: function(){
 		distro.lightbox.hide();
+		distro.tml.hide();
+		distro.topPath = '';
 		distro.tutorial.show('findNetwork');
 	},
 	network: function(name){
@@ -1033,7 +1311,7 @@ distro.Router = Backbone.Router.extend({
 							$liveNetworkContainer.toggle();
 						} else {
 							$content.stencil(
-								['#liveNetworkContainer', 
+								['#liveNetworkContainer',
 									['%ul#liveNetworkList', {$key: "", $children:[
 										'%li',
 											['%a', {href: { $join: ["#/", {$key: "name"}] }},
@@ -1215,6 +1493,15 @@ distro.Router = Backbone.Router.extend({
 		if (target) {
 			window.location.hash = '#/' + target;
 		}
+	},
+	manage: function(target){
+		var network = distro.library.subscriptions.get(target);
+		if (network && network.attributes.admin) {
+			distro.topPath = document.location.hash;
+			distro.tml.show(network);
+		} else {
+			this.fourOhFour();
+		}
 	}
 });
 
@@ -1306,18 +1593,17 @@ distro.init(function(){
 					? distro.library.trackListView.collection.models[0]
 					: distro.library.trackListView.relativeSelection(1);
 			}
-			if(newSelection){ 
+			if(newSelection){
 				distro.library.trackListView.setSelected(newSelection);
-				$.scrollIntoView(distro.library.trackListView.relativeSelection(0).view.el, $('#musicTableBodyContainer'));
 			}
 			e.preventDefault();
 		} else if(e.keyCode == 13){ // enter
-			if ((selected = distro.library.trackListView.selectedTrack)){ 
+			if ((selected = distro.library.trackListView.selectedTrack)){
 				distro.player.play(selected);
 			}
 		}
 	})
-	.focus(); // Give initial focus to the music table 
+	.focus(); // Give initial focus to the music table
 	$(document).keydown(function(e){
 		// { up:38, down:40, left:37, right:39, space:32, enter:13 }
 		var emptySelection = !distro.library.trackListView.selectedTrack,
@@ -1343,9 +1629,9 @@ distro.init(function(){
 		} else if(e.keyCode == 39){
 			if (distro.player.current) {
 				distro.player.next();
-			}	
+			}
 		}
-	});	
+	});
 	(function ($) {
 		var original = $.fn.val;
 		$.fn.val = function(newValue) {
@@ -1360,7 +1646,7 @@ distro.init(function(){
 	//credit: Abhijit Rao (http://stackoverflow.com/questions/1805808)
 	$.scrollIntoView = function(element, container) {
 		var containerTop = $(container).scrollTop(),
-			containerBottom = containerTop + $(container).height(), 
+			containerBottom = containerTop + $(container).height(),
 			elemTop = element.offsetTop,
 			elemBottom = elemTop + $(element).height();
 		if (elemTop < containerTop) {
