@@ -4,3 +4,4 @@
 /server/static/style.css
 .DS_Store
 /DistroAuth.txt
+/s3secret
