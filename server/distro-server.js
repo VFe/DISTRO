@@ -10,7 +10,7 @@ var util = require('util'),
 	distro = require('distro'),
 	port = process.env.PRODUCTION ? 8085 : 3000;
 
-global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
+global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser: 'BSONNative' in mongoDB});
 global.users = new distro.Users();
 global.sessions = new distro.Sessions();
 global.tracks = new distro.Tracks();
@@ -92,7 +92,7 @@ global.db.open(function(err, db){
 				}
 			}));
 			app.get('/library', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				var user = distro.Users.userOrGeneric(session && session.user);
+				var user = global.users.userOrGeneric(session && session.user);
 				global.users.subscriptions(user, function(err, subscriptions){
 					if (err) {
 						errback(err);
@@ -108,7 +108,7 @@ global.db.open(function(err, db){
 				});
 			}));
 			app.get('/library/tracks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				var user = distro.Users.userOrGeneric(session && session.user);
+				var user = global.users.userOrGeneric(session && session.user);
 				global.tracks.tracksForSubscriptions(user.subscriptions, function(err, tracks){
 					if (err) {
 						errback(err);

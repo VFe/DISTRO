@@ -1,11 +1,12 @@
-Backbone.sync = function(method, model, success, error){
+Backbone.sync = function(method, model, options){
+	if ( ! options) options = {};
 	if (!(model && model.url)) { throw new Error("A 'url' property or function must be specified"); }
 	var httpMethod = { 'create': 'POST', 'update': 'PUT', 'delete': 'DELETE', 'read'  : 'GET' }[method],
 	    data = (method === 'create' || method === 'update') ? model.toJSON() : null;
 	
 	distro.request((_.isFunction(model.url) ? model.url() : model.url), httpMethod, data, new Hollerback({
-		success: success,
-		failure: error
+		success: options.success,
+		failure: options.error
 	}));
 };
 
@@ -227,8 +228,8 @@ distro.library = {
 	refresh: function(complete, silent){
 		distro.request('library', 'GET', null, new Hollerback({
 			success: function(data){
-				this.subscriptions.refresh(data.subscriptions || []);
-				this.tracks.refresh(data.tracks || []);
+				this.subscriptions.reset(data.subscriptions || []);
+				this.tracks.reset(data.tracks || []);
 			},
 			complete: complete
 		}, this), silent);
@@ -243,7 +244,7 @@ distro.DependentCollection = Backbone.Collection.extend({
 		});
 	},
 	rebuild: function(options){
-		this.refresh(this.parentCollection.models, options);
+		this.reset(this.parentCollection.models, options);
 	}
 });
 distro.library.filteredTracks = new (distro.DependentCollection.extend({
@@ -285,7 +286,7 @@ distro.library.subscriptionListView = new (Backbone.View.extend({
 		this.$el = $(this.el);
 		this.$foot = this.$el.children('.filler:first');
 		this.collection.bind('add', this.add);
-		this.collection.bind('refresh', this.render);
+		this.collection.bind('reset', this.render);
 	},
 	add: function(subscription){
 		this.$foot.before((new distro.library.SubscriptionView({ model: subscription })).el);
@@ -301,7 +302,7 @@ distro.library.SubscriptionView = Backbone.View.extend({
 		['.subscription', { 'class': { $join: [{ $test: { $key: 'muted' }, $if: 'muted' }, { $test: { $key: 'soloed' }, $if: 'soloed' }], $separator: ' ' } }, ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }], ['.subscriptionControls', ['.mute', {title: distro.loc.stencil('chrome.hover.mute')}, 'M'], ['.solo', {title: distro.loc.stencil('chrome.hover.solo')},'S']]]
 	],
 	events: {
-		"mousedown": "noselect",
+		"selectstart": "noselect",
 		"click .mute": "mute",
 		"click .solo": "solo"
 	},
@@ -314,8 +315,8 @@ distro.library.SubscriptionView = Backbone.View.extend({
 	render: function(){
 		$(this.el).empty().stencil(this.template, this.model.toJSON());
 	},
-	noselect: function(){
-		return false;
+	noselect: function(e){
+		e.preventDefault();
 	},
 	mute: function(){
 		this.model.set({ muted: ! this.model.attributes.muted });
@@ -332,7 +333,7 @@ distro.library.trackListHeaderView = new (Backbone.View.extend({
 		this.currentSort = {$el:this.$el.find('th[data-sort=date]')};
 		this.lastSorts = {};
 		this.model.bind('change', this.render);
-		this.$el.mousedown(function(e){
+		this.$el.bind('selectstart', function(e){
 			e.preventDefault();
 		});
 		this.$el.delegate('th', 'click', this.handle);
@@ -365,7 +366,7 @@ distro.library.trackListView = new (Backbone.View.extend({
 		_.bindAll(this, 'add', 'render');
 		this.$el = $(this.el);
 		this.$foot = this.$el.children('.filler:first');
-		this.collection.bind('refresh', function(){
+		this.collection.bind('reset', function(){
 			self.oldViewCache = self.viewCache;
 			self.viewCache = {};
 			self.render();
@@ -624,7 +625,7 @@ distro.lightbox = new (function(){
 			$content = $('<div>', { 'class': 'lightboxContent' });
 			self.$contentWrapper.html($content);
 			content.show($content, self);
-			Backbone.history.saveLocation('/' + content.name);
+			Backbone.history.navigate('/' + content.name);
 			document.title = content.longName ? (content.longName + ' - ' + distro.TITLE) : distro.TITLE;
 			next();
 		}).fadeIn(200);
@@ -645,7 +646,7 @@ distro.lightbox = new (function(){
 				this.$contentWrapper.fadeOut(200, function(){
 					self.hideContent(old);
 				});
-				Backbone.history.saveLocation('');
+				Backbone.history.navigate('');
 				document.title = distro.TITLE;
 				distro.tutorial.show('findNetwork', { after: true });
 			}
@@ -936,7 +937,7 @@ distro.loadAboutPage =function(pageName, data){
 				],
 				[".contentBox",
 					[".content.leftContent",
-						["%img.photo",{src: "http://distro-static.s3.amazonaws.com/TRDD/TRDD.jpg", width:"510", height:"450"}]
+						["%img.photo",{src: "http://distro-static.s3.amazonaws.com/TRDD/TRDD.png", width:"510", height:"450"}]
 					],
 					[".rightContent",
 						["%ul.aboutIcons",
@@ -967,7 +968,7 @@ distro.AboutPage = function(name, callback){
 	}
 };
 
-distro.Router = Backbone.Controller.extend({
+distro.Router = Backbone.Router.extend({
 	routes: {
 		"": "blank",
 		"/find": "find",
@@ -1059,10 +1060,14 @@ distro.Router = Backbone.Controller.extend({
 					} else {
 						showLiveNetworks(liveNetworkJSON);
 					}
-				}).mousedown(function(e){e.preventDefault();});
+				}).bind('selectstart', function(e){e.preventDefault();});
 				distro.tutorial.show('search');
 				function handleInput(){
 					$spacer.text($text[0].value);
+					if ($bottomBar.hasClass('bright')) {
+						$bottomBar.removeClass('bright');
+						$('#liveNetworkContainer').hide();
+					}
 				}
 				if ('oninput' in $text[0]) {
 					$text.bind('input', handleInput);
@@ -1270,7 +1275,7 @@ distro.init(function(){
 	});
 
 	// Miscellaneous UI
-	$('.button').live('mousedown', function(e){
+	$('.button').live('selectstart', function(e){
 		e.preventDefault();
 	});
 	
@@ -1343,9 +1348,11 @@ distro.init(function(){
 	});	
 	(function ($) {
 		var original = $.fn.val;
-		$.fn.val = function() {
+		$.fn.val = function(newValue) {
 			var ret = original.apply(this, arguments);
-			this.trigger('valuechange');
+			if (newValue) {
+				this.trigger('valuechange');
+			}
 			return ret;
 		};
 	})(jQuery);

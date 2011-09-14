@@ -61,9 +61,8 @@ Networks.prototype.liveNetworks = function(callback){
 		if(err){
 			callback(new Error(err.errmsg + ': ' + err.assertion), null);
 		} else {
-			console.log(results);
 			self.collection.find({ _id: { $in: results.map(function(result){ return result.value.id; }) } },
-				{ fields: {name: 1, fullname: 1, _id: 0}, sort: ['fullname', 'name'] },
+				{ fields: {name: 1, fullname: 1, _id: 0}, sort: ['lfullname', 'lname'] },
 				function(err, cursor){
 					cursor.toArray(callback);
 				}
@@ -132,9 +131,6 @@ Networks.Proxy.prototype.resolve = function(networkDetails){
 		if (this.key instanceof Array) {
 			this.data = {};
 			this.key.forEach(function(key){
-				if (key === 'location.citystate') {
-					console.log(networkDetails);
-				}
 				set(key);
 			});
 		} else {
