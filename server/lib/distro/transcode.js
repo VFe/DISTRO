@@ -1,5 +1,5 @@
 var path = require('path'),
-	exec = require('child_process').execFile;
+	execFile = require('child_process').execFile;
 
 module.exports = function transcode(file, callback){
 	try {
@@ -11,16 +11,20 @@ module.exports = function transcode(file, callback){
 		callback(new Error('File didn\'t match regex'), null);
 		return;
 	}
-	var child = exec('/bin/sh', [path.join(__dirname, './transcode.sh')],
-		{env: {INPUT_FILE: inputFilePath, OUTPUT_FILE: outputFilePath, IS_WAV: isWav}},
-		function (error, stdout, stderr) {
-		console.log('stdout: ' + stdout);
-		console.log('stderr: ' + stderr);
-		if (error !== null) {
-			console.log('exec error: ' + error);
+	execFile('lame', ['--silent', '-V3', inputFilePath, outputFilePath], function (error, stdout, stderr) {
+		if (error) {
 			callback(error, null);
 		} else {
-			callback(null, outputFilePath);
+			if (isWav) {
+				callback(null, outputFilePath);
+			} else {
+				execFile('id3cp', [inputFilePath, outputFilePath], function(error, stdout, stderr){
+					if (error) {
+						console.error("id3cp error:", error);
+					}
+					callback(null, outputFilePath);
+				});
+			}
 		}
 	});
 };
