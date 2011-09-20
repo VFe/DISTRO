@@ -196,18 +196,31 @@ global.db.open(function(err, db){
 
 				distro.request.handleRequest(false, function(session, req, res, successback, errback){
 					upload.complete(function(err, file){
+						var cleanup = {
+							files: [ file ],
+							run: function(){
+								this.files.forEach(function(file){
+									fs.unlink(file, function(err){ if(err){ console.error("Error unlinking " + file + ": ", err); } });
+								});
+							}
+						};
 						if (err) {
+							cleanup.run();
 							errback(err);
 						} else {
 							distro.transcode(file, function(err, outputFile){
+								cleanup.files.push(outputFile);
 								if (err) {
+									cleanup.run();
 									errback(err);
 								} else {
 									console.log("starting to push to S3");
 									distro.S3.pushFile(outputFile, path.basename(outputFile), function(err){
 										if (err) {
+											cleanup.run();
 											errback(err);
 										} else {
+											cleanup.run();
 											successback(null, { success: true });
 										}
 									});
