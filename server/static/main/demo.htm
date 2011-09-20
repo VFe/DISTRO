@@ -2,36 +2,31 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link href="fileuploader.css" rel="stylesheet" type="text/css">	
-    <style>    	
-		body {font-size:13px; font-family:arial, sans-serif; color: #BBBBBB; width:700px; margin:100px auto; background: #141414;}
-    </style>	
 </head>
-<body>		
-	<p>Progress-bar is supported in FF3.6+, Chrome6+, Safari4+</p>
-	
-	<div id="file-uploader-demo1">		
-		<noscript>			
-			<p>Please enable JavaScript to use file uploader.</p>
-			<!-- or put a simple form for upload here -->
-		</noscript>         
-	</div>
-    
+<body>
+	<p>New style:</p>
+	<button id="upload">Yarr, upload me a song</button>
     <script src="fileuploader.js" type="text/javascript"></script>
     <script>        
-        function createUploader(){            
-            var uploader = new qq.FileUploader({
-                element: document.getElementById('file-uploader-demo1'),
-                action: 'http://localhost:3000/api/upload',
-                debug: true
-            });           
-        }
-        
-        // in your app create uploader as soon as the DOM is ready
-        // don't wait for the window to load  
-        window.onload = createUploader;     
+	    var uploader = new qq.FileUploaderBasic({
+	        button: document.getElementById('upload'),
+	        action: '/api/upload',
+			onSubmit: function(id, fileName){
+				console.log('submitting', arguments);
+			},
+			onProgress: function(id, fileName, loaded, total){
+				console.log('progress', arguments);
+			},
+			onComplete: function(id, fileName, responseJSON){
+				console.log('complete', arguments);
+			},
+			onCancel: function(id, fileName){
+				console.log('cancel', arguments);
+			}
+	    });
     </script>
-
+	<hr>
+	<p>Old style:</p>
 	<form action="/api/upload" enctype="multipart/form-data" method="post">
       <input type="text" name="title"><br>
       <input type="file" name="upload" multiple="multiple"><br>
