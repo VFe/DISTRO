@@ -209,7 +209,9 @@ global.db.open(function(err, db){
 							errback(err);
 						} else {
 							distro.transcode(file, function(err, outputFile){
-								cleanup.files.push(outputFile);
+								if (outputFile) {
+									cleanup.files.push(outputFile);
+								}
 								if (err) {
 									cleanup.run();
 									errback(err);
