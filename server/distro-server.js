@@ -29,10 +29,6 @@ global.db.open(function(err, db){
 		.use('/api/', distro.middleware.prelude)
 		.use('/api/', distro.middleware.getUser)
 		.use('/api/', connect.router(function(app) {
-			function methodNotAllowed(req, res, params){
-				res.writeHead(405);
-				res.end("Method Not Allowed");
-			}
 			app.param('network', function(req, res, next, network){
 				global.networks.findNetworkByName(network, { _id: false }, function(err, doc){
 					if (err) {
@@ -46,7 +42,6 @@ global.db.open(function(err, db){
 				});
 			});
 			
-			app.get('/login', methodNotAllowed);
 			app.post('/login', function(req, res, next){
 				var login = req.body;
 				if(login && login.email && login.password){
@@ -72,7 +67,6 @@ global.db.open(function(err, db){
 					next(new distro.error.ClientError("registration.errors.noCredentials"));
 				}
 			});
-			app.get('/logout', methodNotAllowed);
 			app.post('/logout', distro.middleware.ensureUser(), function(req, res, next){
 				global.sessions.endSession(req.session.id, res, function(err){
 					if (err) {
@@ -83,7 +77,6 @@ global.db.open(function(err, db){
 					}
 				});
 			});
-			app.get('/register', methodNotAllowed);
 			app.post('/register', function(req, res, next){
 				var body = req.body;
 				if(body && body.email && body.password){
