@@ -24,132 +24,137 @@ global.db.open(function(err, db){
 			connect.static(__dirname + '/static/main'),
 			connect.static(__dirname + '/static/common')
 		)
+		.use('/api/', distro.middleware.prelude)
+		.use('/api/', distro.middleware.getUser)
 		.use('/api/', connect.router(function(app) {
 			function methodNotAllowed(req, res, params){
 				res.writeHead(405);
 				res.end("Method Not Allowed");
 			}
-
+			
 			app.get('/login', methodNotAllowed);
-			app.post('/login', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+			app.post('/login', function(req, res, next){
 				var login = req.body;
 				if(login && login.email && login.password){
 					global.users.userWithCredentials(login.email, login.password, function(err, user){
-						if (session) {
+						if (req.session) {
 							// The cookie is cleared synchronously, so it's safe to not wait to call startSessionForUserID
-							global.sessions.endSession(session.id, res, function(){});
+							global.sessions.endSession(req.session.id, res, function(){});
 						}
 						if(user){
 							global.sessions.startSessionForUserID(user._id, login.rememberMe, req, res, function(err){
 								if(err){
-									errback(err);
+									next(err);
 								} else {
-									successback(null, {userName:user.email});
+									res.setMetadata({ userName:user.email });
+									res.send();
 								}
 							});	
 						} else {
-							errback(new distro.error.ClientError("registration.errors.invalidCredentials"));
+							next(new distro.error.ClientError("registration.errors.invalidCredentials"));
 						}
 					});
 				} else {
-					errback(new distro.error.ClientError("registration.errors.noCredentials"));
+					next(new distro.error.ClientError("registration.errors.noCredentials"));
 				}
-			}));
+			});
 			app.get('/logout', methodNotAllowed);
-			app.post('/logout', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-				global.sessions.endSession(session.id, res, function(err){
+			app.post('/logout', distro.middleware.ensureUser(), function(req, res, next){
+				global.sessions.endSession(req.session.id, res, function(err){
 					if (err) {
-						errback(err);
+						next(err);
 					} else {
-						successback(null, {userName:null});
+						res.setMetadata({ userName: null });
+						res.send();
 					}
 				});
-			}));
+			});
 			app.get('/register', methodNotAllowed);
-			app.post('/register', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+			app.post('/register', function(req, res, next){
 				var body = req.body;
 				if(body && body.email && body.password){
 					global.users.registerUser(body.email, body.password, function(err, user){
 						if (err) {
-							errback(err);
+							next(err);
 						} else {
 							global.sessions.startSessionForUserID(user._id, null, req, res, function(err){
 								if(err){
-									errback(err);
+									next(err);
 								} else {
-									successback(null, {userName: body.email});
+									res.setMetadata({ userName: body.email });
+									res.send();
 								}
 							});
 						}
 					});
 				} else {
-					errback(new distro.error.ClientError("registration.errors.noCredentials"));
+					next(new distro.error.ClientError("registration.errors.noCredentials"));
 				}
-			}));
-			app.get('/library', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				var user = global.users.userOrGeneric(session && session.user);
+			});
+			app.get('/library', distro.middleware.ensureUser(), function(req, res, next){
+				var user = global.users.userOrGeneric(req.session && req.session.user);
 				global.users.subscriptions(user, function(err, subscriptions){
 					if (err) {
-						errback(err);
+						next(err);
 					} else {
 						global.tracks.tracksForSubscriptions(user.subscriptions, function(err, tracks){
 							if (err) {
-								errback(err);
+								next(err);
 							} else {
-								successback({tracks: tracks, subscriptions: subscriptions});
+								res.send({tracks: tracks, subscriptions: subscriptions});
 							}
 						});
 					}
 				});
-			}));
-			app.get('/library/tracks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
-				var user = global.users.userOrGeneric(session && session.user);
+			});
+			app.get('/library/tracks', function(req, res, next){
+				var user = global.users.userOrGeneric(req.user);
 				global.tracks.tracksForSubscriptions(user.subscriptions, function(err, tracks){
 					if (err) {
-						errback(err);
+						next(err);
 					} else {
-						successback(tracks);
+						res.send(tracks);
 					}
 				});
-			}));
-			app.post('/library/subscriptions', distro.request.handleRequest('ondemand', function(session, req, res, successback, errback){
+			});
+			app.post('/library/subscriptions', distro.middleware.ensureUser({ create: true }), function(req, res, next){
 				if (!req.body || !req.body.name) {
-					errback(new distro.error.ClientError("networks.errors.noNetwork"));
+					next(new distro.error.ClientError("networks.errors.noNetwork"));
 					return;
 				}
 				global.networks.findNetworkByName(req.body.name, {}, function(err, doc){
 					if (err) {
-						errback(err);
+						next(err);
 					} else if (doc) {
-						global.users.subscribeToNetwork(session.user, doc._id, function(err){
+						global.users.subscribeToNetwork(req.user, doc._id, function(err){
 							if (err) {
-								errback(err);
+								next(err);
 							}
-							successback({ id: doc.name, name: doc.name, fullname: doc.fullname });
+							res.send({ id: doc.name, name: doc.name, fullname: doc.fullname });
 						});
 					} else {
-						errback(new distro.error.ClientError("networks.errors.noNetwork"));
+						next(new distro.error.ClientError("networks.errors.noNetwork"));
 					}
 				});
-			}));
-			app.get('/search/:search', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+			});
+			app.get('/search/:search', function(req, res, next){
 				global.networks.search(req.params.search, function(err, returnData){
-					successback(returnData);
+					res.send(returnData);
 				});
-			}));
-			app.get('/livenetworks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+			});
+			app.get('/livenetworks', function(req, res, next){
 				global.networks.liveNetworks(function(err, results){
 					if (err) {
-						errback(err);
+						next(err);
 					} else {
-						successback(results);
+						res.send(results);
 					}
 				});
-			}));
-			app.get('/networks/:name', distro.request.handleRequest(false, function(session, req, res, successback, errback){
+			});
+			app.get('/networks/:name', function(req, res, next){
 				global.networks.findNetworkByName(req.params.name, { _id: false }, function(err, doc){
 					if(err){
-						errback(err);
+						next(err);
 					} else if(doc){
 						if ('presence' in doc) {
 							var presenceMap = doc.presence, presenceArray = [], presenceItem;
@@ -167,13 +172,14 @@ global.db.open(function(err, db){
 								}
 							});
 						}
-						successback(doc);
+						res.send(doc);
 					} else {
-						errback(new distro.error.ClientError("networks.errors.noNetwork"));
+						next(new distro.error.ClientError("networks.errors.noNetwork"));
 					}
 				});
-			}));
+			});
 		}))
+		.use('/api/', distro.middleware.errorHandler)
 		.use('/', connect.router(function(app){
 			app.get('/:network', function(req, res){
 				var target = req.params && req.params.network || '';
