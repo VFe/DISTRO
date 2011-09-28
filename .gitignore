@@ -1,5 +1,6 @@
 /static/style.css
 /DISTRO.tmproj
+/node_modules
 
 .DS_Store
 /DistroAuth.txt
