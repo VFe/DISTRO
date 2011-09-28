@@ -21,8 +21,7 @@ global.db.open(function(err, db){
 			connect.logger(),
 			connect.cookieParser(),
 			connect.bodyParser(),
-			connect.static(__dirname + '/static/main'),
-			connect.static(__dirname + '/static/common')
+			connect.static(__dirname + '/static')
 		)
 		.use('/api/', distro.middleware.prelude)
 		.use('/api/', distro.middleware.getUser)
