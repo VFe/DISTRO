@@ -10,7 +10,6 @@ global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_
 global.users = new distro.Users();
 global.sessions = new distro.Sessions();
 global.tracks = new distro.Tracks();
-global.networks = new distro.Networks();
 
 global.db.open(function(err, db){
 	if (err){
@@ -27,7 +26,7 @@ global.db.open(function(err, db){
 		.use('/api/', distro.middleware.getUser)
 		.use('/api/', connect.router(function(app) {
 			app.param('network', function(req, res, next, network){
-				global.networks.findNetworkByName(network, { _id: false }, function(err, doc){
+				distro.networks.findNetworkByName(network, { _id: false }, function(err, doc){
 					if (err) {
 						next(err);
 					} else if (doc) {
@@ -126,7 +125,7 @@ global.db.open(function(err, db){
 					next(new distro.error.ClientError("networks.errors.noNetwork"));
 					return;
 				}
-				global.networks.findNetworkByName(req.body.name, {}, function(err, doc){
+				distro.networks.findNetworkByName(req.body.name, {}, function(err, doc){
 					if (err) {
 						next(err);
 					} else if (doc) {
@@ -142,12 +141,12 @@ global.db.open(function(err, db){
 				});
 			});
 			app.get('/search/:search', function(req, res, next){
-				global.networks.search(req.params.search, function(err, returnData){
+				distro.networks.search(req.params.search, function(err, returnData){
 					res.send(returnData);
 				});
 			});
 			app.get('/livenetworks', function(req, res, next){
-				global.networks.liveNetworks(function(err, results){
+				distro.networks.liveNetworks(function(err, results){
 					if (err) {
 						next(err);
 					} else {
@@ -159,7 +158,7 @@ global.db.open(function(err, db){
 				var network = req.params.network;
 				if ('presence' in network) {
 					var presenceMap = network.presence, presenceArray = [], presenceItem;
-					distro.Networks.PRESENCE.forEach(function(presenceSpec){
+					distro.networks.PRESENCE.forEach(function(presenceSpec){
 						if ((presenceItem = presenceMap[presenceSpec.name])) {
 							presenceArray.push({
 								name: presenceSpec.name,
