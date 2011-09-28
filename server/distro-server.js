@@ -33,6 +33,18 @@ global.db.open(function(err, db){
 				res.writeHead(405);
 				res.end("Method Not Allowed");
 			}
+			app.param('network', function(req, res, next, network){
+				global.networks.findNetworkByName(network, { _id: false }, function(err, doc){
+					if (err) {
+						next(err);
+					} else if (doc) {
+						req.params.network = doc;
+						next();
+					} else {
+						next(new distro.error.ClientError("networks.errors.noNetwork"));
+					}
+				});
+			});
 			
 			app.get('/login', methodNotAllowed);
 			app.post('/login', function(req, res, next){
@@ -153,32 +165,25 @@ global.db.open(function(err, db){
 					}
 				});
 			});
-			app.get('/networks/:name', function(req, res, next){
-				global.networks.findNetworkByName(req.params.name, { _id: false }, function(err, doc){
-					if(err){
-						next(err);
-					} else if(doc){
-						if ('presence' in doc) {
-							var presenceMap = doc.presence, presenceArray = [], presenceItem;
-							distro.Networks.PRESENCE.forEach(function(presenceSpec){
-								if ((presenceItem = presenceMap[presenceSpec.name])) {
-									presenceArray.push({
-										name: presenceSpec.name,
-										url: (presenceSpec.prefix || '') + presenceItem + (presenceSpec.suffix || '')
-									});
-								}
-								if (presenceArray.length) {
-									doc.presence = presenceArray;
-								} else {
-									delete doc.presence;
-								}
+			app.get('/networks/:network', function(req, res, next){
+				var network = req.params.network;
+				if ('presence' in network) {
+					var presenceMap = network.presence, presenceArray = [], presenceItem;
+					distro.Networks.PRESENCE.forEach(function(presenceSpec){
+						if ((presenceItem = presenceMap[presenceSpec.name])) {
+							presenceArray.push({
+								name: presenceSpec.name,
+								url: (presenceSpec.prefix || '') + presenceItem + (presenceSpec.suffix || '')
 							});
 						}
-						res.send(doc);
-					} else {
-						next(new distro.error.ClientError("networks.errors.noNetwork"));
-					}
-				});
+						if (presenceArray.length) {
+							network.presence = presenceArray;
+						} else {
+							delete network.presence;
+						}
+					});
+				}
+				res.send(network);
 			});
 		}))
 		.use('/api/', distro.middleware.errorHandler)
