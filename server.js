@@ -1,11 +1,9 @@
-require.paths.unshift(__dirname + "/lib");
-
 var util = require('util'),
 	fs = require('fs'),
 	mongoDB = require('mongodb'),
 	url = require('url'),
 	connect = require('connect'),
-	distro = require('distro'),
+	distro = require('./lib/distro'),
 	port = process.env.PRODUCTION ? 8085 : 3000;
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser: 'BSONNative' in mongoDB});
@@ -23,8 +21,7 @@ global.db.open(function(err, db){
 			connect.logger(),
 			connect.cookieParser(),
 			connect.bodyParser(),
-			connect.static(__dirname + '/static/main'),
-			connect.static(__dirname + '/static/common')
+			connect.static(__dirname + '/static')
 		)
 		.use('/api/', distro.middleware.prelude)
 		.use('/api/', distro.middleware.getUser)
