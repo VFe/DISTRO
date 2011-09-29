@@ -679,22 +679,11 @@ html.js #musicTableBodyContainer{
 		}
 	}
 	&:hover{
-		background: rgba(220, 220, 220, 0.2);
-		.subscriptionControls{
-			div, a{
-				visibility: visible;
-				display: block;
-			}
+		a.admin{
+			display: block;
 		}
-	}
-	&.administrating{
-		&:not(:hover) .subscriptionControls .admin{
+		div.mute, div.solo {
 			visibility: visible;
-			color: #F00;
-			background: none;
-		}
-		&:hover .subscriptionControls a.admin{
-			.box-shadow(0px 0px 0.7em #FFF);
 		}
 	}
 	&.muted{
@@ -719,6 +708,21 @@ html.js #musicTableBodyContainer{
 	}
 }
 
+#subscriptionsTable .subscription:hover, #tmlSidebar .subscription{
+	background: rgba(220, 220, 220, 0.2);
+}
+#tmlSidebar .subscription .subscriptionControls {
+	a.admin{
+		display: block;
+	}
+	div.upload {
+		background: #252525;
+	}
+}
+#tmlSidebar .subscription .subscriptionControls a.admin{
+	.box-shadow(0px 0px 0.7em #FFF);
+}
+
 /* Track management library */
 body.TML{
 	#musicTableHead { display: none; }
@@ -735,19 +739,6 @@ body:not(.TML){
 }
 #tmlSidebar .subscription{
 	background: rgba(220, 220, 220, 0.2);
-	.subscriptionControls div{
-		display: block;
-	}
-	.subscriptionControls{
-		div, a{
-			&.admin{
-				right: 2.4em;
-			}
-			&.edit{
-				right: 0.5em;
-			}
-		}
-	}
 }
 #createTrackButton{
 	background: @helloGreen;
