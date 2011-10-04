@@ -16,9 +16,7 @@ Tracks.prototype.prepareForOutput = function(tracks, options, callback){
 	tracks = tracks.map(function(inTrack) {
 		var track = {};
 		Tracks.publicKeys.forEach(function(key){
-			if (key in inTrack) {
-				track[key] = inTrack[key];
-			}
+			track[key] = (key in inTrack) ? inTrack[key] : null;
 		});
 		if (options.id) {
 			track.id = inTrack._id;
@@ -28,9 +26,7 @@ Tracks.prototype.prepareForOutput = function(tracks, options, callback){
 			track.network = track.network.filter(function(network){ return options.subscribedNetworkIds.indexOf(network.id) != -1; });
 		}
 		track.network = track.network.map(function(network){ return networkProxies.create(network); });
-		if (track.artistNetwork) {
-			track.artistNetwork = networkProxies.create(track.artistNetwork);
-		}
+		track.artistNetwork = track.artistNetwork ? networkProxies.create(track.artistNetwork) : null;
 		if (track.performance && track.performance.venue) {
 			track.performance.venue = networkProxies.create(track.performance.venue, ['name', 'fullname', {name: 'citystate', key: 'location.citystate'}]);
 		}
