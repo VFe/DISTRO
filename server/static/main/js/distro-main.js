@@ -624,6 +624,9 @@ distro.LibraryView = Backbone.View.extend({
 		distro.library.subscriptions.bind('add', function(){
 			distro.library.tracks.fetch();
 		});
+		this.$el.delegate('.filler', 'mousedown', function(){
+			self.setSelected(null);
+		});
 	},
 	add: function(track){
 		var view;
