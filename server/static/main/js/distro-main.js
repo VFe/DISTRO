@@ -834,7 +834,7 @@ distro.lightbox = new (function(){
 distro.tml = {
 	TrackView: distro.library.TrackView.extend({
 		template: [
-			['%td', { $key: 'name' }],
+			['%td', { $test: { $key: 'name' }, $if: { $key: 'name' }, $else: [ '%span.placeholder', distro.loc.stencil('library.untitled') ] } ],
 			['%td', { $key: 'time', $handler: function(time){
 				if (!time) { return ''; }
 				var seconds = time % 60;

@@ -52,7 +52,8 @@
 		"receivedFrom": "Received from",
 		"time": "Time",
 		"event": "Event",
-		"artist": "Artist"
+		"artist": "Artist",
+		"untitled": "Untitled"
 	},
 	"tml": {
 		"status": "Status",
