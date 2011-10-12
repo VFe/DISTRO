@@ -373,6 +373,9 @@ distro.library.SubscriptionAdminView = Backbone.View.extend({
 	template: ['%td',
 		['.subscription.admin.administrating',
 			['.subscriptionControls',
+				['%div.upload', {
+					title: distro.loc.stencil('tml.uploadHover')
+				}, 'U'],
 				['%a.admin', {
 					title: distro.loc.stencil('chrome.hover.admin'),
 					href: '#'
@@ -879,6 +882,34 @@ distro.tml = {
 		this.network = network;
 		$(document.body).addClass('TML');
 		this.$subscriptionContainer.append((this.subscriptionView = new distro.library.SubscriptionAdminView({ model: network })).el);
+		console.log('upload button:', $(this.subscriptionView.el).find('.upload:first')[0]);
+		new qq.FileUploaderBasic({
+	        button: $(this.subscriptionView.el).find('.upload:first')[0],
+	        action: distro.SERVER + this.tracks.url,
+			onSubmit: function(id, fileName){
+				var newTrack = new distro.Track;
+				self.tracks.add(newTrack);
+				console.log('submit', arguments);
+				if (self.libraryView.setSelected(newTrack)){
+					self.uploadingTrack = newTrack;
+				} else {
+					self.tracks.remove(newTrack);
+					return false;
+				};
+			},
+			onProgress: function(id, fileName, loaded, total){
+				// TODO
+				console.log('progress', arguments);
+			},
+			onComplete: function(id, fileName, responseJSON){
+				self.uploadingTrack.set(responseJSON.data);
+				console.log('complete', arguments);
+			},
+			onCancel: function(id, fileName){
+				// TODO
+				console.log('cancel', arguments);
+			}
+	    });
 	},
 	hide: function(){
 		this.reset();
@@ -922,15 +953,11 @@ distro.tml.libraryView = new (distro.LibraryView.extend({
 			$('#infoBox').append(trackEditor.el);
 			distro.tml.trackEditor = trackEditor;
 		}
+		return true;
 	}
 }))({
 	el: $('#tmlBody>tbody')[0],
 	collection: new distro.LibraryCollection([], { parentCollection: distro.tml.tracks })
-});
-$('#createTrackButton').click(function(){
-	distro.tml.tracks.create({}, { success: function(track){
-		distro.tml.libraryView.setSelected(track);
-	}});
 });
 
 // Login/registration lightbox

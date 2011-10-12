@@ -61,7 +61,7 @@ function FileUpload(req){
 			})
 			.on('aborted', function() {
 				//TODO need abort handling
-				throw new Error("upload aborted");
+				console.error("upload aborted");
 			})
 			.on('data', function(buffer) {
 				pause();

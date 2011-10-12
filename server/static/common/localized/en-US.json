@@ -56,7 +56,8 @@
 	},
 	"tml": {
 		"status": "Status",
-		"saveError": "There was an error saving this track. Try again, and get in touch with us if you keep having trouble."
+		"saveError": "There was an error saving this track. Try again, and get in touch with us if you keep having trouble.",
+		"uploadHover": "Upload — Add a new track to this network"
 	},
 	"registration": {
 		"emailAddressQuery": "What's your email address?",

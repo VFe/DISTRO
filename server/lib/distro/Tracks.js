@@ -115,6 +115,7 @@ Tracks.prototype.tracksForNetwork = function(network, callback){
 Tracks.prototype.getTrack = function(id, callback){
 	this.collection.findOne({ _id: id }, callback);
 };
+// TODO: this is dead code, probably temporarily
 Tracks.prototype.createTrack = function(inTrack, user, callback){
 	var self = this, track = {};
 	if (inTrack && inTrack.network && inTrack.network.name) {

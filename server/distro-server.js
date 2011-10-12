@@ -117,15 +117,6 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
-			app.post('/library/tracks', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-				global.tracks.createTrack(req.body, session.user, function(err, doc){
-					if (err) {
-						errback(err);
-					} else {
-						successback(doc);
-					}
-				})
-			}));
 			app.post('/library/subscriptions', distro.request.handleRequest('ondemand', function(session, req, res, successback, errback){
 				if (!req.body || !req.body.name) {
 					errback(new distro.error.ClientError("networks.errors.noNetwork"));
@@ -191,47 +182,6 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
-			app.post('/upload', function(req, res, next){
-				var upload = new distro.FileUpload(req);
-
-				distro.request.handleRequest(false, function(session, req, res, successback, errback){
-					upload.complete(function(err, file){
-						var cleanup = {
-							files: [ file ],
-							run: function(){
-								this.files.forEach(function(file){
-									fs.unlink(file, function(err){ if(err){ console.error("Error unlinking " + file + ": ", err); } });
-								});
-							}
-						};
-						if (err) {
-							cleanup.run();
-							errback(err);
-						} else {
-							distro.transcode(file, function(err, outputFile){
-								if (outputFile) {
-									cleanup.files.push(outputFile);
-								}
-								if (err) {
-									cleanup.run();
-									errback(err);
-								} else {
-									console.log("starting to push to S3");
-									distro.S3.pushFile(outputFile, path.basename(outputFile), function(err){
-										if (err) {
-											cleanup.run();
-											errback(err);
-										} else {
-											cleanup.run();
-											successback(null, { success: true });
-										}
-									});
-								}
-							});
-						}
-					});
-				})(req, res);
-			});
 			app.get('/networks/:name/tracks', distro.request.handleRequest(false, function(session, req, res, successback, errback){
 				global.networks.findNetworkByName(req.params.name, function(err, doc){
 					if(err){
@@ -253,22 +203,67 @@ global.db.open(function(err, db){
 					}
 				});
 			}));
-			app.post('/networks/:name/tracks', distro.request.handleRequest(true, function(session, req, res, successback, errback){
-				global.networks.findNetworkByName(req.params.name, function(err, doc){
-					if(err){
-						errback(err);
-					} else if(doc && distro.Networks.isAdmin(session, doc)){
-						// Fuck it.
-						global.tracks.collection.save({ network: [ doc._id ], timestamp: new Date }, function(err, doc){
-							global.tracks.prepareForOutput([doc], { id: true }, function(err, tracks){
-								successback(tracks[0]);
+			app.post('/networks/:name/tracks', function(req, res, next){
+				var upload = new distro.FileUpload(req);
+
+				distro.request.handleRequest(false, function(session, req, res, successback, errback){
+					global.networks.findNetworkByName(req.params.name, function(err, doc){
+						if(err){
+							// TODO: ABORT UPLOAD
+							errback(err);
+						} else if(doc && distro.Networks.isAdmin(session, doc)){
+							//BEGIN
+							upload.complete(function(err, file){
+								console.log('UPLOAD COMPLETED!');
+								var cleanup = {
+									files: [],
+									run: function(){
+										this.files.forEach(function(file){
+											fs.unlink(file, function(err){ if(err){ console.error("Error unlinking " + file + ": ", err); } });
+										});
+									}
+								};
+								if (file) {
+									cleanup.files.push(file);
+								}
+								if (err) {
+									cleanup.run();
+									errback(err);
+								} else {
+									distro.transcode(file, function(err, outputFile){
+										if (outputFile) {
+											// cleanup.files.push(outputFile);
+										}
+										if (err) {
+											cleanup.run();
+											errback(err);
+										} else {
+											// console.log("starting to push to S3");
+											// distro.S3.pushFile(outputFile, path.basename(outputFile), function(err){
+												cleanup.run();
+												// if (err) {
+												// 	errback(err);
+												// } else {
+													// Fuck it.
+													global.tracks.collection.save({ dev_filename: path.basename(outputFile), network: [ doc._id ], timestamp: new Date }, function(err, doc){
+														global.tracks.prepareForOutput([doc], { id: true }, function(err, tracks){
+															successback(tracks[0], { success: true });
+														});
+													});
+											// 	}
+											// });
+										}
+									});
+								}
 							});
-						});
-					} else {
-						errback(new distro.error.ClientError("404"));
-					}
-				});
-			}));
+							//END
+						} else {
+							// TODO: ABORT UPLOAD
+							errback(new distro.error.ClientError("404"));
+						}
+					});
+				})(req, res);
+			});
 			app.put('/networks/:name/tracks/:track', distro.request.handleRequest(true, function(session, req, res, successback, errback){
 				global.networks.findNetworkByName(req.params.name, function(err, doc){
 					if(err){
