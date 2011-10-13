@@ -212,51 +212,55 @@ global.db.open(function(err, db){
 							// TODO: ABORT UPLOAD
 							errback(err);
 						} else if(doc && distro.Networks.isAdmin(session, doc)){
-							//BEGIN
-							upload.complete(function(err, file){
-								console.log('UPLOAD COMPLETED!');
-								var cleanup = {
-									files: [],
-									run: function(){
-										this.files.forEach(function(file){
-											fs.unlink(file, function(err){ if(err){ console.error("Error unlinking " + file + ": ", err); } });
-										});
-									}
-								};
-								if (file) {
-									cleanup.files.push(file);
+							var cleanup = {
+								files: [],
+								run: function(){
+									this.files.forEach(function(file){
+										fs.unlink(file, function(err){ if(err){ console.error("Error unlinking " + file + ": ", err); } });
+									});
 								}
-								if (err) {
-									cleanup.run();
-									errback(err);
-								} else {
+							};
+							async.waterfall([
+								function(callback){
+									upload.complete(function(err, file){
+										console.log('UPLOAD COMPLETED!');
+										if (file) {
+											cleanup.files.push(file);
+										}
+										callback(err, file);
+									});
+								},
+								function(file, callback){
 									distro.transcode(file, function(err, outputFile){
 										if (outputFile) {
 											// cleanup.files.push(outputFile);
 										}
-										if (err) {
-											cleanup.run();
-											errback(err);
-										} else {
-											// console.log("starting to push to S3");
-											// distro.S3.pushFile(outputFile, path.basename(outputFile), function(err){
-												cleanup.run();
-												// if (err) {
-												// 	errback(err);
-												// } else {
-													// Fuck it.
-													global.tracks.collection.save({ dev_filename: path.basename(outputFile), network: [ doc._id ], timestamp: new Date }, function(err, doc){
-														global.tracks.prepareForOutput([doc], { id: true }, function(err, tracks){
-															successback(tracks[0], { success: true });
-														});
-													});
-											// 	}
-											// });
-										}
+										callback(err, outputFile);
 									});
+								},
+								// function(outputFile, callback){
+								// 	console.log("starting to push to S3");
+								// 	distro.S3.pushFile(outputFile, path.basename(outputFile), function(err){
+								// 		callback(err, outputFile);
+								// 	});
+								// },
+								function(outputFile, callback){
+									// Fuck it.
+									global.tracks.collection.save({ dev_filename: path.basename(outputFile), network: [ doc._id ], timestamp: new Date }, callback);
+								},
+								function(doc, callback){
+									global.tracks.prepareForOutput([doc], { id: true }, callback);
+								},
+								function(tracks, callback){
+									successback(tracks[0], { success: true });
+									callback();
+								}
+							], function(err){
+								cleanup.run();
+								if (err) {
+									errback(err);
 								}
 							});
-							//END
 						} else {
 							// TODO: ABORT UPLOAD
 							errback(new distro.error.ClientError("404"));
