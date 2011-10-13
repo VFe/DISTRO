@@ -2,7 +2,7 @@ var fs = require('fs'),
 	knox = require('knox'),
 	s3client = knox.createClient({
 		key: 'AKIAJ6G25MAO2A5YO5ZQ',
-		secret: fs.readFileSync("./s3secret", encoding = 'utf8'),
+		secret: fs.readFileSync("./s3secret", 'utf8'),
 		bucket: 'distro-music-dev'
 	});
 
