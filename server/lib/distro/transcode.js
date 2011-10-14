@@ -17,7 +17,7 @@ module.exports = function transcode(file, callback){
 			if (isWav) {
 				callback(null, outputFilePath);
 			} else {
-				execFile('python', [__dirname + 'id3cp.py', inputFilePath, outputFilePath], function(error, stdout, stderr){
+				execFile('python', [__dirname + '/helpers/id3cp.py', inputFilePath, outputFilePath], function(error, stdout, stderr){
 					if (error) {
 						console.error("id3cp error:", error);
 					}
