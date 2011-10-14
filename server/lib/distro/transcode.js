@@ -1,5 +1,4 @@
-var path = require('path'),
-	execFile = require('child_process').execFile;
+var execFile = require('child_process').execFile;
 
 module.exports = function transcode(file, callback){
 	try {
@@ -18,7 +17,7 @@ module.exports = function transcode(file, callback){
 			if (isWav) {
 				callback(null, outputFilePath);
 			} else {
-				execFile('python', [path.join(__dirname, 'id3cp.py'), inputFilePath, outputFilePath], function(error, stdout, stderr){
+				execFile('python', [__dirname + 'id3cp.py', inputFilePath, outputFilePath], function(error, stdout, stderr){
 					if (error) {
 						console.error("id3cp error:", error);
 					}
