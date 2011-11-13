@@ -13,7 +13,7 @@ Backbone.sync = function(method, model, options){
 
 distro.util = {
 	pad: function(input, length, character){ var padding = length + 1 - input.length; return (padding > 0 ? Array(length + 1 - input.length).join(character || '0') + input : input); },
-	formatTime: function(seconds){ return ((seconds - seconds%60)/60).toString() + ':' + distro.util.pad((seconds%60).toString(), 2); },
+	formatTime: function(seconds){ return ((seconds - seconds % 60) / 60).toString() + ':' + distro.util.pad(Math.ceil(seconds % 60).toString(), 2); },
 	parseDate: (function(){
 		// Based on <http://stackoverflow.com/questions/141348/>
 		var dateRegExp = /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/i;
