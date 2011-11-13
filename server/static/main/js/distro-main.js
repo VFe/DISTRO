@@ -1144,8 +1144,7 @@ distro.loadLandingPage = function(name, callback){
 				name: model.name,
 				longName: model.get('fullname'),
 				show: function($content){
-					var self = this,
-					    $subscribeButton,
+					var $subscribeButton,
 					    subscribed = distro.library.subscriptions.isSubscribed(model.name);
 					$content.attr('id', 'landingBox');
 					$content.stencil(["%form", {},
