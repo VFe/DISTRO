@@ -480,11 +480,7 @@ distro.library.TrackView = Backbone.View.extend({
 	tagName: 'tr',
 	template: [
 		['%td', { $key: 'name' }],
-		['%td', { $key: 'time', $handler: function(time){
-			if (!time) { return ''; }
-			var seconds = time % 60;
-			return Math.floor(time / 60) + ':' + (seconds < 10 ? '0' : '') + seconds;
-		} }],
+		['%td', { $key: 'time', $template: { $test: { $key: '' }, $if: { $handler: distro.util.formatTime }, $else: ''  } }],
 		['%td', { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }] }, $else: { $key: 'artist' } }],
 		{ $test: { $key: 'performance' }, $if: { $test: { $handler: function(track){ return track.performance.date > new Date; } }, $if:
 		{ $key: 'performance', $template: ['%td', { 'class': 'event' }, ['%div', { 'class': { $join: ['event', { $key: 'date', $handler: function(date){
@@ -847,11 +843,7 @@ distro.tml = {
 	TrackView: distro.library.TrackView.extend({
 		template: [
 			['%td', { $test: { $key: 'name' }, $if: { $key: 'name' }, $else: [ '%span.placeholder', distro.loc.stencil('library.untitled') ] } ],
-			['%td', { $key: 'time', $handler: function(time){
-				if (!time) { return ''; }
-				var seconds = time % 60;
-				return Math.floor(time / 60) + ':' + (seconds < 10 ? '0' : '') + seconds;
-			} }],
+			['%td', { $key: 'time', $template: { $test: { $key: '' }, $if: { $handler: distro.util.formatTime }, $else: ''  } }],
 			['%td', { $test: { $key: 'artistNetwork' }, $if: { $key: 'artistNetwork', $template: ['%a', { href: { $join: ['#/', { $key: 'name' }] } }, { $key: 'fullname' }] }, $else: { $key: 'artist' } }],
 			{ $test: { $key: 'performance' }, $if: { $test: { $handler: function(track){ return track.performance.date > new Date; } }, $if:
 			{ $key: 'performance', $template: ['%td', { 'class': 'event' }, ['%div', { 'class': { $join: ['event', { $key: 'date', $handler: function(date){
