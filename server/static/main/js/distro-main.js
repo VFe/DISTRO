@@ -598,7 +598,16 @@ distro.TrackEditView = Backbone.View.extend({
 		$(el).submit(function(e){
 			e.preventDefault();
 			self.trigger('save', { name: formElements.name.value, artist: formElements.artist.value });
-		})
+		});
+		this.model.bind('change', function(model){
+			if (model.hasChanged('name') && ! formElements.name.value) {
+				formElements.name.value = model.get('name');
+			}
+			if ((model.hasChanged('artist') || model.hasChanged('artistNetwork')) && ! formElements.artist.value) {
+				var artistNetwork = model.get('artistNetwork');
+				formElements.artist.value = artistNetwork ? artistNetwork.fullname : model.get('artist');
+			}
+		});
 	},
 	destroy: function(){
 		$(this.el).remove();

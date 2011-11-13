@@ -213,13 +213,14 @@ global.db.open(function(err, db){
 							errback(err);
 						} else if(doc && distro.Networks.isAdmin(session, doc)){
 							var cleanup = {
-								files: [],
-								run: function(){
-									this.files.forEach(function(file){
-										fs.unlink(file, function(err){ if(err){ console.error("Error unlinking " + file + ": ", err); } });
-									});
-								}
-							};
+									files: [],
+									run: function(){
+										this.files.forEach(function(file){
+											fs.unlink(file, function(err){ if(err){ console.error("Error unlinking " + file + ": ", err); } });
+										});
+									}
+								},
+								newTrack = { network: [ doc._id ], timestamp: new Date };
 							async.waterfall([
 								function(callback){
 									upload.complete(function(err, file){
@@ -231,22 +232,40 @@ global.db.open(function(err, db){
 									});
 								},
 								function(file, callback){
+									distro.mp3info(file, function(err, info){
+										var tags = info.tags;
+										[
+											{ in: 'title', out: 'name' },
+											{ in: 'album', out: 'album' },
+											{ in: 'artist', out: 'artist'}
+										].forEach(function(k){
+											var tag = tags[k['in']], v;
+											if (tag && (v = tag[0])) {
+												newTrack[k.out] = v;
+											}
+										});
+										newTrack.time = info.length;
+										callback(err, file);
+									});
+								},
+								function(file, callback){
 									distro.transcode(file, function(err, outputFile){
 										if (outputFile) {
 											// cleanup.files.push(outputFile);
+											newTrack.dev_filename = path.basename(outputFile);
 										}
-										callback(err, outputFile);
+										callback(err/*, outputFile*/);
 									});
 								},
 								// function(outputFile, callback){
 								// 	console.log("starting to push to S3");
 								// 	distro.S3.pushFile(outputFile, path.basename(outputFile), function(err){
-								// 		callback(err, outputFile);
+								// 		callback(err);
 								// 	});
 								// },
-								function(outputFile, callback){
+								function(callback){
 									// Fuck it.
-									global.tracks.collection.save({ dev_filename: path.basename(outputFile), network: [ doc._id ], timestamp: new Date }, callback);
+									global.tracks.collection.save(newTrack, callback);
 								},
 								function(doc, callback){
 									global.tracks.prepareForOutput([doc], { id: true }, callback);
