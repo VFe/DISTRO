@@ -895,7 +895,7 @@ distro.tml = {
 				self.tracks.add(newTrack);
 				console.log('submit', arguments);
 				if (self.libraryView.setSelected(newTrack)){
-					self.uploadingTrack = newTrack;
+					self.uploadingTracks[id] = newTrack;
 				} else {
 					self.tracks.remove(newTrack);
 					return false;
@@ -906,12 +906,14 @@ distro.tml = {
 				console.log('progress', arguments);
 			},
 			onComplete: function(id, fileName, responseJSON){
-				self.uploadingTrack.set(responseJSON.data);
+				self.uploadingTracks[id].set(responseJSON.data);
+				delete self.uploadingTracks[id];
 				console.log('complete', arguments);
 			},
 			onCancel: function(id, fileName){
 				// TODO
 				console.log('cancel', arguments);
+				delete self.uploadingTracks[id];
 			}
 	    });
 	},
