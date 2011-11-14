@@ -34,8 +34,7 @@ Users.prototype.userWithCredentials = function(email, password, callback){
 	this.collection.findOne({"email":email}, function(err, result){
 		if(err){
 			callback(err, null);
-		}
-		if (result && result.salt && result.hash && hash(password, result.salt) === result.hash){
+		} else if (result && result.salt && result.hash && hash(password, result.salt) === result.hash){
 			callback(null, result);
 		} else {
 			callback(null, null);
