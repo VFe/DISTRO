@@ -529,8 +529,8 @@ distro.library.TrackView = Backbone.View.extend({
 		"mousedown": "select"
 	},
 	initialize: function(options) {
-		_.bindAll(this, 'render', 'setPlaying', 'play');
-		this.model.bind('change', this.render);
+		_.bindAll(this, 'setPlaying', 'play');
+		this.model.bind('change', function(){ this.render(); }, this);
 		this.model.bind('reset', this.render);
 		this.model.view = this;
 		this.$el = $(this.el);
@@ -873,12 +873,50 @@ distro.tml = {
 				],
 				{$test: {$key:'extLink'}, $if: ['%a.eventLink', {target:'_blank', href:{$key:'extLink'}}]}
 			]] }, $else: ['%td'] }, $else: ['%td'] },
-			['%td', "STATUS"]
+			['%td', { $test: { $key: 'status' },
+				$if: { $key: 'status' },
+				$else: { $test: { $key: 'release' },
+					$if: { $key: 'release', $handler: function(releaseDate){
+						// More stencil abuse
+						return stencil({ $join: distro.loc.str('tml.status.broadcast') }, {
+							month: releaseDate.getMonth(),
+							day: releaseDate.getDate(),
+							year: releaseDate.getFullYear(),
+							hour: releaseDate.getHours(),
+							minute: distro.util.pad(releaseDate.getMinutes().toString(), 2)
+						});
+					} },
+					$else: ['%a.broadcastNow', distro.loc.stencil('tml.status.broadcastNow')]
+				}
+			}]
 		],
+		events: _.extend({
+			"click .broadcastNow": "broadcastNow"
+		}, distro.library.TrackView.prototype.events),
+		initialize: function(){
+			distro.library.TrackView.prototype.initialize.apply(this, arguments);
+			this.model.bind('uploadProgress', this.uploadProgress, this);
+		},
+		uploadProgress: function(model, loaded, total){
+			// STENCIL ABUSE
+			this.render(model, loaded === total ? distro.loc.str('tml.status.processing') : stencil({ $join: distro.loc.str('tml.status.uploading') }, { percent: Math.floor(loaded / total * 100) }));
+		},
+		broadcastNow: function(){
+			alert('broadcast now: ' + this.model.get('name'));
+		},
+		render: function(model, status){
+			var data = this.model.toJSON();;
+			if (status) {
+				data = _.extend(data, { status: status });
+			}
+			this.$el.empty().stencil(this.template, data);
+		}
 	}),
-	tracks: new Backbone.Collection({ model: distro }),
+	tracks: new (Backbone.Collection.extend({ model: distro.Track })),
+	uploadingTracks: {},
 	$subscriptionContainer: $('#tmlSubscriptionContainer'),
 	show: function(network){
+		var self = this;
 		this.reset();
 		this.tracks.url = 'networks/' + encodeURIComponent(network.get('name')) + '/tracks';
 		this.tracks.fetch();
@@ -886,14 +924,12 @@ distro.tml = {
 		this.network = network;
 		$(document.body).addClass('TML');
 		this.$subscriptionContainer.append((this.subscriptionView = new distro.library.SubscriptionAdminView({ model: network })).el);
-		console.log('upload button:', $(this.subscriptionView.el).find('.upload:first')[0]);
 		new qq.FileUploaderBasic({
 	        button: $(this.subscriptionView.el).find('.upload:first')[0],
 	        action: distro.SERVER + this.tracks.url,
 			onSubmit: function(id, fileName){
 				var newTrack = new distro.Track;
 				self.tracks.add(newTrack);
-				console.log('submit', arguments);
 				if (self.libraryView.setSelected(newTrack)){
 					self.uploadingTracks[id] = newTrack;
 				} else {
@@ -902,13 +938,11 @@ distro.tml = {
 				};
 			},
 			onProgress: function(id, fileName, loaded, total){
-				// TODO
-				console.log('progress', arguments);
+				self.uploadingTracks[id].trigger('uploadProgress', self.uploadingTracks[id], loaded, total);
 			},
 			onComplete: function(id, fileName, responseJSON){
 				self.uploadingTracks[id].set(responseJSON.data);
 				delete self.uploadingTracks[id];
-				console.log('complete', arguments);
 			},
 			onCancel: function(id, fileName){
 				// TODO

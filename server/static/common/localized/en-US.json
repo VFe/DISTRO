@@ -58,7 +58,13 @@
 	"tml": {
 		"status": "Status",
 		"saveError": "There was an error saving this track. Try again, and get in touch with us if you keep having trouble.",
-		"uploadHover": "Upload — Add a new track to this network"
+		"uploadHover": "Upload — Add a new track to this network",
+		"status": {
+			"uploading": [ "Uploading (", { "$key": "percent" }, "%)" ],
+			"processing": "Processing…",
+			"broadcastNow": "Broadcast Now",
+			"broadcast": [ "Broadcast ", { "$key": "month" }, "/", { "$key": "day" }, "/", { "$key": "year" }, " at ", { "$key": "hour" }, ":", { "$key": "minute" } ]
+		}
 	},
 	"registration": {
 		"emailAddressQuery": "What's your email address?",
