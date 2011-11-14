@@ -1,5 +1,3 @@
-require.paths.unshift(__dirname + "/lib");
-
 var util = require('util'),
 	fs = require('fs'),
 	path = require('path'),
@@ -7,9 +5,9 @@ var util = require('util'),
 	url = require('url'),
 	connect = require('connect'),
 	form = require('connect-form'),
-	distro = require('distro'),
-	port = process.env.PRODUCTION ? 8085 : 3000,
-	async = require('async');
+	distro = require('./lib/distro'),
+	async = require('async'),
+	port = process.env.PRODUCTION ? 8085 : 3000;
 
 global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser: 'BSONNative' in mongoDB});
 global.users = new distro.Users();
