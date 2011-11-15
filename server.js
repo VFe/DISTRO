@@ -95,7 +95,7 @@ global.db.open(function(err, db){
 					next(new distro.error.ClientError("registration.errors.noCredentials"));
 				}
 			});
-			app.get('/library', distro.middleware.ensureUser(), function(req, res, next){
+			app.get('/library', function(req, res, next){
 				var user = global.users.userOrGeneric(req.session && req.session.user);
 				global.users.subscriptions(user, function(err, subscriptions){
 					if (err) {
