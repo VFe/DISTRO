@@ -247,11 +247,23 @@ global.db.open(function(err, db){
 									});
 								},
 								function(file, callback){
+									distro.md5(file, function(err, md5){
+										newTrack.uploadMd5 = md5;
+										callback(err, file);
+									});
+								},
+								function(file, callback){
 									distro.transcode(file, function(err, outputFile){
 										if (outputFile) {
 											// cleanup.files.push(outputFile);
 											newTrack.dev_filename = path.basename(outputFile);
 										}
+										callback(err, outputFile);
+									});
+								},
+								function(outputFile, callback){
+									distro.md5(outputFile, function(err, md5){
+										newTrack.md5 = md5;
 										callback(err/*, outputFile*/);
 									});
 								},
