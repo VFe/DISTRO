@@ -287,7 +287,10 @@ global.db.open(function(err, db){
 							], function(err){
 								cleanup.run();
 								if (err) {
-									errback(err);
+									// File Upload Plugin throws away the content of non-2xx responses. Lovely.
+									// errback(err);
+									console.error('Failed upload: ', err);
+									successback(null, { error: true });
 								}
 							});
 						} else {

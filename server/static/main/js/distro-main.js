@@ -902,10 +902,14 @@ distro.tml = {
 		initialize: function(){
 			distro.library.TrackView.prototype.initialize.apply(this, arguments);
 			this.model.bind('uploadProgress', this.uploadProgress, this);
+			this.model.bind('uploadError', this.uploadError, this);
 		},
 		uploadProgress: function(model, loaded, total){
 			// STENCIL ABUSE
 			this.render(model, loaded === total ? distro.loc.str('tml.status.processing') : stencil({ $join: distro.loc.str('tml.status.uploading') }, { percent: Math.floor(loaded / total * 100) }));
+		},
+		uploadError: function(model, loaded, total){
+			this.render(model, distro.loc.str('tml.status.error'));
 		},
 		broadcastNow: function(){
 			alert('broadcast now: ' + this.model.get('name'));
@@ -946,9 +950,19 @@ distro.tml = {
 			onProgress: function(id, fileName, loaded, total){
 				self.uploadingTracks[id].trigger('uploadProgress', self.uploadingTracks[id], loaded, total);
 			},
+			showMessage: function(error){},
 			onComplete: function(id, fileName, responseJSON){
-				self.uploadingTracks[id].set(responseJSON.data);
-				delete self.uploadingTracks[id];
+				var uploadingTrack = self.uploadingTracks[id];
+				if (responseJSON.error) {
+					uploadingTrack.set({ locked: true });
+					if (self.libraryView.selectedTrack === uploadingTrack) {
+						self.libraryView.setSelected(null);
+					}
+					uploadingTrack.trigger('uploadError', uploadingTrack);
+				} else {
+					uploadingTrack.set(responseJSON.data);
+				}
+				delete uploadingTrack;
 			},
 			onCancel: function(id, fileName){
 				// TODO
@@ -976,6 +990,9 @@ distro.tml.libraryView = new (distro.LibraryView.extend({
 	TrackView: distro.tml.TrackView,
 	setSelected: function(track){
 		var trackEditor;
+		if (track && track.get('locked')) {
+			return false;
+		}
 		distro.LibraryView.prototype.setSelected.call(this, track);
 		if (distro.tml.trackEditor) {
 			distro.tml.trackEditor.destroy();
@@ -998,8 +1015,8 @@ distro.tml.libraryView = new (distro.LibraryView.extend({
 			});
 			$('#infoBox').append(trackEditor.el);
 			distro.tml.trackEditor = trackEditor;
+			return true;
 		}
-		return true;
 	}
 }))({
 	el: $('#tmlBody>tbody')[0],

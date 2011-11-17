@@ -63,7 +63,8 @@
 			"uploading": [ "Uploading (", { "$key": "percent" }, "%)" ],
 			"processing": "Processing…",
 			"broadcastNow": "Broadcast Now",
-			"broadcast": [ "Broadcast ", { "$key": "month" }, "/", { "$key": "day" }, "/", { "$key": "year" }, " at ", { "$key": "hour" }, ":", { "$key": "minute" } ]
+			"broadcast": [ "Broadcast ", { "$key": "month" }, "/", { "$key": "day" }, "/", { "$key": "year" }, " at ", { "$key": "hour" }, ":", { "$key": "minute" } ],
+			"error": [ "%span", { "style": "color: red", "title": "Try again, or contact us if you keep having trouble. (This track will go away when you return to your library.)" }, "There was a problem with the upload! Try again, or contact us…" ]
 		}
 	},
 	"registration": {
