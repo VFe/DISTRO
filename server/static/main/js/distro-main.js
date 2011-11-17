@@ -1090,9 +1090,9 @@ distro.player = new (function(){
 				this.loaded = false;
 				this.current = soundManager.createSound({
 					id: "track",
-					url: ( networkWithFile
-							? "//distro-music.s3.amazonaws.com/" + encodeURIComponent(track.get('networkWithFile').name) + "/" + encodeURIComponent(track.get('filename')) + ".mp3"
-							: "//distro-music-dev.s3.amazonaws.com/" + track.get('filename')
+					url: "//distro-music.s3.amazonaws.com/" + ( networkWithFile
+							? encodeURIComponent(track.get('networkWithFile').name) + "/" + encodeURIComponent(track.get('filename')) + ".mp3"
+							: track.get('filename')
 						),
 					onplay: onplay,
 					onresume: onplay,
