@@ -13,10 +13,19 @@ exports.pushFile = function(file, name, callback){
 		} else {
 			var stream = fs.createReadStream(file, {bufferSize: stat.size}); //TODO FIGURE OUT WHAT THIS SHIT DOES
 			s3client.putStream(stream, name, function(err, res){
+				var body, error;
 				if(err){
 					callback(err);
+				} else if (res.statusCode < 200 || res.statusCode > 299) {
+					body = '';
+					res.setEncoding('utf8');
+					res.on('data', function (d) {
+						body += d;
+					});
+					res.on('end', function(){
+						callback(new Error(body));
+					})
 				} else {
-					console.log(res);
 					callback(null);
 				}
 			});
