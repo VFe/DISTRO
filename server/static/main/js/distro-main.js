@@ -591,6 +591,9 @@ distro.TrackEditView = Backbone.View.extend({
 		var self = this,
 			el = this.el = haj(stencil(this.template, this.model.attributes)),
 			formElements = el.elements;
+			if ( ! this.model.id) {
+				formElements.editTrackSaveButton.setAttribute('disabled');
+			}
 		$(el).submit(function(e){
 			e.preventDefault();
 			self.trigger('save', { name: formElements.name.value, artist: formElements.artist.value });
@@ -602,6 +605,9 @@ distro.TrackEditView = Backbone.View.extend({
 			if ((model.hasChanged('artist') || model.hasChanged('artistNetwork')) && ! formElements.artist.value) {
 				var artistNetwork = model.get('artistNetwork');
 				formElements.artist.value = artistNetwork ? artistNetwork.fullname : model.get('artist');
+			}
+			if (model.hasChanged('id')) {
+				formElements.editTrackSaveButton[model.id ? 'removeAttribute' : 'setAttribute']('disabled');
 			}
 		});
 	},
