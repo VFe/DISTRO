@@ -1067,7 +1067,8 @@ distro.player = new (function(){
 		}
 		this.play = function(track){
 			var artistNetwork = track.get('artistNetwork'),
-				artistNetworkName = artistNetwork && artistNetwork.name;
+				artistNetworkName = artistNetwork && artistNetwork.name,
+				networkWithFile = track.get('networkWithFile');
 			mpq.push([
 				"track",
 				"trackPlay",
@@ -1089,7 +1090,10 @@ distro.player = new (function(){
 				this.loaded = false;
 				this.current = soundManager.createSound({
 					id: "track",
-					url: "//distro-music.s3.amazonaws.com/" + encodeURIComponent(track.get('networkWithFile').name) + "/" + encodeURIComponent(track.get('filename')) + ".mp3",
+					url: ( networkWithFile
+							? "//distro-music.s3.amazonaws.com/" + encodeURIComponent(track.get('networkWithFile').name) + "/" + encodeURIComponent(track.get('filename')) + ".mp3"
+							: "//distro-music-dev.s3.amazonaws.com/" + track.get('filename')
+						),
 					onplay: onplay,
 					onresume: onplay,
 					onpause: onpause,

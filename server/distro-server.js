@@ -255,8 +255,7 @@ global.db.open(function(err, db){
 								function(file, callback){
 									distro.transcode(file, function(err, outputFile){
 										if (outputFile) {
-											// cleanup.files.push(outputFile);
-											newTrack.dev_filename = path.basename(outputFile);
+											cleanup.files.push(outputFile);
 										}
 										callback(err, outputFile);
 									});
@@ -264,15 +263,16 @@ global.db.open(function(err, db){
 								function(outputFile, callback){
 									distro.md5(outputFile, function(err, md5){
 										newTrack.md5 = md5;
-										callback(err/*, outputFile*/);
+										callback(err, outputFile);
 									});
 								},
-								// function(outputFile, callback){
-								// 	console.log("starting to push to S3");
-								// 	distro.S3.pushFile(outputFile, path.basename(outputFile), function(err){
-								// 		callback(err);
-								// 	});
-								// },
+								function(outputFile, callback){
+									var filename = newTrack.md5[0] + newTrack.md5[1] + '/' + newTrack.md5 + '.mp3';
+									newTrack.filename = filename;
+									distro.S3.pushFile(outputFile, filename, function(err){
+										callback(err);
+									});
+								},
 								function(callback){
 									// Fuck it.
 									global.tracks.collection.save(newTrack, callback);

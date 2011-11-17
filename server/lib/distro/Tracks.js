@@ -21,7 +21,9 @@ Tracks.prototype.prepareForOutput = function(tracks, options, callback){
 		if (options.id) {
 			track.id = inTrack._id;
 		}
-		track.networkWithFile = networkProxies.create(track.network[0]);
+		if ( ! ('md5' in inTrack)) {
+			track.networkWithFile = networkProxies.create(track.network[0]);
+		}
 		if (options.subscribedNetworkIds) {
 			track.network = track.network.filter(function(network){ return options.subscribedNetworkIds.indexOf(network.id) != -1; });
 		}
