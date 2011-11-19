@@ -1078,11 +1078,11 @@ distro.player = new (function(){
 			player.next();
 		}
 		function onwhileplaying(){
-			currentTime.data = distro.util.formatTime(Math.floor(this.position/1000));
+			currentTime.data = distro.util.formatTime(this.position/1000);
 			updateSlider();
 		}
 		function onwhileloading(){
-			totalTime.data = distro.util.formatTime(Math.floor(this.durationEstimate/1000));
+			totalTime.data = distro.util.formatTime(this.durationEstimate/1000);
 			updateSlider();
 		}
 		function updateSlider(){
@@ -1127,7 +1127,7 @@ distro.player = new (function(){
 					onload: function(success){
 						if (success) {
 							this.loaded = true;
-							totalTime.data = distro.util.formatTime(Math.floor(this.duration/1000));
+							totalTime.data = distro.util.formatTime(this.duration/1000);
 							updateSlider();
 						} else {
 							alert(distro.loc.str('player.errors.loadFail'));

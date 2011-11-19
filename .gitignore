@@ -1,7 +1,7 @@
-/server/static/common/style.css
+/static/style.css
 /DISTRO.tmproj
+/node_modules
 
-/server/static/style.css
 .DS_Store
 /DistroAuth.txt
 /s3secret

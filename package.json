@@ -1,0 +1,11 @@
+{
+	"name": "DISTRO",
+	"version": "0.0.1",
+	"dependencies": {
+		"connect": "1.7",
+		"connect-form": "0.2",
+		"knox": "0.0.9",
+		"mongodb": "0.9",
+		"uuid": "0.0"
+	}
+}
