@@ -285,7 +285,8 @@ global.db.open(function(err, db){
 							// File Upload Plugin throws away the content of non-2xx responses. Lovely.
 							// next(err);
 							console.error('Failed upload: ', err);
-							res.send({ error: true });
+							res.setMetadata({ error: true });
+							res.send();
 						}
 					});
 				} else {
