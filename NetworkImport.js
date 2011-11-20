@@ -48,8 +48,8 @@ var urlLeaderRegExp = /^(?:https?:\/\/)?(?:www.)?(.*)$/i,
 		"YELP": {newName:"yelp", object:"presence", host: "yelp.com"}
 	};
 	
-importDB = new mongoDB.Db('Import', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
-exportDB = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || mongoDB.Connection.DEFAULT_PORT, {}), {native_parser:true});
+importDB = new mongoDB.Db('Import', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || 27017, {}), {native_parser: 'BSONNative' in mongoDB});
+exportDB = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || 27017, {}), {native_parser: 'BSONNative' in mongoDB});
 
 importDB.open(function(err, db) {
 	exportDB.open(function(err, exportDB){
