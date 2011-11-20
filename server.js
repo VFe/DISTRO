@@ -1,7 +1,7 @@
 var util = require('util'),
 	fs = require('fs'),
 	path = require('path'),
-	mongoDB = require('mongodb'),
+	mongodb = require('mongodb'),
 	url = require('url'),
 	connect = require('connect'),
 	form = require('connect-form'),
@@ -9,7 +9,7 @@ var util = require('util'),
 	async = require('async'),
 	port = process.env.PRODUCTION ? 8085 : 3000;
 
-global.db = new mongoDB.Db('Distro', new mongoDB.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || 27017, {}), {native_parser: 'BSONNative' in mongoDB});
+global.db = new mongodb.Db('Distro', new mongodb.Server(process.env['MONGO_NODE_DRIVER_HOST'] ||  'localhost', process.env['MONGO_NODE_DRIVER_PORT'] || 27017, {}), {native_parser: 'BSONNative' in mongodb});
 global.users = new distro.Users();
 global.sessions = new distro.Sessions();
 global.tracks = new distro.Tracks();
