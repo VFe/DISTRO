@@ -104,6 +104,9 @@ img{
 a:focus{
 	outline: none;
 }
+a {
+	cursor: pointer;
+}
 tr.filler{
 	display: table-row !important;
 	height: auto !important;
@@ -421,11 +424,6 @@ html.fontface.no-brokenfontvariant #account>a{
 	width: 100%;
 	height: 100%;
 }
-#infoBox{
-	width: 100%;
-	height: 20em;
-	margin: 1em 0;
-}
 table{
 	border-spacing: 0;
 	border-collapse: collapse;
@@ -444,7 +442,7 @@ thead.sortable th.descending{
 	background-repeat: no-repeat;
 	background-position: right center;
 }
-#musicTableHead, #subscriptionsTableHead, #musicTableBody, #subscriptionsTableBody{
+#musicTableHead, #tmlHead, #subscriptionsTableHead, #musicTableBody, #tmlBody, #subscriptionsTableBody{
 	.border-box;
 	width:100%;
 	table-layout: fixed;
@@ -452,123 +450,139 @@ thead.sortable th.descending{
 #musicTableBodyContainer:focus{
 	outline: none;
 }
-#musicTableBody .filler:nth-child(even){
-	.zebra(rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.8), 2em);
-}
-#musicTableBody .filler:nth-child(odd){
-	.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8), 2em);
-}
-#musicTableBody tr:not(.filler){
-	cursor: default;
-	.button;
-	&:nth-child(odd){
-		background-color: rgba(255, 255, 255, 0.8);
+#musicTableBodyContainer {
+	.filler:nth-child(even),{
+		.zebra(rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.8), 2em);
 	}
-	&:nth-child(even){
-		background-color: rgba(240, 240, 240, 0.8);
+	.filler:nth-child(odd){
+		.zebra(rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8), 2em);
 	}
-}
-#musicTableBody tr.playing td:not(.event){
-	font-weight: bold;
+	tr:not(.filler):not(.selected){
+		cursor: default;
+		.button;
+		&:nth-child(odd){
+			background-color: rgba(255, 255, 255, 0.8);
+		}
+		&:nth-child(even){
+			background-color: rgba(240, 240, 240, 0.8);
+		}
+	}
+	tr.playing td:not(.event){
+		font-weight: bold;
+	}
 }
 #musicTableBodyContainer tr.selected{
 	background-color: #ccc;
 }
+#musicTableBodyContainer .placeholder{
+	color: #999;
+}
 #musicTableBodyContainer:focus tr.selected{
 	background-color: #999;
 	color: white;
-}
-#musicTableBody td.new{
-	background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #3e6a97), color-stop(0.5, rgba(0, 0, 0, 0)));
-	background-image: -moz-linear-gradient(45deg, #3e6a97 50%, rgba(0, 0, 0, 0) 50%);
-}
-#musicTableBody td.event{
-	overflow: visible;
-	padding: 0;
-}
-#musicTableBody td.event div.event{
-	display: block;
-	width: 100%;
-	height: 100%;
-	position: relative;
-	background-position: center;
-	background-repeat: no-repeat;
-	&.someday{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/black.png');
-	}
-	&.soon{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/yellow.png');
-	}
-	&.sooner{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/orange.png');
-	}
-	&.soonest{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/red.png');
+	.placeholder{
+		color: #EEE;
 	}
 }
-#musicTableBody td.fresh div.fresh{
-	display: block;
-	width: 100%;
-	height: 100%;
-	position: relative;
-	background-position: center;
-	background-repeat: no-repeat;
-	&.blue{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/blue.png');
+#musicTableBody, #tmlBody{
+	td.new{
+		background-image: -webkit-gradient(linear, left bottom, right top, color-stop(0.5, #3e6a97), color-stop(0.5, rgba(0, 0, 0, 0)));
+		background-image: -moz-linear-gradient(45deg, #3e6a97 50%, rgba(0, 0, 0, 0) 50%);
 	}
-	&.indigo{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/indigo.png');
+	td.event{
+		overflow: visible;
+		padding: 0;
 	}
-	&.violet{
-		background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/violet.png');
+	td.event div.event{
+		display: block;
+		width: 100%;
+		height: 100%;
+		position: relative;
+		background-position: center;
+		background-repeat: no-repeat;
+		&.someday{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/black.png');
+		}
+		&.soon{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/yellow.png');
+		}
+		&.sooner{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/orange.png');
+		}
+		&.soonest{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/red.png');
+		}
+	}
+	td.fresh div.fresh{
+		display: block;
+		width: 100%;
+		height: 100%;
+		position: relative;
+		background-position: center;
+		background-repeat: no-repeat;
+		&.blue{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/blue.png');
+		}
+		&.indigo{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/indigo.png');
+		}
+		&.violet{
+			background-image: url('http://distro-static.s3.amazonaws.com/music_library/fresh/violet.png');
+		}
+	}
+	td.event div.event:not(:hover) .eventDetails{
+		display: none;
+	}
+	td.event div.event:hover{
+		background-color: #222;
+	}
+	td.event div.event div.eventDetails{
+		position: absolute;
+		right: 100%;
+		background: #222;
+		color: white;
+		.border-radius(0.5em 0 0 0.5em);
+		padding: 0.5em 1em;
+	}
+	td.event div.eventDetails a{
+		color: @brightBlue;
+		font-size: 1.3em;
+		font-weight: 500;
+	}
+	td.event a.eventLink{
+		display:block;
+		height: 100%;
+	}
+	td.event span.cityState{
+		padding-left: 0.3em;
+		color: #999;
+	}
+	a, #subscriptionsTable a, .subscription a {
+		text-decoration: none;
+	}
+	a {
+		color: #3B698A;
 	}
 }
-#musicTableBody td.event div.event:not(:hover) .eventDetails{
-	display: none;
+#musicTableBody, #tmlBody, #subscriptionsTable, #tmlSubscriptionContainer{
+	a {
+		text-decoration: none;
+	}
 }
-#musicTableBody td.event div.event:hover{
-	background-color: #222;
-}
-#musicTableBody td.event div.event div.eventDetails{
-	position: absolute;
-	right: 100%;
-	background: #222;
-	color: white;
-	.border-radius(0.5em 0 0 0.5em);
-	padding: 0.5em 1em;
-}
-#musicTableBody td.event div.eventDetails a{
-	color: @brightBlue;
-	font-size: 1.3em;
-	font-weight: 500;
-}
-#musicTableBody td.event a.eventLink{
-	display:block;
-	height: 100%;
-}
-#musicTableBody td.event span.cityState{
-	padding-left: 0.3em;
-	color: #999;
-}
-#musicTableBody a, #subscriptionsTable a {
-	text-decoration: none;
-}
-#musicTableBody a {
-	color: #3B698A;
-}
-#subscriptionsTable a {
+
+.subscription a {
 	color: inherit;
 }
 
-#musicTableBodyContainer td, #subscriptionsTable td{
-	padding: 0 0.5em;
+#musicTableBodyContainer td, #subscriptionsTable td, #tmlSidebar .subscription{
+	padding: 0;
 	line-height: 2em;
 	height: 2em;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-#musicTableHead th, #musicTableBody td{
+#musicTableHead th, #tmlHead th, #musicTableBody td, #tmlBody td{
 	padding: 0 0.5em;
 }
 #freshHead {
@@ -579,7 +593,7 @@ thead.sortable th.descending{
 th.descending #freshHead, th.ascending #freshHead{
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAATtJREFUeNqckz1Ow0AQhePFRUrnBHFJmQMEBU6Ab4Bzg9AlVUJF6FzSkdzAJV2M5APkCM4JWDrKzFqf0cjymsCTRrvefTP75sfBwIPlchXJMuGz2m6fqy6eGfjhnA9Y6iP1BbgIQYf0RJYHsaR1lYvtJZVcOE7RTPbzoJXzG44u372Y5XosdktaBXuHnU7hgHMGaS12j/OCYE+qsDVCXt9wkVGwSHG+WBsFjygt6hSQ/unkQIqVs1PygZoGFq5TNTKqWLbl7EOkVCUGJ9uS/RtmqItDDo6e12PViS6MQ0UsPAH60joZeu5Ipz+kcKTglWHCmmGpLnDWKeVXZVl+T6c3AW1x7bkWG/YEeGVWXmQO3utJlM0GWQsUddWjYBJTlGY/kwjumLCUYJnqd9O6NQ/M5VH7779RH54FGAAHC1xQvuNSggAAAABJRU5ErkJggg==);
 } 
-#musicTableHead th {
+#musicTableHead th, #tmlHead th {
 	border-left: 1px solid @lightBorder;
 }
 #musicTableHeadContainer, #subscriptions thead tr{
@@ -587,7 +601,7 @@ th.descending #freshHead, th.ascending #freshHead{
 	background-color: rgb(40, 40, 40);
 	.commonGradient;
 }
-#musicTableHead th, #subscriptions th{
+#musicTableHead th, #tmlHead th, #subscriptions th{
 	text-align: left;
 	color: #888;
 	font-weight: 200;
@@ -597,14 +611,14 @@ th.descending #freshHead, th.ascending #freshHead{
 	text-transform: uppercase;
 }
 html.fontface.no-brokenfontvariant{
-	#musicTableHead th, #subscriptions th{
+	#musicTableHead th, #tmlHead th, #subscriptions th{
 		text-transform: lowercase;
 		font-variant: small-caps;
 		font-size: 1.2em;
 		line-height: 28px;
 	}
 }
-#musicTableBodyContainer, #subscriptionsTableBodyContainer{
+#musicTableBodyContainer, #subscriptionsTableBodyContainer, #tmlSidebar{
 	overflow-y: auto;
 	bottom: 0;
 	right: 0;
@@ -618,7 +632,7 @@ html.js #musicTableBodyContainer{
 #musicTableBodyContainer{
 	top: 2.4em;
 }
-#subscriptionsTableBodyContainer{
+#subscriptionsTableBodyContainer, #tmlSidebar{
 	top: 5.2em;
 }
 #musicTableBodyContainer table, #subscriptionsTable{
@@ -630,15 +644,14 @@ html.js #musicTableBodyContainer{
 	top: 0;
 	bottom: 0;
 }
-#subscriptionsTable{
+#subscriptionsTable, #tmlSidebar{
 	background-color: rgb(40, 40, 40);
 	.backgroundGradientVertical(#373737, #222);
 }
 #subscriptionsTable tr:not(.filler) {
 	border-bottom: 1px solid @lightBorder;
 }
-#subscriptionsTable div.subscription{
-	margin: 0 -0.5em;
+#subscriptionsTable .subscription, #tmlSidebar .subscription{
 	overflow: hidden;
 	text-overflow: ellipsis;
 	padding: 0 0.8em;
@@ -646,69 +659,117 @@ html.js #musicTableBodyContainer{
 	white-space: nowrap;
 	.border-box;
 	.subscriptionControls{
+		.button;
+		z-index: 1;
+		position: relative;
 		font-family: "Helvetica Neue", Helvetica, sans-serif;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		div{
-			display: none;
+		float: right;
+		div, a{
 			line-height: 1.5em;
-			margin: 0.3em 0;
+			margin: 0.3em 0 0.3em 0.4em;
 			width: 1.5em;
 			height: 1.5em;
 			text-align: center;
-			position: absolute;
+			float: left;
 			.border-radius(0.4em);
 			cursor: pointer;
+			&.admin{
+				display: none;
+				background: #F00;
+			}
 			&.mute{
+				visibility: hidden;
 				background: #F88017;
-				right: 2.4em;
-				top: 0;
 			}
 			&.solo{
+				visibility: hidden;
 				background: #87AFC7;
-				right: 0.5em;
-				top: 0;
 			}
 		}
 	}
-	&.soloed{
-		padding-right: 2em;
-	}
-	&:hover, &.muted{
-		padding-right: 4em;
-	}
 	&:hover{
-		background: rgba(220, 220, 220, 0.2);
-		.subscriptionControls div{
+		a.admin{
 			display: block;
+		}
+		div.mute, div.solo {
+			visibility: visible;
 		}
 	}
 	&.muted{
 		&:not(:hover) .subscriptionControls div.mute{
-			display: block;
+			visibility: visible;
 			color: #F88017;
 			background: none;
 		}
 		&:hover .subscriptionControls div.mute{
-			background-color: #FF6929;
 			.box-shadow(0px 0px 0.7em #FF6929);
 		}
 	}
 	&.soloed{
 		&:not(:hover) .subscriptionControls div.solo{
-			display: block;
+			visibility: visible;
 			color: #87AFC7;
 			background: none;
 		}
 		&:hover .subscriptionControls div.solo{
-			background-color: #93C7E6;
 			.box-shadow(0px 0px 0.7em #95D6FC);
 		}
 	}
 }
 
+#subscriptionsTable .subscription:hover, #tmlSidebar .subscription{
+	background: rgba(220, 220, 220, 0.2);
+}
+#tmlSidebar .subscription .subscriptionControls {
+	a.admin{
+		display: block;
+	}
+	div.upload {
+		background: #252525;
+	}
+}
+#tmlSidebar .subscription .subscriptionControls a.admin{
+	.box-shadow(0px 0px 0.7em #FFF);
+}
+
+/* Track management library */
+body.TML{
+	#musicTableHead { display: none; }
+	#musicTableBody { display: none; }
+	#subscriptionsTableBodyContainer { display: none; }
+}
+body:not(.TML){
+	#tmlHead { display: none; }
+	#tmlBody { display: none; }
+	#tmlSidebar { display: none; }
+}
+#tmlSubscriptionContainer{
+	width: 100%;
+}
+#tmlSidebar .subscription{
+	background: rgba(220, 220, 220, 0.2);
+}
+#infoBox{
+	margin: 0;
+	position: absolute;
+	top: 2em;
+	border-top: 0.2em solid @lightBorder;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	overflow: auto;
+}
+#infoBoxPlaceholder{
+	font-size: 1.5em;
+	text-align: center;
+	color: #888;
+	margin: 1em 0;
+	&:nth-last-child(n+2){
+		display: none;
+	}
+}
+
+/* Lightbox */
 #lightbox{
 	background: rgba(0, 0, 0, 0.7);
 	height: 100%;
@@ -984,6 +1045,27 @@ html.js #musicTableBodyContainer{
 }
 #landingBox{
 	width: 65em;
+	.ownerbox{
+		text-align: center;
+		position: absolute;
+		margin: 0 auto;
+		width: 60em;
+		left: 2.5em;
+		padding: 1em;
+		top: 100%;
+		background: #080808;
+		.box-shadow(0px 0.5em 3em rgba(0, 0, 0, 0.5));
+		.border-radius(0 0 1em 1em);
+		h1{
+			font-weight: 200;
+			margin: 0;
+			font-size: 1.5em;
+			color: @brightBlue;
+		}
+		a{
+			color: inherit;
+		}
+	}
 }
 #aboutBox{
 	width: 73em;
@@ -1353,6 +1435,67 @@ ul.aboutIcons{
 	padding: 0 0.25em;
 	.border-radius(0.25em);
 }
+#lightboxWrapper #loginRegisterBox, #editTrack{
+	input[type='text'], input[type='email'], input[type='password']{
+		display: block;
+		.border-box;
+		width: 100%;
+		margin: 0.8em 0;
+		font: inherit;
+		padding: 0.7em;
+		font-size: 1.2em;
+		background: #4A4A4A;
+		border: 1px solid #999;
+		.border-radius(0.4em);
+		color: white;
+		&:disabled{
+			background: #333;
+			border-color: #555;
+			&::-webkit-input-placeholder{
+				color: #444;
+			}
+			&:-moz-placeholder{
+				color: #444;
+			}
+		}
+		&:focus{
+			border-color: #EEE;
+			outline: none;
+		}
+	}
+	button{
+		color: black;
+		border: none;
+		.border-radius(0.7em);
+		font: inherit;
+		font-size: 1em;
+		font-weight: 500;
+		padding: 0.5em 0;
+		width: 5em;
+		margin-right: 1em;
+	}
+	#logIn button{
+		background-color: #DD5;
+	}
+	#register button{
+		background-color: #6CE;
+	}
+	button:enabled{
+		cursor: pointer;
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0)), color-stop(0.5, rgba(50, 50, 50, 0)), to(rgba(50, 50, 50, 0.8)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0) 50%, rgba(50, 50, 50, 0.8));
+	}
+	button:disabled{
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.5)), color-stop(0.5, rgba(50, 50, 50, 0.5)), to(rgba(50, 50, 50, 0.9)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.5) 50%, rgba(50, 50, 50, 0.8));
+		color: #333;
+	}
+	button:enabled:active{
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.9)), color-stop(0.5, rgba(50, 50, 50, 0)), to(rgba(50, 50, 50, 0)));
+		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.9), rgba(50, 50, 50, 0) 50%);
+	}
+}
+
 #lightboxWrapper #loginRegisterBox{
 	font-size: 11px;
 	width: 350px;
@@ -1384,60 +1527,8 @@ ul.aboutIcons{
 	form{
 		margin: 1.5em 1.5em;
 	}
-	input[type='text'], input[type='email'], input[type='password']{
-		display: block;
-		.border-box;
-		width: 100%;
-		margin: 0.8em 0;
-		font: inherit;
-		padding: 0.7em;
-		font-size: 1.2em;
-		background: #4A4A4A;
-		border: 1px solid #999;
-		.border-radius(0.4em);
-		color: white;
-		&:disabled{
-			background: #666;
-			border-color: #888;
-		}
-	}
 	label{
 		color: #777;
-	}
-	input:focus{
-		border-color: #EEE;
-		outline: none;
-	}
-	button{
-		color: black;
-		border: none;
-		.border-radius(0.7em);
-		font: inherit;
-		font-size: 1em;
-		font-weight: 500;
-		padding: 0.5em 0;
-		width: 5em;
-		margin-right: 1em;
-	}
-	#logIn button{
-		background-color: #DD5;
-	}
-	#register button{
-		background-color: #6CE;
-	}
-	button:not(:disabled){
-		cursor: pointer;
-		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0)), color-stop(0.5, rgba(50, 50, 50, 0)), to(rgba(50, 50, 50, 0.8)));
-		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0) 50%, rgba(50, 50, 50, 0.8));
-	}
-	button:disabled{
-		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.5)), color-stop(0.5, rgba(50, 50, 50, 0.5)), to(rgba(50, 50, 50, 0.9)));
-		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.5) 50%, rgba(50, 50, 50, 0.8));
-		color: #333;
-	}
-	button:not(:disabled):active{
-		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.9)), color-stop(0.5, rgba(50, 50, 50, 0)), to(rgba(50, 50, 50, 0)));
-		background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.9), rgba(50, 50, 50, 0) 50%);
 	}
 	#register label{
 		text-transform: uppercase;
@@ -1459,6 +1550,96 @@ ul.aboutIcons{
 	left: 41.25%;
 	font-size: 14px;
 	text-align: center;
+}
+
+#editTrack{
+	line-height: normal;
+	>h1{
+		line-height: 2em;
+		font-size: 1em;
+		padding: 0 1em;
+		margin: 0;
+		background: #888;
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(210, 210, 210)), to(rgb(30, 30, 30)));
+	}
+	>ul{
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	>ul>li{
+		border-bottom: 0.2em solid #555;
+		padding: 0 1.5em 0.5em 2em;
+	}
+	>ul>li:before{
+		content: "\2014";
+		position: absolute;
+		margin-left: -1.3em;
+		margin-top: 0.2em;
+		font-size: 1em;
+	}
+	h2{
+		font-size: 1em;
+		font-weight: 600;
+		margin: 0;
+		margin-top: 0.5em;
+		line-height: 2em;
+	}
+	input[type="text"]{
+		border-color: #555;
+		font-size: 1em;
+		padding: 0.3em 0.7em;
+		line-height: 1.5em;
+		margin: 1em 0;
+	}
+	input[type="text"]:first-of-type{
+		margin-top: 0.3em;
+	}
+	input[type="text"]:focus{
+		border-color: #777;
+	}
+	#uploadFile{
+		-webkit-border-radius: 1.5em;
+		color: #777;
+		border: 0.2em solid #777;
+		float: right;
+		padding: 0 1em;
+		line-height: 1.8em;
+		width: 9em;
+		position: relative;
+		overflow: hidden;
+		cursor: default;
+	}
+	#uploadFile input{
+		cursor: default;
+		width: 100%;
+		z-index: 1;
+		position: absolute;
+		opacity: 0;
+		top: 0;
+		left: 0;
+		background: green;
+	}
+	#editTrackSaveButton{
+		display: block;
+		font-weight: bold;
+		margin: 1em;
+		width: auto;
+		padding: 0.3em 0.7em;
+	}
+	#editTrackSaveButton:enabled{
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(20, 20, 20, 0)), to(rgba(20, 20, 20, 0.9)));
+	}
+	#editTrackSaveButton:enabled:active{
+		background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(20, 20, 20, 0.7)), to(rgba(20, 20, 20, 0.2)));
+	}
+	#onDeck{
+		margin-left: 1em;
+	}
+	#broadcastDate, #broadcastTime{
+		display: inline;
+		width: 7em;
+	}
 }
 
 /*

@@ -26,6 +26,7 @@
 			"login": "Log in or sign up to keep track of your DISTRO subscriptions",
 			"event": "Sort by the date of upcoming events",
 			"freshness": "Freshness – Sort by date added to your music library",
+			"admin": "Admin – Manage and broadcast music on this network: you own it!",
 			"mute": "Mute – Hide songs from this network",
 			"solo": "Solo – Only show songs from this network"
 		}
@@ -51,7 +52,20 @@
 		"receivedFrom": "Received from",
 		"time": "Time",
 		"event": "Event",
-		"artist": "Artist"
+		"artist": "Artist",
+		"untitled": "Untitled"
+	},
+	"tml": {
+		"status": "Status",
+		"saveError": "There was an error saving this track. Try again, and get in touch with us if you keep having trouble.",
+		"uploadHover": "Upload — Add a new track to this network",
+		"status": {
+			"uploading": [ "Uploading (", { "$key": "percent" }, "%)" ],
+			"processing": "Processing…",
+			"broadcastNow": "Broadcast Now",
+			"broadcast": [ "Broadcast ", { "$key": "month" }, "/", { "$key": "day" }, "/", { "$key": "year" }, " at ", { "$key": "hour" }, ":", { "$key": "minute" } ],
+			"error": [ "%span", { "style": "color: red", "title": "Try again, or contact us if you keep having trouble. (This track will go away when you return to your library.)" }, "There was a problem with the upload! Try again, or contact us…" ]
+		}
 	},
 	"registration": {
 		"emailAddressQuery": "What's your email address?",
