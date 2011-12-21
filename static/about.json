@@ -2,7 +2,7 @@
 		{"name": "FAQ", "url": "#/about/faq"},
 		{"name": "About", "url": "#/about/about"},
 		{"name": "Contact", "url": "#/about/contact"},
-		{"name": "Invest", "url": "#/about/invest"},
+		{"name": "Donate", "url": "#/about/donate"},
 		{"name": "Jobs", "url": "#/about/jobs"}
 	],
 	"faq":{
@@ -21,8 +21,8 @@
 		"title": "Work for DISTRO",
 		"content":"<h2>DISTRO needs your help! &nbsp;We are currently hiring to fill the following two positions:</h2>\n<dl>\n  <dt>DISTRO Developer</dt>\n  <dd>We’re looking for web developers. If you are interested in getting in on the ground floor of an innovative company, please send a resume to <a href=\"mailto:tech@DISTRO.fm\">tech@DISTRO.fm</a>. &nbsp;We are accepting applications from developers located anywhere around the world, but we prefer people that are willing to relocate to NYC.</dd>\n  <dt>DISTRO Diplomat</dt>\n  <dd>This position will be responsible for establishing and maintaining contacts with bands, venue owners, concert promoters, etc. If you are interested in getting in on the ground floor of an innovative company, please send your resume to <a href=\"mailto:jobs@DISTRO.fm\">jobs@DISTRO.fm</a>.</dd>\n</dl>"
 	},
-	"invest":{
-		"title": "Invest in DISTRO",
-		"content":"<h2>Invest money in DISTRO, and share in our success.</h2>\n<p>Contact our business development coordinator to learn more about investment opportunities:\n<br>Lynn Pyfer\n<br>Business Development Coordinator\n<br><a href=\"mailto:invest@DISTRO.fm\">invest@DISTRO.fm</a></p>"
+	"donate":{
+		"title": "Donate to DISTRO",
+		"content":"<h2>Make a tax-deductible donation to support the health and growth of DISTRO.fm.</h2>\n<p>DISTRO.fm is the world&rsquo;s first nonprofit, subscription-based music distribution platform. Since the beginning of online music distribution, artists have taken for granted that 30% of their fees can be appropriated by digital music stores such as iTunes, Amazon, and Google Music. DISTRO.fm is alleviating this financial burden for musicians by providing a nonprofit alternative for online music distribution. Additionally, by running as a nonprofit, DISTRO.fm is ensuring a &lsquo;collective&rsquo; atmosphere with community-based decision-making.</p>\n<p>Click <a href=\"https://www.fracturedatlas.org/site/contribute/donate/5650\" target=\"_blank\">here</a> to make a tax-deductible donation to DISTRO.fm</p>"
 	}
 }
