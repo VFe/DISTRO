@@ -2,6 +2,7 @@
 	"name": "DISTRO",
 	"version": "0.0.1",
 	"dependencies": {
+		"async": "0.1",
 		"connect": "1.7",
 		"connect-form": "0.2",
 		"knox": "0.0.9",
