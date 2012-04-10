@@ -1341,6 +1341,7 @@ distro.Router = Backbone.Router.extend({
 		"/find": "find",
 		"/login": "login",
 		"/about/:page": "about",
+		"/action": "action",
 		"/manage": "fourOhFour",
 		"/manage/:network": "manage",
 		"/:network": "network",
@@ -1372,6 +1373,62 @@ distro.Router = Backbone.Router.extend({
 		distro.AboutPage(page, function(model){
 			if(!model) {
 				window.location.hash = '/about/about';
+			}
+		});
+	},
+	action: function(){
+		distro.lightbox.show({
+			name: "action",
+			longName: "Get involved",
+			show: function($content){
+				// var $text, $spacer, $placeholder, liveNetworkJSON, liveNetworkHold;
+				$content.attr('id', 'actionBox');
+				$content.haj([
+					[".lightboxHeader",
+						["%span.close.button", {}, "x"],
+						["%h1", "Get involved with DISTRO"]
+					],
+					[".contentBox",
+						[ ".left",
+							[ "%img", { "width": "210", "height": "52", "src": "//distro-static.s3.amazonaws.com/action/action_logo.png" } ],
+							[ "%p",
+								[ "%strong", "Get involved." ],
+								" DISTRO.fm is just getting started and we would love your help.\n\t\t"
+							]
+						],
+						[ ".right",
+							[ "%ul.actionList",
+								[ "%li", [ "%a", { "href": "mailto:hello@distro.fm" },
+									[ "%span.label", "ASK A QUESTION." ], [ "%span.link", "HELLO@DISTRO.FM" ]
+								] ],
+								[ "%li", [ "%a", { "target": "_blank", "href": "http://faq.distro.fm" },
+									[ "%span.label", "READ OUR ANSWERS." ], [ "%span.link", "FAQ.DISTRO.FM" ]
+								] ],
+								[ "%li", [ "%a", { "target": "_blank", "href": "http://donate.distro.fm" },
+									[ "%span.label", "MAKE A PRIVATE DONATION." ], [ "%span.link", "DONATE.DISTRO.FM" ]
+								] ],
+								[ "%li", [ "%a", { "target": "_blank", "href": "http://code.distro.fm" },
+									[ "%span.label", "JOIN OUR CODE TEAM." ], [ "%span.link", "CODE.DISTRO.FM" ]
+								] ],
+								[ "%li", [ "%a", { "target": "_blank", "href": "http://board.distro.fm" },
+									[ "%span.label", "BE ON THE BOARD OF DIRECTORS." ], [ "%span.link", "BOARD.DISTRO.FM" ]
+								] ],
+								[ "%li", [ "%a", { "target": "_blank", "href": "http://help.distro.fm" },
+									[ "%span.label", "WORK OR VOLUNTEER." ], [ "%span.link", "HELP.DISTRO.FM" ]
+								] ],
+								[ "%li", [ "%a", { "target": "_blank", "href": "http://facebook.distro.fm" },
+									[ "%span.label", "FOLLOW US ON FACEBOOK." ], [ "%span.link", "FACEBOOK.DISTRO.FM" ]
+								] ],
+								[ "%li", [ "%a", { "target": "_blank", "href": "http://twitter.distro.fm" },
+									[ "%span.label", "FOLLOW US ON TWITTER." ], [ "%span.link", "TWITTER.DISTRO.FM" ]
+								] ],
+								[ "%li", [ "%a", { "target": "_blank", "href": "http://kickstarter.distro.fm" },
+									[ "%span.label", "SUPPORT OUR KICKSTARTER." ], [ "%span.link", "KICKSTARTER.DISTRO.FM" ]
+								] ]
+							]
+						]
+					]
+				]);
 			}
 		});
 	},
