@@ -106,6 +106,11 @@ importDB.open(function(err, db) {
 										util.error('['+doc.NETWORK_NAME+'] '+e.message);
 									}
 								}
+								if ( ! ('name' in record)) {
+									util.error('Network missing a network name, skipping:', util.inspect(doc));
+									process.nextTick(nextRecord);
+									return;
+								}
 								record.lname = record.name.toLowerCase();
 								record.lfullname = record.fullname.toLowerCase();
 								// exportColl.findAndModify({"filename":out.filename, network:out.network}, [], out, { upsert: true, 'new': true}, function(err, doc){
